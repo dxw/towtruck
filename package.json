@@ -1,0 +1,15 @@
+{
+  "name": "towtruck",
+  "version": "0.0.1",
+  "description": "for keeping on top of dxw's repos",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "start": "node --env-file=.env index.js",
+    "start:watch": "node --env-file=.env --watch index.js",
+    "test": "node --test"
+  },
+  "author": "dxw",
+  "license": "MIT",
+  "dependencies": {}
+}
