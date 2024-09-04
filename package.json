@@ -7,7 +7,8 @@
   "scripts": {
     "start": "node --env-file=.env index.js",
     "start:watch": "node --env-file=.env --watch index.js",
-    "test": "node --test"
+    "test": "node --test",
+    "format": "prettier --write ."
   },
   "author": "dxw",
   "license": "MIT",
