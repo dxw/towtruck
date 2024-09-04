@@ -1,0 +1,21 @@
+#!/bin/sh
+
+# script/setup: Set up the application for the first time after cloning, or set
+#               it back to the initial unused state.
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+if [ ! -f .env ]; then
+  cp .env.example .env
+fi
+
+if [ ! -f .env.test ]; then
+  cp .env.example .env
+fi
+
+rm -rf node_modules
+
+script/bootstrap
+

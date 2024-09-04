@@ -1,0 +1,11 @@
+#!/bin/sh
+
+# script/server: Launch the application
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Starting the server..."
+
+npm run start:watch
