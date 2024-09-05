@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # script/test: Run the test suite for the application.
 
