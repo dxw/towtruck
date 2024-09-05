@@ -14,7 +14,9 @@
   },
   "author": "dxw",
   "license": "MIT",
-  "dependencies": {},
+  "dependencies": {
+    "@octokit/rest": "^21.0.2"
+  },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
     "eslint": "^9.9.1",
