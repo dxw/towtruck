@@ -7,6 +7,10 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+
+export NVM_DIR=$HOME/.nvm;
+source $NVM_DIR/nvm.sh;
+
 echo "==> Installing node version..."
 nvm install
 
