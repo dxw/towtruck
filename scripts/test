@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# script/test: Run the test suite for the application.
+
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Linting the code"
+
+npm run lint
