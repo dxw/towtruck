@@ -1,5 +1,11 @@
 import { createServer } from "http";
 import { Octokit } from "@octokit/rest";
+import nunjucks from "nunjucks";
+
+nunjucks.configure({
+  autoescape: true,
+  watch: true,
+});
 
 const ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN;
 
@@ -10,7 +16,11 @@ const octokit = new Octokit({
 const httpServer = createServer(async (_, response) => {
   const repos = await getRepos({ org: "dxw" });
 
-  return response.end(JSON.stringify(repos));
+  const template = nunjucks.render("index.njk", {
+    repos,
+  });
+
+  return response.end(template);
 });
 
 const getRepos = async ({ org }) => {

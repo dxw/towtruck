@@ -15,10 +15,12 @@
   "author": "dxw",
   "license": "MIT",
   "dependencies": {
-    "@octokit/rest": "^21.0.2"
+    "@octokit/rest": "^21.0.2",
+    "nunjucks": "^3.2.4"
   },
   "devDependencies": {
     "@eslint/js": "^9.9.1",
+    "chokidar": "^3.6.0",
     "eslint": "^9.9.1",
     "eslint-config-prettier": "^9.1.0",
     "globals": "^15.9.0"
