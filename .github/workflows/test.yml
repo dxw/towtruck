@@ -24,6 +24,6 @@ jobs:
       - name: Install dependencies
         run: |
           ./script/setup
-      - name: Run lints
+      - name: Run lint
         run: |
           ./script/test
