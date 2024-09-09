@@ -16,6 +16,9 @@ Towtruck is set up as a [GitHub App](https://docs.github.com/en/apps).
 
 ### GitHub App settings
 
+
+#### Using a test Github App
+
 The first step is to register a new app as described [here](https://docs.github.com/en/apps/creating-github-apps/registering-a-github-app/registering-a-github-app):
 - For **9**, no callback URL is currently required, so this step can be skipped.
 - For **11**, no user authentication is currently required, so this step can be skipped.
@@ -35,14 +38,20 @@ Once the app is registered, it should be installed to an account to allow Towtru
 GitHub have instructions to do this [here](https://docs.github.com/en/apps/using-github-apps/installing-your-own-github-app).
 
 
-#### Permissions
+##### Permissions
 
 Towtruck is still in early development so the exact set of needed permissions has not been finalised.
 
 
-#### Webhooks
+##### Webhooks
 
 Towtruck is still in early development so the exact set of needed webhooks has not been finalised.
+
+
+#### Using the dxw Github App
+
+This will use the live data from dxw's repos. Any testing to configuration should be performed using a personal test app first
+The environment variables are available here: https://github.com/settings/apps/towtruck-testing-223. You may need to ask permission from an owner of the dxw organisation.
 
 
 ### Environment variables
