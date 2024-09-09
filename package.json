@@ -15,7 +15,7 @@
   "author": "dxw",
   "license": "MIT",
   "dependencies": {
-    "@octokit/rest": "^21.0.2",
+    "@octokit/app": "^15.1.0",
     "nunjucks": "^3.2.4"
   },
   "devDependencies": {
