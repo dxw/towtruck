@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import nunjucks from "nunjucks";
 import { OctokitApp } from "./octokitApp.js";
+import { orgRespositoriesToUiRepositories } from "./utils.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -40,12 +41,7 @@ const getReposForInstallation = async ({ octokit, installation }) => {
   return octokit
     .request(installation.repositories_url)
     .then(({ data }) => {
-      const repos = data.repositories.map((repo) => ({
-        name: repo.name,
-      }));
-      const totalRepos = data.total_count;
-
-      return { repos, totalRepos };
+      return orgRespositoriesToUiRepositories(data);
     })
     .catch((error) => {
       console.error(error);
