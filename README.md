@@ -3,6 +3,8 @@
 Towtruck is an application to aid maintenence of dxw's repos. 
 It aims to make it easier to keep on top of which repos need updates applying.
 
+Please review the [High Level Design document](/doc/high-level-design.md) if this is your first time in the project
+
 ## Prerequisites
 
 You must have [nvm](https://github.com/nvm-sh/nvm) installed. It is available on brew.
