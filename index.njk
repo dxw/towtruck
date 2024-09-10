@@ -19,10 +19,10 @@
       <div class="bg-stone-50 overflow-hidden rounded-lg border-b-4 border-stone-200 space-y-4">
         <h2 class="bg-white border-b-2 border-stone-100 text-xl font-bold p-4">{{ name }}</h2>
         <p class="mx-4">
-          {% if repos.length === 1 %}
+          {% if totalRepos === 1 %}
           There is <span class="font-bold">1</span> repository
           {% else %} 
-          There are <span class="font-bold">{{ repos.length }}</span> repositories
+          There are <span class="font-bold">{{ totalRepos }}</span> repositories
           {% endif %}
           that Towtruck is tracking for <span class="font-bold">{{ name }}</span>.
         </p>
