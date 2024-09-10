@@ -10,3 +10,7 @@ cd "$(dirname "$0")/.."
 echo "==> Linting the code"
 
 npm run lint
+
+echo "==> Running the tests"
+
+npm test
