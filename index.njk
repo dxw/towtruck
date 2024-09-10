@@ -30,13 +30,17 @@
           <table class="table-auto w-full mb-4 border-y border-stone-200">
             <thead class="bg-white border-b border-stone-200 text-left">
               <tr class="space-x-2">
-                <th class="py-2 pl-2 last:pr-2" scope="col">Name</th>
+                <th class="py-2 pl-2" scope="col">Name</th>
+                <th class="py-2 pl-2" scope="col">Description</th>
+                <th class="py-2 pl-2 last:pr-2" scope="col">Last updated</th>
               </tr>
             </thead>
             <tbody>
               {% for repo in repos %}
               <tr class="even:bg-white">
-                <td class="py-2 pl-2 last:pr-2">{{ repo.name }}</td>
+                <td class="py-2 pl-2"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.url}}">{{ repo.name }}</a></td>
+                <td class="py-2 pl-2">{{ repo.description }}</td>
+                <td class="py-2 pl-2 last:pr-2">{{ repo.updatedAt }}</td>
               </tr>
               {% else %}
               <tr>
