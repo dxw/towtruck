@@ -19,14 +19,15 @@ const httpServer = createServer(async (request, response) => {
   // "Only on this account" when registering the app.
 
   const installations = [];
-  await OctokitApp.app.eachInstallation(async octokit => {
+  await OctokitApp.app.eachInstallation(async (octokit) => {
     const name = octokit.installation.account.login;
-    
-    const repos = await getReposForInstallation(octokit);
+
+    const { repos, totalRepos } = await getReposForInstallation(octokit);
 
     installations.push({
       name,
       repos,
+      totalRepos,
     });
   });
 
@@ -39,9 +40,12 @@ const getReposForInstallation = async ({ octokit, installation }) => {
   return octokit
     .request(installation.repositories_url)
     .then(({ data }) => {
-      return data.repositories.map((repo) => ({
+      const repos = data.repositories.map((repo) => ({
         name: repo.name,
       }));
+      const totalRepos = data.total_count;
+
+      return { repos, totalRepos };
     })
     .catch((error) => {
       console.error(error);
