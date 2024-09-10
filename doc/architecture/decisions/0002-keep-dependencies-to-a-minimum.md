@@ -15,7 +15,7 @@ To begin with the application is a simple dashboard.
 
 ## Decision
 
-We will keep the dependencies of this project to an absolute medium.
+We will keep the dependencies of this project to an absolute minimum.
 
 ## Consequences
 
