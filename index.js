@@ -2,6 +2,7 @@ import { createServer } from "http";
 import nunjucks from "nunjucks";
 import { OctokitApp } from "./octokitApp.js";
 import { orgRespositoriesToUiRepositories } from "./utils.js";
+import { getDependenciesForRepo } from "./renovate/dependencyDashboard.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -24,6 +25,10 @@ const httpServer = createServer(async (request, response) => {
     const name = octokit.installation.account.login;
 
     const { repos, totalRepos } = await getReposForInstallation(octokit);
+
+    for (const repo of repos) {
+      repo.dependencies = await getDependenciesForRepo(octokit, repo);
+    }
 
     installations.push({
       name,

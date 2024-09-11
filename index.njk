@@ -33,14 +33,48 @@
                 <th class="py-2 pl-2" scope="col">Name</th>
                 <th class="py-2 pl-2" scope="col">Description</th>
                 <th class="py-2 pl-2 last:pr-2" scope="col">Last updated</th>
+                <th class="py-2 pl-2 last:pr-2" scope="col">Dependencies</th>
               </tr>
             </thead>
             <tbody>
               {% for repo in repos %}
               <tr class="even:bg-white">
-                <td class="py-2 pl-2"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.url}}">{{ repo.name }}</a></td>
-                <td class="py-2 pl-2">{{ repo.description }}</td>
-                <td class="py-2 pl-2 last:pr-2">{{ repo.updatedAt }}</td>
+                <td class="py-2 pl-2 align-text-top"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.url}}">{{ repo.name }}</a></td>
+                <td class="py-2 pl-2 align-text-top">{{ repo.description }}</td>
+                <td class="py-2 pl-2 last:pr-2 align-text-top">{{ repo.updatedAt }}</td>
+
+                {% if repo.dependencies.length %}
+                <td class="group py-2 pl-2 last:pr-2 align-text-top space-y-2">
+                  <p>
+                    {% if repo.dependencies.length === 1 %}
+                    There is <span class="font-bold">1</span> dependency:
+                    {% else %}
+                    There are <span class="font-bold">{{ repo.dependencies.length }}</span> dependencies:
+                    {% endif %}
+                    <label>
+                      <input class="hidden" type="checkbox" />
+                      <span class="text-sm bg-stone-500 text-white rounded-lg py-1 px-2 hidden group-has-[:checked]:inline">Hide</span>
+                      <span class="text-sm bg-stone-500 text-white rounded-lg py-1 px-2 group-has-[:checked]:hidden">Show</span>
+                    </label>
+                  </p>
+                  <ul class="space-y-2 hidden group-has-[:checked]:block">
+                    {% for dependency in repo.dependencies %}
+                      <li>
+                        <div class="inline-block text-[0px]">
+                          <span class="font-mono text-sm bg-stone-200 rounded-l-full py-1 px-2">{{ dependency.name }}</span>
+                          <span class="font-mono text-sm bg-stone-300 rounded-r-full py-1 px-2">{{ dependency.version }}</span>
+                        </div>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                </td>
+                {% else %}
+                  <td class="py-2 px-2 text-center text-stone-400 font-light italic">
+                    No dependencies have been discovered.
+                    <br/>
+                    Please make sure that Renovate has been configured on the repository to produce a dependency dashboard.
+                  </td>
+                {% endif %}
               </tr>
               {% else %}
               <tr>
