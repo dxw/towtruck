@@ -1,3 +1,4 @@
+import { readFile } from "fs/promises";
 export const mapRepoFromStorageToUi = (persistedData) => {
   const mappedRepos = persistedData.repos.map((repo) => {
     const newDate = new Date(repo.updatedAt).toLocaleDateString();
@@ -10,6 +11,13 @@ export const mapRepoFromStorageToUi = (persistedData) => {
   const totalRepos = mappedRepos.length;
 
   return { ...persistedData, repos: mappedRepos, totalRepos };
+};
+
+export const getReposFromJson = async (filePath) => {
+  const reposJson = await readFile(filePath, { encoding: "utf-8" });
+  const persistedData = JSON.parse(reposJson);
+
+  return persistedData;
 };
 
 export const mapRepoFromApiForStorage = (repo) => ({
