@@ -1,12 +1,13 @@
-export const orgRespositoriesToUiRepositories = (apiResponse) => {
-  const repos = apiResponse.repositories.map((repo) => ({
-    name: repo.name,
-    updatedAt: new Date(repo.updated_at).toLocaleDateString(),
-    url: repo.html_url,
-    issuesUrl: repo.issues_url,
-    description: repo.description,
-  }));
-  const totalRepos = apiResponse.total_count;
+export const mapRepoFromStorageToUi = (persistedData) => {
+  const mappedRepos = persistedData.repos.map((repo) => {
+    const newDate = new Date(repo.updatedAt).toLocaleDateString();
+    return {
+      ...repo,
+      updatedAt: newDate,
+    };
+  });
 
-  return { repos, totalRepos };
+  const totalRepos = mappedRepos.length;
+
+  return { ...persistedData, repos: mappedRepos, totalRepos };
 };
