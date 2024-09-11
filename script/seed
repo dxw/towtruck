@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# script/seed: Seeds the necessary data
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+echo "==> Seeding data..."
+npm run seed
