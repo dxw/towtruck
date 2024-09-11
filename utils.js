@@ -11,3 +11,16 @@ export const mapRepoFromStorageToUi = (persistedData) => {
 
   return { ...persistedData, repos: mappedRepos, totalRepos };
 };
+
+export const mapRepoFromApiForStorage = (repo) => ({
+  name: repo.name,
+  description: repo.description,
+  htmlUrl: repo.html_url,
+  apiUrl: repo.url,
+  pullsUrl: repo.pulls_url,
+  issuesUrl: repo.issues_url,
+  updatedAt: repo.updated_at,
+  language: repo.language,
+  topics: repo.topics,
+  openIssues: repo.open_issues,
+});
