@@ -24,7 +24,7 @@
           {% else %} 
           There are <span class="font-bold">{{ totalRepos }}</span> repositories
           {% endif %}
-          that Towtruck is tracking for <span class="font-bold">{{ name }}</span>.
+          that Towtruck is tracking for <span class="font-bold">{{ org }}</span>.
         </p>
         <div class="mx-4">
           <table class="table-auto w-full mb-4 border-y border-stone-200">
@@ -32,6 +32,9 @@
               <tr class="space-x-2">
                 <th class="py-2 pl-2" scope="col">Name</th>
                 <th class="py-2 pl-2" scope="col">Description</th>
+                <th class="py-2 pl-2" scope="col">Language</th>
+                <th class="py-2 pl-2" scope="col">Topics</th>
+                <th class="py-2 pl-2" scope="col">Open issues count</th>
                 <th class="py-2 pl-2 last:pr-2" scope="col">Last updated</th>
                 <th class="py-2 pl-2 last:pr-2" scope="col">Dependencies</th>
               </tr>
@@ -39,9 +42,12 @@
             <tbody>
               {% for repo in repos %}
               <tr class="even:bg-white">
-                <td class="py-2 pl-2 align-text-top"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.url}}">{{ repo.name }}</a></td>
-                <td class="py-2 pl-2 align-text-top">{{ repo.description }}</td>
-                <td class="py-2 pl-2 last:pr-2 align-text-top">{{ repo.updatedAt }}</td>
+                 <td class="py-2 pl-2"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.url}}">{{ repo.name }}</a></td>
+                <td class="py-2 pl-2">{{ repo.description }}</td>
+                <td class="py-2 pl-2">{{ repo.language }}</td>
+                <td class="py-2 pl-2">{{ repo.topics | join(", ")}}</td>
+                <td class="py-2 pl-2">{{ repo.openIssues }}</td>
+                <td class="py-2 pl-2 last:pr-2">{{ repo.updatedAt }}</td>
 
                 {% if repo.dependencies.length %}
                 <td class="group py-2 pl-2 last:pr-2 align-text-top space-y-2">
@@ -75,6 +81,7 @@
                     Please make sure that Renovate has been configured on the repository to produce a dependency dashboard.
                   </td>
                 {% endif %}
+             
               </tr>
               {% else %}
               <tr>
