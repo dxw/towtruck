@@ -132,3 +132,6 @@ dist
 # Local config
 towtruck.private-key.pem
 .mygitignore
+
+# Sensitive repo data
+/data
