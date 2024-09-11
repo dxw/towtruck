@@ -21,6 +21,10 @@ const fetchAllRepos = async () => {
   return repos;
 };
 
+const installationOctokit = await OctokitApp.app.octokit.request(
+  "GET /app/installations"
+);
+
 const saveAllRepos = async () => {
   console.info("Fetching all repos...");
   const repos = await fetchAllRepos();
@@ -30,7 +34,12 @@ const saveAllRepos = async () => {
     await mkdir(dir, { recursive: true });
 
     console.info("Saving all repos...");
-    await writeFile("./data/repos.json", JSON.stringify({ repos }), {
+    const toSave = {
+      org: installationOctokit.data[0].account.login,
+      repos,
+    };
+
+    await writeFile("./data/repos.json", JSON.stringify(toSave), {
       encoding: "utf-8",
       flag: "w",
     });
