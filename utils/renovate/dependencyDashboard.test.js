@@ -1,6 +1,7 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { Dependency, handleIssuesApiResponse } from "./dependencyDashboard.js";
+import { Dependency } from "../../model/Dependency.js";
+import { handleIssuesApiResponse } from "./dependencyDashboard.js";
 
 describe("handleIssuesApiResponse", () => {
   it("should extract dependency version information from the Renovate Dependency Dashboard if it exists", async () => {
