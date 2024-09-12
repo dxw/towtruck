@@ -24,7 +24,17 @@ describe("handleIssuesApiResponse", () => {
           user: {
             login: "renovate[bot]",
           },
-          body: '# Dependency Dashboard\nList of dependencies:\n- `libquux v4.1.1.rc4`\n- `@xyzzy/utils "~> 22.04 Questing Quokka"`\n\nHere\'s some more:\n- `baz-framework ^0.1`',
+          body: '# Dependency Dashboard\n'
+            + 'Here\'s some things in the preamble that should not be picked up:\n'
+            + '`fake-dependency`, `another-fake-dependency`\n'
+            + '\n'
+            + '## Detected dependencies\n'
+            + '- `libquux v4.1.1.rc4`\n'
+            + '- `@xyzzy/utils "~> 22.04 Questing Quokka"`\n'
+            + '\n'
+            + 'Here\'s some more:\n'
+            + '- `baz-framework ^0.1`\n'
+            + '---',
         },
       ],
     };
