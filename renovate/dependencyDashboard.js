@@ -52,9 +52,7 @@ export const handleIssuesApiResponse = (response) => {
 
   return parseDependenciesFromDashboard(dependencyDashboardIssue);
 }
+export const getDependenciesForRepo = ({ octokit, repository }) => {
+  return octokit.request(repository.issues_url).then(handleIssuesApiResponse);
+};
 
-export const getDependenciesForRepo = ({ octokit }, repo) => {
-  return octokit
-    .request(repo.issues_url)
-    .then(handleIssuesApiResponse);
-}
