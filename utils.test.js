@@ -253,6 +253,7 @@ describe("mapRepoFromStorageToUi", () => {
           pull: false,
         },
         dependencies: repoDependencies,
+        openPrsCount: 0,
       };
 
       const repoToSave = {
@@ -270,6 +271,7 @@ describe("mapRepoFromStorageToUi", () => {
         topics: ["delivery-plus", "internal", "tech-ops"],
         openIssues: 2,
         dependencies: repoDependencies,
+        openPrsCount: 0,
       };
 
       expect.deepEqual(mapRepoFromApiForStorage(apiRepo), repoToSave);

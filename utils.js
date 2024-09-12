@@ -94,4 +94,5 @@ export const mapRepoFromApiForStorage = (repo) => ({
   topics: repo.topics,
   openIssues: repo.open_issues,
   dependencies: repo.dependencies,
+  openPrsCount: repo.openPrsCount,
 });

@@ -52,7 +52,13 @@ export const handleIssuesApiResponse = (response) => {
 
   return parseDependenciesFromDashboard(dependencyDashboardIssue);
 }
+
+export const handlePrsApiResponse = ({ data }) => data?.length || 0;
+
 export const getDependenciesForRepo = ({ octokit, repository }) => {
   return octokit.request(repository.issues_url).then(handleIssuesApiResponse);
 };
 
+export const getOpenPRsForRepo = ({ octokit, repository }) => {
+  return octokit.request(repository.pulls_url).then(handlePrsApiResponse);
+};
