@@ -35,13 +35,13 @@ export const mapRepoFromStorageToUi = (persistedData) => {
 };
 
 /**
- * Reads the persisted repo data from a JSON file
+ * Reads data from a JSON file
  * @param {string} filePath - The path to the file to read from
- * @returns {PersistedData}
+ * @returns {any}
  */
-export const getReposFromJson = async (filePath) => {
-  const reposJson = await readFile(filePath, { encoding: "utf-8" });
-  const persistedData = JSON.parse(reposJson);
+export const readFromJsonFile = async (filePath) => {
+  const json = await readFile(filePath, { encoding: "utf-8" });
+  const persistedData = JSON.parse(json);
 
   return persistedData;
 };

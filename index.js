@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import nunjucks from "nunjucks";
-import { getReposFromJson, mapRepoFromStorageToUi } from "./utils/index.js";
+import { readFromJsonFile, mapRepoFromStorageToUi } from "./utils/index.js";
 import { getQueryParams } from "./utils/queryParams.js";
 import { sortByType } from "./utils/sorting.js";
 
@@ -17,7 +17,7 @@ const httpServer = createServer(async (request, response) => {
     return response.end();
   }
 
-  const persistedData = await getReposFromJson("./data/repos.json");
+  const persistedData = await readFromJsonFile("./data/repos.json");
   const reposForUi = mapRepoFromStorageToUi(persistedData);
 
   const { sortDirection, sortBy } = getQueryParams(url);
