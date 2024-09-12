@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "seed": "node --env-file=.env ./utils/githubApi/fetchAllRepos.js"
+    "seed": "npm run seed:repos && npm run seed:lifetimes",
+    "seed:repos": "node --env-file=.env ./utils/githubApi/fetchAllRepos.js",
+    "seed:lifetimes": "node --env-file=.env ./utils/endOfLifeDateApi/fetchAllDependencyEolInfo.js"
   },
   "author": "dxw",
   "license": "MIT",
