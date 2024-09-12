@@ -10,7 +10,8 @@
     "test": "node --test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "seed": "node --env-file=.env ./dataScripts/fetchAllRepos.js"
   },
   "author": "dxw",
   "license": "MIT",

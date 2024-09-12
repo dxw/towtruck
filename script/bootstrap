@@ -17,3 +17,10 @@ nvm install
 
 echo "==> Installing node modules..."
 npm install
+
+if [ -n "$1" ]; then
+    echo "==> Seeding data..."
+    npm run seed
+else
+    echo "==> Skipping seeding data..."
+fi

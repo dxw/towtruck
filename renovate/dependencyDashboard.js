@@ -55,6 +55,6 @@ export const handleIssuesApiResponse = (response) => {
 
 export const getDependenciesForRepo = ({ octokit }, repo) => {
   return octokit
-    .request(repo.issuesUrl)
+    .request(repo.issues_url)
     .then(handleIssuesApiResponse);
 }
