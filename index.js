@@ -17,8 +17,12 @@ const httpServer = createServer(async (request, response) => {
     return response.end();
   }
 
-  const persistedData = await readFromJsonFile("./data/repos.json");
-  const reposForUi = mapRepoFromStorageToUi(persistedData);
+  const [ persistedRepoData, persistedLifetimeData ] = await Promise.all([
+    readFromJsonFile("./data/repos.json"),
+    readFromJsonFile("./data/lifetimes.json"),
+  ]);
+
+  const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData);
 
   const { sortDirection, sortBy } = getQueryParams(url);
 

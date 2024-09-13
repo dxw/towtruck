@@ -8,6 +8,7 @@
     <title>Towtruck</title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
   </head>
   <body class="bg-stone-100 text-stone-800">
@@ -70,9 +71,23 @@
                   <ul class="space-y-2 hidden group-has-[:checked]:block">
                     {% for dependency in repo.dependencies %}
                       <li>
-                        <div class="inline-block text-[0px]">
-                          <span class="font-mono text-sm bg-stone-200 rounded-l-full py-1 px-2">{{ dependency.name }}</span>
-                          <span class="font-mono text-sm bg-stone-300 rounded-r-full py-1 px-2">{{ dependency.version }}</span>
+                        <div class="inline-block whitespace-nowrap text-[0px]">
+                          <span>
+                          <span class="font-mono text-sm bg-{{ dependency.color }}-200 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
+                          {% if dependency.version %}
+                          <span class="font-mono text-sm bg-{{ dependency.color }}-300 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
+                          {% endif %}
+                          {% if dependency.tag %}
+                          <span class="font-mono text-sm bg-{{ dependency.color }}-400 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
+                          {% endif %}
+                          </span>
+                          {% if dependency.isOutdated %}
+                          <span class="inline-block w-1"></span>
+                          <span class="font-mono text-sm bg-{{ dependency.color }}-500 text-white rounded-full py-1 px-2">  
+                            <i class="align-[-1px] bx {{dependency.icon}}"></i>
+                            v{{ dependency.latestVersion }}
+                          </span>
+                          {% endif%}
                         </div>
                       </li>
                     {% endfor %}

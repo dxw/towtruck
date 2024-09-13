@@ -1,4 +1,5 @@
 import { readFile } from "fs/promises";
+import { getDependencyState } from "./endOfLifeDateApi/index.js";
 
 /**
  * @typedef {Object} PersistedData
@@ -15,17 +16,90 @@ import { readFile } from "fs/promises";
  */
 
 /**
+ * @typedef {Object} UiDependency
+ * @property {string} name
+ * @property {string?} version
+ * @property {string?} tag
+ * @property {string} color
+ */
+
+/**
+ * Maps the persisted dependency data from storage to a format suitable for the UI
+ * @param {import("../model/Dependency").Dependency} dependency 
+ * @param {import("./endOfLifeDateApi/fetchAllDependencyEolInfo").DependencyLifetimes[]} persistedLifetimes
+ * @returns {UiDependency} 
+ */
+export const mapDependencyFromStorageToUi = (dependency, persistedLifetimes) => {
+  const lifetimes = persistedLifetimes.lifetimes.find((item) => item.dependency === dependency.name);
+
+  const state = lifetimes === undefined ? "unknown" : getDependencyState(dependency, lifetimes.lifetimes);
+  const latestVersion = lifetimes?.lifetimes[0]?.latest;
+
+  let color;
+  switch (state) {
+    case "unknown":
+      color = "stone";
+      break;
+    case "upToDate":
+      color = "sky";
+      break;
+    case "minorUpdateAvailable":
+      color = "amber";
+      break;
+    case "majorUpdateAvailable":
+      color = "orange";
+      break;
+    case "endOfLife":
+      color = "red";
+      break;
+  }
+
+  let icon;
+  switch (state) {
+    case "unknown":
+      icon = "bx-question-mark";
+      break;
+    case "upToDate":
+      icon = "bx-check-circle";
+      break;
+    case "minorUpdateAvailable":
+      icon = "bx-up-arrow-circle";
+      break;
+    case "majorUpdateAvailable":
+      icon = "bxs-up-arrow-circle";
+      break;
+    case "endOfLife":
+      icon = "bxs-x-circle";
+      break;
+  }
+
+  return {
+    name: dependency.name,
+    version: dependency.version,
+    tag: dependency.tag,
+    color,
+    icon,
+    isOutdated: state !== "upToDate" && state !== "unknown",
+    latestVersion,
+  }
+}
+
+/**
  * Maps the persisted repo data from storage to a format suitable for the UI
  * @param {PersistedData} persistedData
+ * @param {import("./endOfLifeDateApi/fetchAllDependencyEolInfo").DependencyLifetimes[]} persistedLifetimes
  * @returns {RepoData}
  */
-export const mapRepoFromStorageToUi = (persistedData) => {
+export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
   const mappedRepos = persistedData.repos.map((repo) => {
     const newDate = new Date(repo.updatedAt).toLocaleDateString();
+    const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
+
     return {
       ...repo,
       updatedAt: newDate,
       updatedAtISO8601: repo.updatedAt,
+      dependencies,
     };
   });
 
@@ -57,7 +131,7 @@ export const readFromJsonFile = async (filePath) => {
  * @property {string} language - The primary language the repo is written in.
  * @property {string[]} topics - An array of topics associated with the repo - conventially in dxw this is used to list the owners of the repo (EG govpress, delivery-plus).
  * @property {number} open_issues - The number of open issues on the repo.
- * @property {string[]} dependencies - An array of dependencies used by the repo.
+ * @property {import("../model/Dependency").Dependency[]} dependencies - An array of dependencies used by the repo.
  */
 
 /**
@@ -72,7 +146,7 @@ export const readFromJsonFile = async (filePath) => {
  * @property {string} language - The primary language the repo is written in.
  * @property {string[]} topics - An array of topics associated with the repo - conventially in dxw this is used to list the owners of the repo (EG govpress, delivery-plus).
  * @property {number} openIssues - The number of open issues on the repo.
- * @property {string[]} dependencies - An array of dependencies used by the repo.
+ * @property {import("../model/Dependency").Dependency[]} dependencies - An array of dependencies used by the repo.
  */
 
 /**
