@@ -1,6 +1,7 @@
 import { createServer } from "http";
 import nunjucks from "nunjucks";
 import { getReposFromJson, mapRepoFromStorageToUi } from "./utils/index.js";
+import { getQueryParams } from "./utils/queryParams.js";
 import { OctokitApp } from "./octokitApp.js";
 
 nunjucks.configure({
@@ -20,10 +21,13 @@ const httpServer = createServer(async (request, response) => {
 
   const persistedData = await getReposFromJson("./data/repos.json");
 
-  const template = nunjucks.render(
-    "index.njk",
-    mapRepoFromStorageToUi(persistedData)
-  );
+  const { sortDirection, sortBy } = getQueryParams(url);
+
+  const template = nunjucks.render("index.njk", {
+    sortBy,
+    sortDirection,
+    ...mapRepoFromStorageToUi(persistedData),
+  });
 
   return response.end(template);
 });
