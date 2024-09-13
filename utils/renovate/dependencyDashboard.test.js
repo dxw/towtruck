@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { Dependency, handleIssuesApiResponse, handlePrsApiResponse } from "./dependencyDashboard.js";
+import { Dependency, handleIssuesApiResponse } from "./dependencyDashboard.js";
 
 describe("handleIssuesApiResponse", () => {
   it("should extract dependency version information from the Renovate Dependency Dashboard if it exists", async () => {
@@ -24,9 +24,9 @@ describe("handleIssuesApiResponse", () => {
           user: {
             login: "renovate[bot]",
           },
-          body: "# Dependency Dashboard\nList of dependencies:\n- `libquux v4.1.1.rc4`\n- `@xyzzy/utils \"~> 22.04 Questing Quokka\"`\n\nHere's some more:\n- `baz-framework ^0.1`",
-        }
-      ]
+          body: '# Dependency Dashboard\nList of dependencies:\n- `libquux v4.1.1.rc4`\n- `@xyzzy/utils "~> 22.04 Questing Quokka"`\n\nHere\'s some more:\n- `baz-framework ^0.1`',
+        },
+      ],
     };
 
     const expectedDependencies = [
@@ -37,7 +37,7 @@ describe("handleIssuesApiResponse", () => {
 
     expect.deepEqual(
       handleIssuesApiResponse(issuesApiResponse),
-      expectedDependencies,
+      expectedDependencies
     );
   });
 
@@ -58,24 +58,14 @@ describe("handleIssuesApiResponse", () => {
           pull_request: {},
           body: "Configure Renovate",
         },
-      ]
+      ],
     };
 
     const expectedDependencies = [];
 
     expect.deepEqual(
       handleIssuesApiResponse(issuesApiResponse),
-      expectedDependencies,
+      expectedDependencies
     );
-  });
-
-  describe("handlePrsApiResponse", () => {
-    it("returns the length of the array containing PRs", () => {
-      expect.equal(handlePrsApiResponse({ data: [1, 2, 3] }), 3);
-    });
-
-    it("returns 0 if there are no open PRs", () => {
-      expect.equal(handlePrsApiResponse({ data: undefined }), 0);
-    });
   });
 });

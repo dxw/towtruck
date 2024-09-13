@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { mapRepoFromStorageToUi, mapRepoFromApiForStorage } from "./utils.js";
+import { mapRepoFromStorageToUi, mapRepoFromApiForStorage } from "./index.js";
 
 describe("mapRepoFromStorageToUi", () => {
   it("converts the ISO8601 date to a human-readable date", () => {
