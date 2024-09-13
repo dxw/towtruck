@@ -1,6 +1,6 @@
 import { createServer } from "http";
 import nunjucks from "nunjucks";
-import { getReposFromJson, mapRepoFromStorageToUi } from "./utils.js";
+import { getReposFromJson, mapRepoFromStorageToUi } from "./utils/index.js";
 import { OctokitApp } from "./octokitApp.js";
 
 nunjucks.configure({

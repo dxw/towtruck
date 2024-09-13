@@ -1,6 +1,6 @@
 import { OctokitApp } from "../../octokitApp.js";
 import { writeFile, mkdir } from "fs/promises";
-import { mapRepoFromApiForStorage } from "../utils.js";
+import { mapRepoFromApiForStorage } from "../index.js";
 import path from "path";
 import {
   getDependenciesForRepo,
