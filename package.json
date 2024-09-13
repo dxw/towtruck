@@ -11,7 +11,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
-    "seed": "node --env-file=.env ./dataScripts/fetchAllRepos.js"
+    "seed": "node --env-file=.env ./utils/githubApi/fetchAllRepos.js"
   },
   "author": "dxw",
   "license": "MIT",
