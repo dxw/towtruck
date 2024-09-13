@@ -8,6 +8,12 @@ export class Dependency {
 // Matches CR LF or CR or LF.
 const LINE_SEPARATOR_REGEX = /\r?\n|\r|\n/g;
 
+// Matches the part of the Dependency Dashboard body text between the header and the horizontal rule,
+// without capturing the header or the horizontal rule itself.
+//
+// This will prevent false positives from being detected in the preamble.
+const DETECTED_DEPENDENCIES_SECTION_REGEX = /(?<=## Detected dependencies)(.*)(?=---)/s;
+
 // Matches text in backticks separated by a space.
 // Group 1 is interpreted as the name, and group 2 the version.
 // Examples:
@@ -28,11 +34,22 @@ const DEPENDENCY_NAME_AND_VERSION_REGEX = /`(\S+?) (.*)`/;
 const issueIsRenovateDependencyDashboard = (issue) =>
   issue.user.login === "renovate[bot]" && issue.pull_request === undefined;
 
+const getDetectedDependencies = (issue) => {
+  const match = issue.body.match(DETECTED_DEPENDENCIES_SECTION_REGEX);
+
+  if (match === null) {
+    return null;
+  }
+
+  return match[0];
+}
+
 const parseDependenciesFromDashboard = (issue) =>
-  issue.body
-    .split(LINE_SEPARATOR_REGEX)
-    .map(parseDependencyFromLine)
-    .filter((dependency) => dependency !== null);
+  getDetectedDependencies(issue)
+    ?.split(LINE_SEPARATOR_REGEX)
+    ?.map(parseDependencyFromLine)
+    ?.filter((dependency) => dependency !== null)
+    ?? [];
 
 const parseDependencyFromLine = (line) => {
   const match = line.match(DEPENDENCY_NAME_AND_VERSION_REGEX);
