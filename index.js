@@ -2,7 +2,7 @@ import { createServer } from "http";
 import nunjucks from "nunjucks";
 import { getReposFromJson, mapRepoFromStorageToUi } from "./utils/index.js";
 import { getQueryParams } from "./utils/queryParams.js";
-import { sortByOpenPrs } from "./utils/sorting.js";
+import { sortByType } from "./utils/sorting.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -26,7 +26,7 @@ const httpServer = createServer(async (request, response) => {
     sortBy,
     sortDirection,
     ...reposForUi,
-    repos: sortByOpenPrs(reposForUi.repos, sortDirection),
+    repos: sortByType(reposForUi.repos, sortDirection, sortBy),
   });
 
   return response.end(template);

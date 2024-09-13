@@ -36,7 +36,7 @@
                 <th class="py-2 pl-2" scope="col">Description</th>
                 <th class="py-2 pl-2" scope="col">Language</th>
                 <th class="py-2 pl-2" scope="col">Topics</th>
-                <th class="py-2 pl-2" scope="col">Open issues count</th>
+                {{macros.sortableTableHeader("Open issues count", "openIssues", sortDirection, sortBy)}}
                 {{macros.sortableTableHeader("Open PRs count", "openPrsCount", sortDirection, sortBy)}}
                 <th class="py-2 pl-2 last:pr-2" scope="col">Last updated</th>
                 <th class="py-2 pl-2 last:pr-2" scope="col">Dependencies</th>

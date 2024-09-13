@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { sortByOpenPrs, sortByNumericValue } from "./sorting.js";
+import { sortByOpenPrs, sortByNumericValue, sortByType } from "./sorting.js";
 
 describe("sortByOpenPrs", () => {
   it("returns the original array if sortDirection is not provided", () => {
@@ -91,5 +91,43 @@ describe("sortByNumericValue", () => {
       { name: "Repo 1", value: 5 },
       { name: "Repo 2", value: 3 },
     ]);
+  });
+});
+
+describe("sortByType", () => {
+  it("sorts the repos by number of open PRs", () => {
+    const reposToSort = [
+      { name: "Repo 1", openPrsCount: 5 },
+      { name: "Repo 2", openPrsCount: 3 },
+      { name: "Repo 3", openPrsCount: 7 },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "openPrsCount"),
+      sortByNumericValue(reposToSort, "asc", "openPrsCount")
+    );
+  });
+
+  it("sorts the repos by number of open issues", () => {
+    const reposToSort = [
+      { name: "Repo 1", openIssues: 5 },
+      { name: "Repo 2", openIssues: 3 },
+      { name: "Repo 3", openIssues: 7 },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "openIssues"),
+      sortByNumericValue(reposToSort, "asc", "openIssues")
+    );
+  });
+
+  it("returns the original array if the sortBy parameter is passed", () => {
+    const reposToSort = [
+      { name: "Repo 1", openIssues: 5 },
+      { name: "Repo 2", openIssues: 3 },
+      { name: "Repo 3", openIssues: 7 },
+    ];
+
+    expect.deepEqual(sortByType(reposToSort, "asc", null), reposToSort);
   });
 });
