@@ -15,8 +15,7 @@ const httpServer = createServer(async (request, response) => {
     return response.end();
   }
 
-  const pathToRepos = "./data/repos.json";
-  const persistedData = await getReposFromJson(pathToRepos);
+  const persistedData = await getReposFromJson("./data/repos.json");
 
   const template = nunjucks.render(
     "index.njk",
