@@ -10,6 +10,8 @@ import { readFile } from "fs/promises";
 /**
  * @typedef {PersistedData} RepoData
  * @property {UiRepo[]} repos - An array of repos.
+ * @property {number} totalRepos - The total number of repos.
+ * @property {string} org - The name of the Github organisation the repos belong to.
  */
 
 /**
