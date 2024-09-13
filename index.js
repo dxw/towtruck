@@ -11,6 +11,13 @@ nunjucks.configure({
 const httpServer = createServer(async (request, response) => {
   if (await OctokitApp.middleware(request, response)) return;
 
+  let url = new URL(request.url, `http://${request.headers.host}`);
+
+  if (url.pathname !== "/") {
+    response.writeHead(404);
+    return response.end();
+  }
+
   const persistedData = await getReposFromJson("./data/repos.json");
 
   const template = nunjucks.render(
