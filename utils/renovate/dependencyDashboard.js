@@ -25,13 +25,14 @@ const LINE_SEPARATOR_REGEX = /\r?\n|\r|\n/g;
 // Group 2: ^7.20.2
 const DEPENDENCY_NAME_AND_VERSION_REGEX = /`(\S+?) (.*)`/;
 
-const issueIsRenovateDependencyDashboard = (issue) => issue.user.login === "renovate[bot]" && issue.pull_request === undefined;
+const issueIsRenovateDependencyDashboard = (issue) =>
+  issue.user.login === "renovate[bot]" && issue.pull_request === undefined;
 
-const parseDependenciesFromDashboard = (issue) => issue
-  .body
-  .split(LINE_SEPARATOR_REGEX)
-  .map(parseDependencyFromLine)
-  .filter((dependency) => dependency !== null);
+const parseDependenciesFromDashboard = (issue) =>
+  issue.body
+    .split(LINE_SEPARATOR_REGEX)
+    .map(parseDependencyFromLine)
+    .filter((dependency) => dependency !== null);
 
 const parseDependencyFromLine = (line) => {
   const match = line.match(DEPENDENCY_NAME_AND_VERSION_REGEX);
@@ -41,18 +42,20 @@ const parseDependencyFromLine = (line) => {
   }
 
   return new Dependency(match[1], match[2]);
-}
+};
 
 export const handleIssuesApiResponse = (response) => {
-  const dependencyDashboardIssue = response.data.find(issueIsRenovateDependencyDashboard);
+  const dependencyDashboardIssue = response.data.find(
+    issueIsRenovateDependencyDashboard
+  );
 
   if (!dependencyDashboardIssue) {
     return [];
   }
 
   return parseDependenciesFromDashboard(dependencyDashboardIssue);
-}
+};
+
 export const getDependenciesForRepo = ({ octokit, repository }) => {
   return octokit.request(repository.issues_url).then(handleIssuesApiResponse);
 };
-

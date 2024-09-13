@@ -35,6 +35,7 @@
                 <th class="py-2 pl-2" scope="col">Language</th>
                 <th class="py-2 pl-2" scope="col">Topics</th>
                 <th class="py-2 pl-2" scope="col">Open issues count</th>
+                <th class="py-2 pl-2" scope="col">Open PRs count</th>
                 <th class="py-2 pl-2 last:pr-2" scope="col">Last updated</th>
                 <th class="py-2 pl-2 last:pr-2" scope="col">Dependencies</th>
               </tr>
@@ -47,6 +48,7 @@
                 <td class="py-2 pl-2">{{ repo.language }}</td>
                 <td class="py-2 pl-2">{{ repo.topics | join(", ")}}</td>
                 <td class="py-2 pl-2">{{ repo.openIssues }}</td>
+                <td class="py-2 pl-2">{{ repo.openPrsCount }}</td>
                 <td class="py-2 pl-2 last:pr-2">{{ repo.updatedAt }}</td>
 
                 {% if repo.dependencies.length %}

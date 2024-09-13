@@ -1,8 +1,11 @@
-import { OctokitApp } from "../octokitApp.js";
+import { OctokitApp } from "../../octokitApp.js";
 import { writeFile, mkdir } from "fs/promises";
 import { mapRepoFromApiForStorage } from "../utils.js";
 import path from "path";
-import { getDependenciesForRepo } from "../renovate/dependencyDashboard.js";
+import {
+  getDependenciesForRepo,
+  getOpenPRsForRepo,
+} from "../renovate/dependencyDashboard.js";
 
 const fetchAllRepos = async () => {
   const repos = [];
@@ -10,9 +13,18 @@ const fetchAllRepos = async () => {
   await OctokitApp.app.eachRepository(async ({ repository, octokit }) => {
     if (repository.archived) return;
 
-    repository.dependencies = await getDependenciesForRepo({
-      repository,
-      octokit,
+    await Promise.all([
+      await getDependenciesForRepo({
+        repository,
+        octokit,
+      }),
+      await getOpenPRsForRepo({
+        repository,
+        octokit,
+      }),
+    ]).then(([dependencies, openPrsCount]) => {
+      repository.dependencies = dependencies;
+      repository.openPrsCount = openPrsCount;
     });
 
     repos.push(mapRepoFromApiForStorage(repository));

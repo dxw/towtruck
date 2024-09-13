@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { mapRepoFromStorageToUi, mapRepoFromApiForStorage } from "./utils.js";
+import { mapRepoFromStorageToUi, mapRepoFromApiForStorage } from "./index.js";
 
 describe("mapRepoFromStorageToUi", () => {
   it("converts the ISO8601 date to a human-readable date", () => {
@@ -253,6 +253,7 @@ describe("mapRepoFromStorageToUi", () => {
           pull: false,
         },
         dependencies: repoDependencies,
+        openPrsCount: 0,
       };
 
       const repoToSave = {
@@ -270,6 +271,7 @@ describe("mapRepoFromStorageToUi", () => {
         topics: ["delivery-plus", "internal", "tech-ops"],
         openIssues: 2,
         dependencies: repoDependencies,
+        openPrsCount: 0,
       };
 
       expect.deepEqual(mapRepoFromApiForStorage(apiRepo), repoToSave);
