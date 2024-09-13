@@ -18,3 +18,18 @@ export const sortByOpenPrs = (repos, sortDirection) => {
   }
   return repos.sort((a, b) => b.openPrsCount - a.openPrsCount);
 };
+
+/**
+ * Sorts repos by the a numeric value
+ * @param {UiRepo[]} repos
+ * @param {SortDirection} sortDirection
+ * @param {string} key - The key to sort by
+ * @returns {UiRepo[]}
+ */
+export const sortByNumericValue = (repos, sortDirection, key) => {
+  if (!sortDirection) return repos;
+  if (sortDirection === "asc") {
+    return repos.sort((a, b) => a[key] - b[key]);
+  }
+  return repos.sort((a, b) => b[key] - a[key]);
+};
