@@ -7,6 +7,11 @@ import {
   getOpenPRsForRepo,
 } from "../renovate/dependencyDashboard.js";
 
+/**
+ * Fetches all repos from the GitHub API.
+ * Each repo is enriched with data fetched through further API calls
+ * @returns {Promise<StoredRepo[]>}
+ */
 const fetchAllRepos = async () => {
   const repos = [];
 
@@ -33,10 +38,17 @@ const fetchAllRepos = async () => {
   return repos;
 };
 
+/**
+ * Fetches installation data for the app from the GitHub API
+ * @returns {Object}
+ */
 const installationOctokit = await OctokitApp.app.octokit.request(
   "GET /app/installations"
 );
 
+/**
+ * Saves all repos to a JSON file
+ */
 const saveAllRepos = async () => {
   console.info("Fetching all repos...");
   const repos = await fetchAllRepos();
