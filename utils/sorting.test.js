@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { sortByNumericValue, sortByType } from "./sorting.js";
+import { sortByNumericValue, sortByType, sortByUpdatedAt } from "./sorting.js";
 
 describe("sortByNumericValue", () => {
   it("returns the original array if sortDirection is not provided", () => {
@@ -48,6 +48,22 @@ describe("sortByNumericValue", () => {
   });
 });
 
+describe.only("sortByUpdatedAt", () => {
+  it("sorts the repos by the date they were last updated", () => {
+    const reposToSort = [
+      { name: "Repo 1", updatedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", updatedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", updatedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(sortByUpdatedAt(reposToSort, "asc"), [
+      { name: "Repo 2", updatedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 1", updatedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 3", updatedAtISO8601: "2023-01-01T00:00:00Z" },
+    ]);
+  });
+});
+
 describe("sortByType", () => {
   it("sorts the repos by number of open PRs", () => {
     const reposToSort = [
@@ -83,5 +99,18 @@ describe("sortByType", () => {
     ];
 
     expect.deepEqual(sortByType(reposToSort, "asc", null), reposToSort);
+  });
+
+  it('sorts the repos by the date they were last updated if "updatedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", updatedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", updatedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", updatedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "updatedAt"),
+      sortByUpdatedAt(reposToSort, "asc")
+    );
   });
 });
