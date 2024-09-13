@@ -28,6 +28,7 @@ describe("mapRepoFromStorageToUi", () => {
         name: "repo1",
         description: "description1",
         updatedAt: new Date("2021-01-01T00:00:00Z").toLocaleDateString(),
+        updatedAtISO8601: "2021-01-01T00:00:00Z",
         htmlUrl: "http://url.com/repo1",
         apiUrl: "http://api.com/repo1",
         pullsUrl: "http://api.com/repo1/pulls",

@@ -25,6 +25,7 @@ export const mapRepoFromStorageToUi = (persistedData) => {
     return {
       ...repo,
       updatedAt: newDate,
+      updatedAtISO8601: repo.updatedAt,
     };
   });
 
@@ -77,6 +78,7 @@ export const getReposFromJson = async (filePath) => {
 /**
  * @typedef {StoredRepo} UiRepo
  * @property {Date} date - The date the repo was last updated in JS date format.
+ * @property {string} updatedAtISO8601 - The date the repo was last updated in ISO8601 format for sorting.
  */
 
 /**
