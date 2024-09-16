@@ -48,7 +48,7 @@ describe("sortByNumericValue", () => {
   });
 });
 
-describe.only("sortByUpdatedAt", () => {
+describe("sortByUpdatedAt", () => {
   it("sorts the repos by the date they were last updated in ascending order", () => {
     const reposToSort = [
       { name: "Repo 1", updatedAtISO8601: "2022-01-01T00:00:00Z" },
@@ -81,14 +81,14 @@ describe.only("sortByUpdatedAt", () => {
 describe("sortByType", () => {
   it("sorts the repos by number of open PRs", () => {
     const reposToSort = [
-      { name: "Repo 1", openPrsCount: 5 },
-      { name: "Repo 2", openPrsCount: 3 },
-      { name: "Repo 3", openPrsCount: 7 },
+      { name: "Repo 1", openPrCount: 5 },
+      { name: "Repo 2", openPrCount: 3 },
+      { name: "Repo 3", openPrCount: 7 },
     ];
 
     expect.deepEqual(
-      sortByType(reposToSort, "asc", "openPrsCount"),
-      sortByNumericValue(reposToSort, "asc", "openPrsCount")
+      sortByType(reposToSort, "asc", "openPrCount"),
+      sortByNumericValue(reposToSort, "asc", "openPrCount")
     );
   });
 
