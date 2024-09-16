@@ -2,10 +2,8 @@ import { OctokitApp } from "../../octokitApp.js";
 import { writeFile, mkdir } from "fs/promises";
 import { mapRepoFromApiForStorage } from "../index.js";
 import path from "path";
-import {
-  getDependenciesForRepo,
-  getOpenPRsForRepo,
-} from "../renovate/dependencyDashboard.js";
+import { getDependenciesForRepo } from "../renovate/dependencyDashboard.js";
+import { getOpenPRsForRepo } from "./fetchOpenPrs.js";
 
 /**
  * Fetches all repos from the GitHub API.
