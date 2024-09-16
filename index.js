@@ -1,7 +1,6 @@
 import { createServer } from "http";
 import nunjucks from "nunjucks";
 import { getReposFromJson, mapRepoFromStorageToUi } from "./utils/index.js";
-import { OctokitApp } from "./octokitApp.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -9,8 +8,6 @@ nunjucks.configure({
 });
 
 const httpServer = createServer(async (request, response) => {
-  if (await OctokitApp.middleware(request, response)) return;
-
   const pathToRepos = "./data/repos.json";
   const persistedData = await getReposFromJson(pathToRepos);
 

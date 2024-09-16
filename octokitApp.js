@@ -21,8 +21,7 @@ const app = new App({
   },
 });
 
-// eslint-disable-next-line no-unused-vars
-app.webhooks.onAny(({ id, name, payload }) => {
+app.webhooks.onAny(({ name }) => {
   console.log(name, "event received");
 });
 
