@@ -95,23 +95,6 @@ describe("mapRepoFromStorageToUi", () => {
 
   describe("mapRepo", () => {
     it("maps the repo from the data returned from the api", async () => {
-      const repoDependencies = [
-        {
-          user: {
-            login: "some-user",
-          },
-          pull_request: {},
-          body: "Here's a pull request to manually update dependency `foo-utils 1.2.3` to `foo-utils 1.2.4`.",
-        },
-        {
-          user: {
-            login: "renovate[bot]",
-          },
-          pull_request: {},
-          body: "Configure Renovate",
-        },
-      ];
-
       const apiRepo = {
         id: 248204237,
         node_id: "MDEwOlJlcG9zaXRvcnkyNDgyMDQyMzc=",
@@ -258,8 +241,6 @@ describe("mapRepoFromStorageToUi", () => {
           triage: false,
           pull: false,
         },
-        dependencies: repoDependencies,
-        openPrsCount: 0,
       };
 
       const repoToSave = {
@@ -276,8 +257,6 @@ describe("mapRepoFromStorageToUi", () => {
         language: "Ruby",
         topics: ["delivery-plus", "internal", "tech-ops"],
         openIssues: 2,
-        dependencies: repoDependencies,
-        openPrsCount: 0,
       };
 
       expect.deepEqual(mapRepoFromApiForStorage(apiRepo), repoToSave);
