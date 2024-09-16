@@ -1,3 +1,5 @@
+{% import "./macros.njk" as macros %}
+
 <!DOCTYPE html>
 <html>
   <head>
@@ -34,16 +36,16 @@
                 <th class="py-2 pl-2" scope="col">Description</th>
                 <th class="py-2 pl-2" scope="col">Language</th>
                 <th class="py-2 pl-2" scope="col">Topics</th>
-                <th class="py-2 pl-2" scope="col">Open issues count</th>
-                <th class="py-2 pl-2" scope="col">Open PRs count</th>
-                <th class="py-2 pl-2 last:pr-2" scope="col">Last updated</th>
+                {{macros.sortableTableHeader("Open issues count", "openIssues", sortDirection, sortBy)}}
+                {{macros.sortableTableHeader("Open PRs count", "openPrsCount", sortDirection, sortBy)}}
+                {{macros.sortableTableHeader("Updated at", "updatedAt", sortDirection, sortBy)}}
                 <th class="py-2 pl-2 last:pr-2" scope="col">Dependencies</th>
               </tr>
             </thead>
             <tbody>
               {% for repo in repos %}
               <tr class="even:bg-white">
-                 <td class="py-2 pl-2"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.url}}">{{ repo.name }}</a></td>
+                 <td class="py-2 pl-2"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a></td>
                 <td class="py-2 pl-2">{{ repo.description }}</td>
                 <td class="py-2 pl-2">{{ repo.language }}</td>
                 <td class="py-2 pl-2">{{ repo.topics | join(", ")}}</td>

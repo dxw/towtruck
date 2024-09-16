@@ -1,6 +1,8 @@
 import { createServer } from "http";
 import nunjucks from "nunjucks";
 import { getReposFromJson, mapRepoFromStorageToUi } from "./utils/index.js";
+import { getQueryParams } from "./utils/queryParams.js";
+import { sortByType } from "./utils/sorting.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -15,13 +17,17 @@ const httpServer = createServer(async (request, response) => {
     return response.end();
   }
 
-  const pathToRepos = "./data/repos.json";
-  const persistedData = await getReposFromJson(pathToRepos);
+  const persistedData = await getReposFromJson("./data/repos.json");
+  const reposForUi = mapRepoFromStorageToUi(persistedData);
 
-  const template = nunjucks.render(
-    "index.njk",
-    mapRepoFromStorageToUi(persistedData)
-  );
+  const { sortDirection, sortBy } = getQueryParams(url);
+
+  const template = nunjucks.render("index.njk", {
+    sortBy,
+    sortDirection,
+    ...reposForUi,
+    repos: sortByType(reposForUi.repos, sortDirection, sortBy),
+  });
 
   return response.end(template);
 });

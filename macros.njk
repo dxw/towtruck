@@ -1,0 +1,40 @@
+{% macro sortableTableHeader(name, id, sortDirection, sortBy) %}
+
+{% set upArrow %}
+    <svg class="inline-block h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+    </svg>
+{%endset%}
+
+{% set downArrow %}
+    <svg class="inline-block h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+    </svg>
+{%endset%}
+    
+    
+
+{% set sortingOnThisParam = id === sortBy %}
+{% set linkParams = "?sortBy=" + id + "&sortDirection=asc" %}
+
+{%if sortingOnThisParam and sortDirection === "asc"%}
+    {% set linkParams = "?sortBy=" + id + "&sortDirection=desc" %}
+{%endif%}
+
+<th class="py-2 pl-2" scope="col"><a href="/{{linkParams}}"> {{name}}
+
+    <span class="text-xs ml-1">
+        {% if sortDirection === "asc" and sortingOnThisParam %}
+            {{upArrow | safe}}
+        {% elseif sortDirection === 'desc' and sortingOnThisParam %}
+            {{downArrow | safe}}
+        {% elseif id !== sortBy %}
+        <div class="w-full">
+            {{upArrow | safe}}
+            {{downArrow | safe}}
+        </div>
+        {% endif %}
+    </span>
+</a>
+</th>
+{% endmacro %}
