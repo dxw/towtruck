@@ -13,4 +13,6 @@ export const getOpenPRsForRepo = async ({ octokit, repository }) => {
  * @param {any} {data}
  * @returns {number}
  */
-export const handlePrsApiResponse = ({ data }) => data?.length || 0;
+export const handlePrsApiResponse = ({ data }) => {
+  return { openPrCount: data?.length || 0 };
+};
