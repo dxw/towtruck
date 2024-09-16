@@ -13,7 +13,8 @@
       "topics": ["composer", "govpress", "packagist", "php"],
       "openIssues": 0,
       "dependencies": [],
-      "openPrCount": 0
+      "openPrCount": 0,
+      "openBotPrCount": 0
     },
     {
       "name": "govuk-blogs",
@@ -27,7 +28,8 @@
       "topics": ["govpress", "wordpress-theme"],
       "openIssues": 1,
       "dependencies": [],
-      "openPrCount": 0
+      "openPrCount": 0,
+      "openBotPrCount": 1
     },
     {
       "name": "php-missing",
@@ -41,7 +43,8 @@
       "topics": ["composer", "govpress", "packagist", "php"],
       "openIssues": 7,
       "dependencies": [],
-      "openPrCount": 2
+      "openPrCount": 2,
+      "openBotPrCount": 3
     }
   ]
 }
