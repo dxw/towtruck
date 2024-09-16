@@ -8,6 +8,13 @@ nunjucks.configure({
 });
 
 const httpServer = createServer(async (request, response) => {
+  const url = new URL(request.url, `http://${request.headers.host}`);
+
+  if (url.pathname !== "/") {
+    response.writeHead(404);
+    return response.end();
+  }
+
   const pathToRepos = "./data/repos.json";
   const persistedData = await getReposFromJson(pathToRepos);
 
