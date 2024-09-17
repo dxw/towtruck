@@ -16,6 +16,8 @@ const fetchAllRepos = async () => {
   await OctokitApp.app.eachRepository(async ({ repository, octokit }) => {
     if (repository.archived) return;
 
+    let repo = mapRepoFromApiForStorage(repository);
+
     await Promise.all([
       await getDependenciesForRepo({
         repository,
@@ -25,12 +27,12 @@ const fetchAllRepos = async () => {
         repository,
         octokit,
       }),
-    ]).then(([dependencies, openPrsCount]) => {
-      repository.dependencies = dependencies;
-      repository.openPrsCount = openPrsCount;
+    ]).then(([dependencies, prInfo]) => {
+      repo.dependencies = dependencies;
+      repo = { ...repo, ...prInfo };
     });
 
-    repos.push(mapRepoFromApiForStorage(repository));
+    repos.push(repo);
   });
 
   return repos;

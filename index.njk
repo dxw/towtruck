@@ -38,7 +38,8 @@
                 <th class="py-2 pl-2" scope="col">Language</th>
                 <th class="py-2 pl-2" scope="col">Topics</th>
                 {{macros.sortableTableHeader("Open issues count", "openIssues", sortDirection, sortBy)}}
-                {{macros.sortableTableHeader("Open PRs count", "openPrsCount", sortDirection, sortBy)}}
+                {{macros.sortableTableHeader("Open bot PR count", "openBotPrCount", sortDirection, sortBy)}}
+                {{macros.sortableTableHeader("Open PR count", "openPrCount", sortDirection, sortBy)}}
                 {{macros.sortableTableHeader("Updated at", "updatedAt", sortDirection, sortBy)}}
                 <th class="py-2 pl-2 last:pr-2" scope="col">Dependencies</th>
               </tr>
@@ -46,12 +47,13 @@
             <tbody>
               {% for repo in repos %}
               <tr class="even:bg-white">
-                 <td class="py-2 pl-2"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a></td>
+                <td class="py-2 pl-2" scope="row"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a></td>
                 <td class="py-2 pl-2">{{ repo.description }}</td>
                 <td class="py-2 pl-2">{{ repo.language }}</td>
                 <td class="py-2 pl-2">{{ repo.topics | join(", ")}}</td>
                 <td class="py-2 pl-2">{{ repo.openIssues }}</td>
-                <td class="py-2 pl-2">{{ repo.openPrsCount }}</td>
+                <td class="py-2 pl-2">{{ repo.openBotPrCount }}</td>
+                <td class="py-2 pl-2">{{ repo.openPrCount }}</td>
                 <td class="py-2 pl-2 last:pr-2">{{ repo.updatedAt }}</td>
 
                 {% if repo.dependencies.length %}
