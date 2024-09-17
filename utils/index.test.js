@@ -16,6 +16,7 @@ describe("mapRepoFromStorageToUi", () => {
         language: null,
         topics: [],
         openIssues: 0,
+        dependencies: [],
       },
     ];
 
@@ -36,6 +37,7 @@ describe("mapRepoFromStorageToUi", () => {
         language: null,
         topics: [],
         openIssues: 0,
+        dependencies: [],
       },
     ];
 
@@ -55,6 +57,7 @@ describe("mapRepoFromStorageToUi", () => {
         language: null,
         topics: [],
         openIssues: 0,
+        dependencies: [],
       },
       {
         name: "repo2",
@@ -67,6 +70,7 @@ describe("mapRepoFromStorageToUi", () => {
         language: null,
         topics: [],
         openIssues: 0,
+        dependencies: [],
       },
       {
         name: "repo3",
@@ -79,6 +83,7 @@ describe("mapRepoFromStorageToUi", () => {
         language: null,
         topics: [],
         openIssues: 0,
+        dependencies: [],
       },
     ];
     const persistedData = {

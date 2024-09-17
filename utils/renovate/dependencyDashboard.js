@@ -1,9 +1,4 @@
-export class Dependency {
-  constructor(name, version) {
-    this.name = name;
-    this.version = version;
-  }
-}
+import { Dependency } from "../../model/Dependency.js";
 
 // Matches CR LF or CR or LF.
 const LINE_SEPARATOR_REGEX = /\r?\n|\r|\n/g;
