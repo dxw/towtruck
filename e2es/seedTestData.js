@@ -2,7 +2,7 @@ import { copyFile, mkdir } from "fs/promises";
 
 export const createDestinationDirectory = async () => {
   console.info("Creating destination directory...");
-  await mkdir("./data");
+  await mkdir("./data", { recursive: true });
 };
 
 export const seedTestData = async () => {
