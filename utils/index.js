@@ -1,5 +1,6 @@
 import { readFile } from "fs/promises";
-import { getDependencyState } from "./endOfLifeDateApi/index.js";
+import { differenceInYears, formatDistance, startOfToday } from "date-fns";
+import { getDependencyEndOfLifeDate, getDependencyState } from "./endOfLifeDateApi/index.js";
 
 /**
  * @typedef {Object} PersistedData
@@ -16,12 +17,45 @@ import { getDependencyState } from "./endOfLifeDateApi/index.js";
  */
 
 /**
+ * @typedef {"sky"|"amber"|"orange"|"red"} TailwindColor
+ */
+
+/**
+ * @typedef {"bx-check-circle"|"bx-up-arrow-circle"|"bxs-up-arrow-circle"|"bxs-x-circle"} Boxicon
+ */
+
+/**
  * @typedef {Object} UiDependency
  * @property {string} name
  * @property {string?} version
  * @property {string?} tag
- * @property {string} color
+ * @property {TailwindColor} color
+ * @property {Boxicon} icon
+ * @property {string?} latestVersion
+ * @property {Date?} endOfLifeDate
+ * @property {string?} endOfLifeRelative
+ * @property {boolean} isOutdated
+ * @property {boolean} isOutOfSupport
+ * @property {boolean} isEndOfLifeSoon
  */
+
+const stateColors = {
+  "upToDate": "sky",
+  "minorUpdateAvailable": "amber",
+  "majorUpdateAvailable": "orange",
+  "endOfLife": "red",
+};
+
+const defaultColor = "stone";
+
+const stateIcons = {
+  "upToDate": "bx-check-circle",
+  "minorUpdateAvailable": "bx-up-arrow-circle",
+  "majorUpdateAvailable": "bxs-up-arrow-circle",
+  "endOfLife": "bxs-x-circle",
+};
+
+const defaultIcon = "bx-question-mark";
 
 /**
  * Maps the persisted dependency data from storage to a format suitable for the UI
@@ -35,43 +69,15 @@ export const mapDependencyFromStorageToUi = (dependency, persistedLifetimes) => 
   const state = lifetimes === undefined ? "unknown" : getDependencyState(dependency, lifetimes.lifetimes);
   const latestVersion = lifetimes?.lifetimes[0]?.latest;
 
-  let color;
-  switch (state) {
-    case "unknown":
-      color = "stone";
-      break;
-    case "upToDate":
-      color = "sky";
-      break;
-    case "minorUpdateAvailable":
-      color = "amber";
-      break;
-    case "majorUpdateAvailable":
-      color = "orange";
-      break;
-    case "endOfLife":
-      color = "red";
-      break;
-  }
+  const color = stateColors[state] ?? defaultColor;
+  const icon = stateIcons[state] ?? defaultIcon;
 
-  let icon;
-  switch (state) {
-    case "unknown":
-      icon = "bx-question-mark";
-      break;
-    case "upToDate":
-      icon = "bx-check-circle";
-      break;
-    case "minorUpdateAvailable":
-      icon = "bx-up-arrow-circle";
-      break;
-    case "majorUpdateAvailable":
-      icon = "bxs-up-arrow-circle";
-      break;
-    case "endOfLife":
-      icon = "bxs-x-circle";
-      break;
-  }
+  const endOfLifeDate = lifetimes && getDependencyEndOfLifeDate(dependency, lifetimes.lifetimes);
+  const endOfLifeRelative = endOfLifeDate && formatDistance(endOfLifeDate, startOfToday(), { addSuffix: true });
+
+  const isOutdated = state !== "upToDate" && state !== "unknown";
+  const isOutOfSupport = state === "endOfLife";
+  const isEndOfLifeSoon = !!endOfLifeDate && !isOutOfSupport && differenceInYears(endOfLifeDate, startOfToday()) < 1;
 
   return {
     name: dependency.name,
@@ -79,10 +85,14 @@ export const mapDependencyFromStorageToUi = (dependency, persistedLifetimes) => 
     tag: dependency.tag,
     color,
     icon,
-    isOutdated: state !== "upToDate" && state !== "unknown",
     latestVersion,
-  }
-}
+    endOfLifeDate,
+    endOfLifeRelative,
+    isOutdated,
+    isOutOfSupport,
+    isEndOfLifeSoon,
+  };
+};
 
 /**
  * Maps the persisted repo data from storage to a format suitable for the UI

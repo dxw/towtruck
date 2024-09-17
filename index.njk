@@ -75,21 +75,35 @@
                       <li>
                         <div class="inline-block whitespace-nowrap text-[0px]">
                           <span>
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-200 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
-                          {% if dependency.version %}
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-300 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
-                          {% endif %}
-                          {% if dependency.tag %}
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-400 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
-                          {% endif %}
+                            <span class="font-mono text-sm bg-{{ dependency.color }}-200 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
+                            {% if dependency.version %}
+                            <span class="font-mono text-sm bg-{{ dependency.color }}-300 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
+                            {% endif %}
+                            {% if dependency.tag %}
+                            <span class="font-mono text-sm bg-{{ dependency.color }}-400 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
+                            {% endif %}
                           </span>
-                          {% if dependency.isOutdated %}
                           <span class="inline-block w-1"></span>
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-500 text-white rounded-full py-1 px-2">  
-                            <i class="align-[-1px] bx {{dependency.icon}}"></i>
-                            v{{ dependency.latestVersion }}
+                          <span>
+                            {% if dependency.isOutdated %}
+                            <span class="font-mono text-sm bg-{{ dependency.color }}-500 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">  
+                              <i class="align-[-1px] bx {{dependency.icon}}"></i>
+                              {{ dependency.changelog }}
+                              v{{ dependency.latestVersion }}
+                            </span>
+                            {% endif %}
+                            {% if dependency.isEndOfLifeSoon %}
+                            <span class="font-mono text-sm bg-{{ dependency.color }}-600 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
+                              <i class="align-[-1px] bx bxs-hourglass"></i>
+                              <span class="font-sans">Support ends {{ dependency.endOfLifeRelative }}</span>
+                            </span>
+                            {% elif dependency.isOutOfSupport %}
+                            <span class="font-mono text-sm bg-{{ dependency.color }}-600 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
+                              <i class="align-[-1px] bx bxs-hourglass-bottom"></i>
+                              <span class="font-sans">Support ended {{ dependency.endOfLifeRelative }}</span>
+                            </span>
+                            {% endif %}
                           </span>
-                          {% endif%}
                         </div>
                       </li>
                     {% endfor %}
