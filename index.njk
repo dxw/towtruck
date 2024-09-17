@@ -47,7 +47,7 @@
             <tbody>
               {% for repo in repos %}
               <tr class="even:bg-white">
-                 <td class="py-2 pl-2"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a></td>
+                <td class="py-2 pl-2" scope="row"><a target="_blank" class="text-blue-600 dark:text-blue-500 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a></td>
                 <td class="py-2 pl-2">{{ repo.description }}</td>
                 <td class="py-2 pl-2">{{ repo.language }}</td>
                 <td class="py-2 pl-2">{{ repo.topics | join(", ")}}</td>
