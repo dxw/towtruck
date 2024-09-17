@@ -67,23 +67,59 @@ export class EndOfLifeDateApiClient {
  */
 
 /**
+ * Finds the release cycle for the given dependency version from the specified list of release cycles
+ * @param {Dependency} dependency 
+ * @param {Cycle[]} cycles 
+ * @returns {Cycle}
+ */
+const findDependencyCycle = (dependency, cycles) => cycles.find((cycle) => cycle.cycle === dependency.major?.toString())
+  ?? cycles.find((cycle) => cycle.cycle === dependency.major?.toString() + "." + dependency.minor?.toString())
+  ?? cycles.find((cycle) => cycle.codename?.toLowerCase()?.includes(dependency.tag?.toLowerCase()));
+
+/**
+ * 
+ * @param {Cycle} cycle 
+ * @returns {Date}
+ */
+const getEolDate = (cycle) => {
+  const date = cycle.eol ?? cycle.lts ?? cycle.support;
+
+  if (typeof date !== "string") return undefined;
+
+  return new Date(date);
+};
+
+/**
  * Gets the state of the given dependency according to the specified list of release cycles
  * @param {Dependency} dependency 
  * @param {Cycle[]} cycles 
  * @returns {DependencyState}
  */
 export const getDependencyState = (dependency, cycles) => {
-  const cycle = cycles.find((cycle) => cycle.cycle === dependency.major?.toString())
-    ?? cycles.find((cycle) => cycle.cycle === dependency.major?.toString() + "." + dependency.minor?.toString())
-    ?? cycles.find((cycle) => cycle.codename?.toLowerCase()?.includes(dependency.tag?.toLowerCase()));
+  const cycle = findDependencyCycle(dependency, cycles);
 
   if (!cycle) return "unknown";
 
-  if (new Date(cycle.eol) < Date.now()) return "endOfLife";
+  const eolDate = getEolDate(cycle);
+  if (eolDate && (eolDate < Date.now())) return "endOfLife";
 
   if (cycle !== cycles[0]) return "majorUpdateAvailable";
 
   if (cycle.latest !== dependency.version) return "minorUpdateAvailable";
 
   return "upToDate";
+};
+
+/**
+ * Gets the end-of-life date of the given dependency according to the specified list of release cycles
+ * @param {Dependency} dependency 
+ * @param {Cycle[]} cycles 
+ * @returns {Date}
+ */
+export const getDependencyEndOfLifeDate = (dependency, cycles) => {
+  const cycle = findDependencyCycle(dependency, cycles);
+
+  if (!cycle) return undefined;
+
+  return getEolDate(cycle);
 };
