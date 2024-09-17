@@ -13,15 +13,23 @@
 {%endset%}
     
     
-
 {% set sortingOnThisParam = id === sortBy %}
 {% set linkParams = "?sortBy=" + id + "&sortDirection=asc" %}
+{%set ariaSort = "none"%}
 
 {%if sortingOnThisParam and sortDirection === "asc"%}
     {% set linkParams = "?sortBy=" + id + "&sortDirection=desc" %}
+    {%set ariaSort = "ascending"%}
 {%endif%}
 
-<th class="py-2 pl-2" scope="col"><a href="/{{linkParams}}"> {{name}}
+{%if sortingOnThisParam and sortDirection === "desc"%}
+    {% set linkParams = "?sortBy=" + id + "&sortDirection=asc" %}
+    {%set ariaSort = "descending"%}
+{%endif%}
+
+
+
+<th class="py-2 pl-2" scope="col" aria-sort="{{ariaSort}}"><a href="/{{linkParams}}"> {{name}}
 
     <span class="text-xs ml-1">
         {% if sortDirection === "asc" and sortingOnThisParam %}
