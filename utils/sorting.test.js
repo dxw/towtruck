@@ -139,4 +139,56 @@ describe("sortByType", () => {
       sortByISO8601Timestamp(reposToSort, "asc", "updatedAtISO8601")
     );
   });
+
+  it('sorts the repos by the date they were last updated if "mostRecentPrOpenedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", mostRecentPrOpenedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", mostRecentPrOpenedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "mostRecentPrOpenedAt"),
+      sortByISO8601Timestamp(reposToSort, "asc", "mostRecentPrOpenedAtISO8601")
+    );
+  });
+
+  it('sorts the repos by the date they were last updated if "oldestOpenPrOpenedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", oldestOpenPrOpenedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", oldestOpenPrOpenedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", oldestOpenPrOpenedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "oldestOpenPrOpenedAt"),
+      sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenPrOpenedAtISO8601")
+    );
+  });
+
+  it('sorts the repos by the date they were last updated if "mostRecentIssueOpenedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", mostRecentIssueOpenedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", mostRecentIssueOpenedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", mostRecentIssueOpenedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "mostRecentIssueOpenedAt"),
+      sortByISO8601Timestamp(reposToSort, "asc", "mostRecentIssueOpenedAtISO8601")
+    );
+  });
+
+  it('sorts the repos by the date they were last updated if "oldestOpenIssueOpenedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", oldestOpenIssueOpenedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", oldestOpenIssueOpenedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", oldestOpenIssueOpenedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "oldestOpenIssueOpenedAt"),
+      sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenIssueOpenedAtISO8601")
+    );
+  });
 });
