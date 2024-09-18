@@ -1,5 +1,5 @@
 import { readFile } from "fs/promises";
-import { differenceInYears, formatDistance, startOfToday } from "date-fns";
+import { differenceInYears, formatDistance, formatDistanceToNow, startOfToday } from "date-fns";
 import { getDependencyEndOfLifeDate, getDependencyState } from "./endOfLifeDateApi/index.js";
 
 /**
@@ -105,11 +105,24 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
     const newDate = new Date(repo.updatedAt).toLocaleDateString();
     const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
 
+    const mostRecentPrOpenedAt = repo.mostRecentPrOpenedAt && formatDistanceToNow(repo.mostRecentPrOpenedAt, { addSuffix: true });
+    const oldestOpenPrOpenedAt = repo.oldestOpenPrOpenedAt && formatDistanceToNow(repo.oldestOpenPrOpenedAt, { addSuffix: true });
+    const mostRecentIssueOpenedAt = repo.mostRecentIssueOpenedAt && formatDistanceToNow(repo.mostRecentIssueOpenedAt, { addSuffix: true });
+    const oldestOpenIssueOpenedAt = repo.oldestOpenIssueOpenedAt && formatDistanceToNow(repo.oldestOpenIssueOpenedAt, { addSuffix: true });
+
     return {
       ...repo,
       updatedAt: newDate,
       updatedAtISO8601: repo.updatedAt,
       dependencies,
+      mostRecentPrOpenedAt,
+      mostRecentPrOpenedAtISO8601: repo.mostRecentPrOpenedAt,
+      oldestOpenPrOpenedAt,
+      oldestOpenPrOpenedAtISO8601: repo.oldestOpenPrOpenedAt,
+      mostRecentIssueOpenedAt,
+      mostRecentIssueOpenedAtISO8601: repo.mostRecentIssueOpenedAt,
+      oldestOpenIssueOpenedAt,
+      oldestOpenIssueOpenedAtISO8601: repo.oldestOpenIssueOpenedAt,
     };
   });
 
