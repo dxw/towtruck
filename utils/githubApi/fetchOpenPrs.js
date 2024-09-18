@@ -23,5 +23,26 @@ export const handlePrsApiResponse = ({ data }) => {
     return acc;
   }, 0);
 
-  return { openPrCount: data?.length || 0, openBotPrCount };
+  const mostRecentPrOpenedAt = data.reduce((latestDate, pr) => {
+    const prOpenedAt = new Date(pr.created_at);
+    if (latestDate < prOpenedAt) {
+      return prOpenedAt;
+    }
+    return latestDate;
+  }, null);
+
+  const oldestOpenPrOpenedAt = data.reduce((oldestDate, pr) => {
+    if (pr.state !== "open") {
+      return oldestDate;
+    }
+
+    const prOpenedAt = new Date(pr.created_at);
+    if (!oldestDate || oldestDate > prOpenedAt) {
+      return prOpenedAt;
+    }
+
+    return oldestDate;
+  }, null);
+
+  return { openPrCount: data?.length || 0, openBotPrCount, mostRecentPrOpenedAt, oldestOpenPrOpenedAt };
 };
