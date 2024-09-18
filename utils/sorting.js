@@ -4,6 +4,9 @@
  * @property {"asc"} ASC
  * @property {"desc"} DESC
  */
+/**
+ * @typedef {import('./index').UiRepo} UiRepo
+ */
 
 /**
  * Sorts repos by the a numeric value

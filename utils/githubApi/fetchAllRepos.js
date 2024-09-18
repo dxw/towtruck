@@ -6,6 +6,10 @@ import { getDependenciesForRepo } from "../renovate/dependencyDashboard.js";
 import { getOpenPRsForRepo } from "./fetchOpenPrs.js";
 
 /**
+ * @typedef {import('../index.js').StoredRepo} StoredRepo
+ */
+
+/**
  * Fetches all repos from the GitHub API.
  * Each repo is enriched with data fetched through further API calls
  * @returns {Promise<StoredRepo[]>}
