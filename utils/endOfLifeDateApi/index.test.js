@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { getDependencyState } from "./index.js";
+import { getDependencyEndOfLifeDate, getDependencyState } from "./index.js";
 import { Dependency } from "../../model/Dependency.js";
 
 describe("getDependencyState", () => {
@@ -103,4 +103,39 @@ describe("getDependencyState", () => {
       "upToDate",
     );
   })
+});
+
+describe("getDependencyEndOfLifeDate", () => {
+  it("should return undefined by default", () => {
+    const dependency = new Dependency("ruby", "3.3.5");
+    const cycles = [];
+
+    const result = getDependencyEndOfLifeDate(dependency, cycles);
+
+    expect.strictEqual(
+      result,
+      undefined,
+    );
+  });
+
+  it("should return the end-of-life date from the correct cycle", () => {
+    const dependency = new Dependency("ruby", "3.3.5");
+    const cycles = [
+      {
+        cycle: "4",
+        eol: "9999-01-01",
+      },
+      {
+        cycle: "3",
+        eol: "2024-01-01",
+      },
+    ];
+
+    const result = getDependencyEndOfLifeDate(dependency, cycles);
+
+    expect.deepStrictEqual(
+      result,
+      new Date("2024-01-01"),
+    );
+  });
 });
