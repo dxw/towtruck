@@ -5,6 +5,7 @@ import path from "path";
 import { getDependenciesForRepo } from "../renovate/dependencyDashboard.js";
 import { getOpenPRsForRepo } from "./fetchOpenPrs.js";
 import { getOpenIssuesForRepo } from "./fetchOpenIssues.js";
+import { getDependabotAlertsForRepo } from "./fetchDependabotAlerts.js";
 
 /**
  * @typedef {import('../index.js').StoredRepo} StoredRepo
@@ -36,9 +37,13 @@ const fetchAllRepos = async () => {
         repository,
         octokit,
       }),
-    ]).then(([dependencies, prInfo, issueInfo ]) => {
+      getDependabotAlertsForRepo({
+        repository,
+        octokit,
+      }),
+    ]).then(([dependencies, prInfo, issueInfo , alerts]) => {
       repo.dependencies = dependencies;
-      repo = { ...repo, ...prInfo, ...issueInfo };
+      repo = { ...repo, ...prInfo, ...issueInfo, ...alerts };
     });
 
     repos.push(repo);
