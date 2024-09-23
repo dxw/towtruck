@@ -95,6 +95,44 @@ export const mapDependencyFromStorageToUi = (dependency, persistedLifetimes) => 
 };
 
 /**
+ * Picks a Tailwind colour by hashing the given string.
+ * @param {string} str
+ * @returns {string}
+ */
+export const hashToTailwindColor = (str) => {
+  const languageColors = [
+    "red",
+    "orange",
+    "amber",
+    "yellow",
+    "lime",
+    "green",
+    "emerald",
+    "teal",
+    "cyan",
+    "sky",
+    "blue",
+    "indigo",
+    "violet",
+    "purple",
+    "fuchsia",
+    "pink",
+    "rose",
+  ];
+
+  let languageColor = undefined;
+  if (str && typeof str === "string") {
+    let hash = 0;
+    for (const c of str) {
+      hash = hash * 13 + c.charCodeAt(0) * 19;
+    }
+    languageColor = languageColors[hash % 17];
+  }
+
+  return languageColor;
+};
+
+/**
  * Maps the persisted repo data from storage to a format suitable for the UI
  * @param {PersistedData} persistedData
  * @param {import("./endOfLifeDateApi/fetchAllDependencyEolInfo").DependencyLifetimes[]} persistedLifetimes
@@ -110,6 +148,8 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
     const mostRecentIssueOpenedAt = repo.mostRecentIssueOpenedAt && formatDistanceToNow(repo.mostRecentIssueOpenedAt, { addSuffix: true });
     const oldestOpenIssueOpenedAt = repo.oldestOpenIssueOpenedAt && formatDistanceToNow(repo.oldestOpenIssueOpenedAt, { addSuffix: true });
 
+    const languageColor = hashToTailwindColor(repo.language);
+
     return {
       ...repo,
       updatedAt: newDate,
@@ -123,6 +163,7 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
       mostRecentIssueOpenedAtISO8601: repo.mostRecentIssueOpenedAt,
       oldestOpenIssueOpenedAt,
       oldestOpenIssueOpenedAtISO8601: repo.oldestOpenIssueOpenedAt,
+      languageColor,
     };
   });
 

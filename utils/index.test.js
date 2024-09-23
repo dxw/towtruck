@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { mapRepoFromStorageToUi, mapRepoFromApiForStorage } from "./index.js";
+import { mapRepoFromStorageToUi, mapRepoFromApiForStorage, hashToTailwindColor } from "./index.js";
 import { formatDistanceToNow } from "date-fns";
 
 describe("mapRepoFromStorageToUi", () => {
@@ -51,6 +51,101 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDistanceToNow(new Date("2024-04-04T00:00:00Z"), { addSuffix: true }),
         oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
+        languageColor: undefined,
+      },
+    ];
+
+    expect.deepEqual(mapRepoFromStorageToUi(persistedData).repos, expected);
+  });
+
+  it("converts the language string to a Tailwind colour", () => {
+    const storedRepos = [
+      {
+        name: "repo1",
+        description: "description1",
+        updatedAt: "2021-01-01T00:00:00Z",
+        htmlUrl: "http://url.com/repo1",
+        apiUrl: "http://api.com/repo1",
+        pullsUrl: "http://api.com/repo1/pulls",
+        issuesUrl: "http://api.com/repo1/issues",
+        language: "Ruby",
+        topics: [],
+        openIssues: 0,
+        dependencies: [],
+        mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+        oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+        oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+      },
+      {
+        name: "repo2",
+        description: "description2",
+        updatedAt: "2021-01-01T00:00:00Z",
+        htmlUrl: "http://url.com/repo2",
+        apiUrl: "http://api.com/repo2",
+        pullsUrl: "http://api.com/repo2/pulls",
+        issuesUrl: "http://api.com/repo2/issues",
+        language: "TypeScript",
+        topics: [],
+        openIssues: 0,
+        dependencies: [],
+        mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+        oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+        oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+      },
+    ];
+
+    const persistedData = {
+      repos: storedRepos,
+    };
+
+    const expected = [
+      {
+        name: "repo1",
+        description: "description1",
+        updatedAt: new Date("2021-01-01T00:00:00Z").toLocaleDateString(),
+        updatedAtISO8601: "2021-01-01T00:00:00Z",
+        htmlUrl: "http://url.com/repo1",
+        apiUrl: "http://api.com/repo1",
+        pullsUrl: "http://api.com/repo1/pulls",
+        issuesUrl: "http://api.com/repo1/issues",
+        language: "Ruby",
+        topics: [],
+        openIssues: 0,
+        dependencies: [],
+        mostRecentPrOpenedAt: formatDistanceToNow(new Date("2021-01-01T00:00:00Z"), { addSuffix: true }),
+        mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
+        oldestOpenPrOpenedAt: formatDistanceToNow(new Date("2022-02-02T00:00:00Z"), { addSuffix: true }),
+        oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentIssueOpenedAt: formatDistanceToNow(new Date("2023-03-03T00:00:00Z"), { addSuffix: true }),
+        mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
+        oldestOpenIssueOpenedAt: formatDistanceToNow(new Date("2024-04-04T00:00:00Z"), { addSuffix: true }),
+        oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
+        languageColor: "rose",
+      },
+      {
+        name: "repo2",
+        description: "description2",
+        updatedAt: new Date("2021-01-01T00:00:00Z").toLocaleDateString(),
+        updatedAtISO8601: "2021-01-01T00:00:00Z",
+        htmlUrl: "http://url.com/repo2",
+        apiUrl: "http://api.com/repo2",
+        pullsUrl: "http://api.com/repo2/pulls",
+        issuesUrl: "http://api.com/repo2/issues",
+        language: "TypeScript",
+        topics: [],
+        openIssues: 0,
+        dependencies: [],
+        mostRecentPrOpenedAt: formatDistanceToNow(new Date("2021-01-01T00:00:00Z"), { addSuffix: true }),
+        mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
+        oldestOpenPrOpenedAt: formatDistanceToNow(new Date("2022-02-02T00:00:00Z"), { addSuffix: true }),
+        oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentIssueOpenedAt: formatDistanceToNow(new Date("2023-03-03T00:00:00Z"), { addSuffix: true }),
+        mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
+        oldestOpenIssueOpenedAt: formatDistanceToNow(new Date("2024-04-04T00:00:00Z"), { addSuffix: true }),
+        oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
+        languageColor: "emerald",
       },
     ];
 
@@ -276,3 +371,59 @@ describe("mapRepoFromStorageToUi", () => {
     });
   });
 });
+
+describe("hashToTailwindColor", () => {
+  it("returns undefined if not given a string", () => {
+    const actual = hashToTailwindColor(5);
+
+    expect.strictEqual(actual, undefined);
+  });
+
+  it("hashes a string's characters and uses the hash to pick from the list of Tailwind colours", () => {
+    const inputStrings = [
+      "f",
+      "fo",
+      "foi",
+      "foic",
+      "foicn",
+      "foicnh",
+      "foicnhb",
+      "foicnhbm",
+      "foicnhbmg",
+      "foicnhbmga",
+      "foicnhbmgal",
+      "foicnhbmgalf",
+      "l",
+      "lk",
+      "lke",
+      "lkep",
+      "lkepj",
+    ];
+
+    const expectedStrings = [
+      "red",
+      "orange",
+      "amber",
+      "yellow",
+      "lime",
+      "green",
+      "emerald",
+      "teal",
+      "cyan",
+      "sky",
+      "blue",
+      "indigo",
+      "violet",
+      "purple",
+      "fuchsia",
+      "pink",
+      "rose",
+    ];
+
+    for (const [input, expected] of inputStrings.map((e, i) => [e, expectedStrings[i]])) {
+      const actual = hashToTailwindColor(input);
+
+      expect.strictEqual(actual, expected);
+    }
+  });
+})
