@@ -31,11 +31,15 @@
 
 <th class="py-2 pl-2" scope="col" aria-sort="{{ariaSort}}"><a href="/{{linkParams}}"> {{name}}
 
-    <span class="text-xs ml-1">
+    <span class="text-xs ml-1 whitespace-nowrap">
         {% if sortDirection === "asc" and sortingOnThisParam %}
+        <div class="w-full">
             {{upArrow | safe}}
+        </div>
         {% elseif sortDirection === 'desc' and sortingOnThisParam %}
+        <div class="w-full">
             {{downArrow | safe}}
+        </div>
         {% elseif id !== sortBy %}
         <div class="w-full">
             {{upArrow | safe}}
