@@ -4,6 +4,7 @@ import { mapRepoFromApiForStorage } from "../index.js";
 import path from "path";
 import { getDependenciesForRepo } from "../renovate/dependencyDashboard.js";
 import { getOpenPRsForRepo } from "./fetchOpenPrs.js";
+import { getOpenIssuesForRepo } from "./fetchOpenIssues.js";
 
 /**
  * @typedef {import('../index.js').StoredRepo} StoredRepo
@@ -23,17 +24,21 @@ const fetchAllRepos = async () => {
     let repo = mapRepoFromApiForStorage(repository);
 
     await Promise.all([
-      await getDependenciesForRepo({
+      getDependenciesForRepo({
         repository,
         octokit,
       }),
-      await getOpenPRsForRepo({
+      getOpenPRsForRepo({
         repository,
         octokit,
       }),
-    ]).then(([dependencies, prInfo]) => {
+      getOpenIssuesForRepo({
+        repository,
+        octokit,
+      }),
+    ]).then(([dependencies, prInfo, issueInfo ]) => {
       repo.dependencies = dependencies;
-      repo = { ...repo, ...prInfo };
+      repo = { ...repo, ...prInfo, ...issueInfo };
     });
 
     repos.push(repo);

@@ -1,9 +1,10 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
 import { mapRepoFromStorageToUi, mapRepoFromApiForStorage } from "./index.js";
+import { formatDistanceToNow } from "date-fns";
 
 describe("mapRepoFromStorageToUi", () => {
-  it("converts the ISO8601 date to a human-readable date", () => {
+  it("converts ISO8601 timestamps to human-readable forms", () => {
     const storedRepos = [
       {
         name: "repo1",
@@ -17,6 +18,10 @@ describe("mapRepoFromStorageToUi", () => {
         topics: [],
         openIssues: 0,
         dependencies: [],
+        mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+        oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+        oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
       },
     ];
 
@@ -38,6 +43,14 @@ describe("mapRepoFromStorageToUi", () => {
         topics: [],
         openIssues: 0,
         dependencies: [],
+        mostRecentPrOpenedAt: formatDistanceToNow(new Date("2021-01-01T00:00:00Z"), { addSuffix: true }),
+        mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
+        oldestOpenPrOpenedAt: formatDistanceToNow(new Date("2022-02-02T00:00:00Z"), { addSuffix: true }),
+        oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentIssueOpenedAt: formatDistanceToNow(new Date("2023-03-03T00:00:00Z"), { addSuffix: true }),
+        mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
+        oldestOpenIssueOpenedAt: formatDistanceToNow(new Date("2024-04-04T00:00:00Z"), { addSuffix: true }),
+        oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
       },
     ];
 

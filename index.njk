@@ -41,6 +41,10 @@
                 {{macros.sortableTableHeader("Open bot PR count", "openBotPrCount", sortDirection, sortBy)}}
                 {{macros.sortableTableHeader("Open PR count", "openPrCount", sortDirection, sortBy)}}
                 {{macros.sortableTableHeader("Updated at", "updatedAt", sortDirection, sortBy)}}
+                {{macros.sortableTableHeader("Most recent PR opened", "mostRecentPrOpenedAt", sortDirection, sortBy)}}
+                {{macros.sortableTableHeader("Oldest open PR opened", "oldestOpenPrOpenedAt", sortDirection, sortBy)}}
+                {{macros.sortableTableHeader("Most recent issue opened", "mostRecentIssueOpenedAt", sortDirection, sortBy)}}
+                {{macros.sortableTableHeader("Oldest open issue opened", "oldestOpenIssueOpenedAt", sortDirection, sortBy)}}
                 <th class="py-2 pl-2 last:pr-2" scope="col">Dependencies</th>
               </tr>
             </thead>
@@ -55,6 +59,10 @@
                 <td class="py-2 pl-2">{{ repo.openBotPrCount }}</td>
                 <td class="py-2 pl-2">{{ repo.openPrCount }}</td>
                 <td class="py-2 pl-2 last:pr-2">{{ repo.updatedAt }}</td>
+                <td class="py-2 pl-2 last:pr-2">{{ repo.mostRecentPrOpenedAt }}</td>
+                <td class="py-2 pl-2 last:pr-2">{{ repo.oldestOpenPrOpenedAt }}</td>
+                <td class="py-2 pl-2 last:pr-2">{{ repo.mostRecentIssueOpenedAt }}</td>
+                <td class="py-2 pl-2 last:pr-2">{{ repo.oldestOpenIssueOpenedAt }}</td>
 
                 {% if repo.dependencies.length %}
                 <td class="group py-2 pl-2 last:pr-2 align-text-top space-y-2">

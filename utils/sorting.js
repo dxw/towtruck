@@ -24,23 +24,31 @@ export const sortByNumericValue = (repos, sortDirection, key) => {
 };
 
 /**
- * Sorts repositories by the date they were last updated
- * @param {UiRepo[]} repos
- * @param {SortDirection} sortDirection
+ * Compares two strings in lexicographical order.
+ * @param {string?} first 
+ * @param {string?} second 
+ * @returns {number}
+ */
+const lexicographicalSort = (first, second, ascending) => {
+  if (!first) return 1;
+  if (!second) return -1;
+
+  if (ascending) return first.localeCompare(second);
+  return second.localeCompare(first);
+}
+
+/**
+ * Sorts repos by a timestamp value in ISO 8601 (`YYYY-MM-DDThh:mm:ssZ`) format
+ * @param {UiRepo[]} repos 
+ * @param {SortDirection} sortDirection 
+ * @param {string} key 
  * @returns {UiRepo[]}
  */
-export const sortByUpdatedAt = (repos, sortDirection) => {
+export const sortByISO8601Timestamp = (repos, sortDirection, key) => {
   if (!sortDirection) return repos;
 
-  if (sortDirection === "asc") {
-    return repos.sort((a, b) => {
-      return a.updatedAtISO8601.localeCompare(b.updatedAtISO8601);
-    });
-  }
-  return repos.sort((a, b) =>
-    b.updatedAtISO8601.localeCompare(a.updatedAtISO8601)
-  );
-};
+  return repos.sort((a, b) => lexicographicalSort(a[key], b[key], sortDirection === "asc"));
+}
 
 /**
  * Sorts repositories based on the specified type and direction.
@@ -61,7 +69,20 @@ export const sortByType = (repos, sortDirection, sortBy) => {
       return sortByNumericValue(repos, sortDirection, "openIssues");
 
     case "updatedAt":
-      return sortByUpdatedAt(repos, sortDirection);
+      return sortByISO8601Timestamp(repos, sortDirection, "updatedAtISO8601");
+
+    case "mostRecentPrOpenedAt":
+      return sortByISO8601Timestamp(repos, sortDirection, "mostRecentPrOpenedAtISO8601");
+
+    case "oldestOpenPrOpenedAt":
+      return sortByISO8601Timestamp(repos, sortDirection, "oldestOpenPrOpenedAtISO8601");
+
+    case "mostRecentIssueOpenedAt":
+      return sortByISO8601Timestamp(repos, sortDirection, "mostRecentIssueOpenedAtISO8601");
+
+    case "oldestOpenIssueOpenedAt":
+      return sortByISO8601Timestamp(repos, sortDirection, "oldestOpenIssueOpenedAtISO8601");
+
     default:
       return repos;
   }

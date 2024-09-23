@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { sortByNumericValue, sortByType, sortByUpdatedAt } from "./sorting.js";
+import { sortByISO8601Timestamp, sortByNumericValue, sortByType } from "./sorting.js";
 
 describe("sortByNumericValue", () => {
   it("returns the original array if sortDirection is not provided", () => {
@@ -48,32 +48,44 @@ describe("sortByNumericValue", () => {
   });
 });
 
-describe("sortByUpdatedAt", () => {
-  it("sorts the repos by the date they were last updated in ascending order", () => {
-    const reposToSort = [
-      { name: "Repo 1", updatedAtISO8601: "2022-01-01T00:00:00Z" },
-      { name: "Repo 2", updatedAtISO8601: "2021-01-01T00:00:00Z" },
-      { name: "Repo 3", updatedAtISO8601: "2023-01-01T00:00:00Z" },
+describe("sortByISO8601Timestamp", () => {
+  it("returns the original array if sortDirection is not provided", () => {
+    const repos = [
+      { name: "Repo 1", value: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", value: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", value: "2023-01-01T00:00:00Z" },
     ];
 
-    expect.deepEqual(sortByUpdatedAt(reposToSort, "asc"), [
-      { name: "Repo 2", updatedAtISO8601: "2021-01-01T00:00:00Z" },
-      { name: "Repo 1", updatedAtISO8601: "2022-01-01T00:00:00Z" },
-      { name: "Repo 3", updatedAtISO8601: "2023-01-01T00:00:00Z" },
+    const result = sortByISO8601Timestamp(repos, null, "value");
+
+    expect.deepEqual(result, repos);
+  });
+
+  it("sorts the array in ascending order by the specified key if sortDirection is 'asc'", () => {
+    const reposToSort = [
+      { name: "Repo 1", value: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", value: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", value: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(sortByISO8601Timestamp(reposToSort, "asc", "value"), [
+      { name: "Repo 2", value: "2021-01-01T00:00:00Z" },
+      { name: "Repo 1", value: "2022-01-01T00:00:00Z" },
+      { name: "Repo 3", value: "2023-01-01T00:00:00Z" },
     ]);
   });
 
-  it("sorts the repos by the date they were last updated in descending order", () => {
+  it("sorts the array in descending order by the specified key if sortDirection is 'desc'", () => {
     const reposToSort = [
-      { name: "Repo 1", updatedAtISO8601: "2022-01-01T00:00:00Z" },
-      { name: "Repo 2", updatedAtISO8601: "2021-01-01T00:00:00Z" },
-      { name: "Repo 3", updatedAtISO8601: "2023-01-01T00:00:00Z" },
+      { name: "Repo 1", value: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", value: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", value: "2023-01-01T00:00:00Z" },
     ];
 
-    expect.deepEqual(sortByUpdatedAt(reposToSort, "desc"), [
-      { name: "Repo 3", updatedAtISO8601: "2023-01-01T00:00:00Z" },
-      { name: "Repo 1", updatedAtISO8601: "2022-01-01T00:00:00Z" },
-      { name: "Repo 2", updatedAtISO8601: "2021-01-01T00:00:00Z" },
+    expect.deepEqual(sortByISO8601Timestamp(reposToSort, "desc", "value"), [
+      { name: "Repo 3", value: "2023-01-01T00:00:00Z" },
+      { name: "Repo 1", value: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", value: "2021-01-01T00:00:00Z" },
     ]);
   });
 });
@@ -124,7 +136,59 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "asc", "updatedAt"),
-      sortByUpdatedAt(reposToSort, "asc")
+      sortByISO8601Timestamp(reposToSort, "asc", "updatedAtISO8601")
+    );
+  });
+
+  it('sorts the repos by the date they were last updated if "mostRecentPrOpenedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", mostRecentPrOpenedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", mostRecentPrOpenedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "mostRecentPrOpenedAt"),
+      sortByISO8601Timestamp(reposToSort, "asc", "mostRecentPrOpenedAtISO8601")
+    );
+  });
+
+  it('sorts the repos by the date they were last updated if "oldestOpenPrOpenedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", oldestOpenPrOpenedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", oldestOpenPrOpenedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", oldestOpenPrOpenedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "oldestOpenPrOpenedAt"),
+      sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenPrOpenedAtISO8601")
+    );
+  });
+
+  it('sorts the repos by the date they were last updated if "mostRecentIssueOpenedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", mostRecentIssueOpenedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", mostRecentIssueOpenedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", mostRecentIssueOpenedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "mostRecentIssueOpenedAt"),
+      sortByISO8601Timestamp(reposToSort, "asc", "mostRecentIssueOpenedAtISO8601")
+    );
+  });
+
+  it('sorts the repos by the date they were last updated if "oldestOpenIssueOpenedAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", oldestOpenIssueOpenedAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", oldestOpenIssueOpenedAtISO8601: "2021-01-01T00:00:00Z" },
+      { name: "Repo 3", oldestOpenIssueOpenedAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "oldestOpenIssueOpenedAt"),
+      sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenIssueOpenedAtISO8601")
     );
   });
 });

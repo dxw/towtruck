@@ -6,16 +6,14 @@ describe("handlePrsApiResponse", () => {
   describe("openPrCount", () => {
     it("returns the length of the array containing PRs", () => {
       const actual = handlePrsApiResponse({ data: [1, 2, 3] });
-      const expected = { openPrCount: 3, openBotPrCount: 0 };
 
-      expect.deepEqual(actual, expected);
+      expect.strictEqual(actual.openPrCount, 3);
     });
 
     it("returns 0 if there are no open PRs", () => {
       const actual = handlePrsApiResponse({ data: [] });
-      const expected = { openPrCount: 0, openBotPrCount: 0 };
 
-      expect.deepEqual(actual, expected);
+      expect.strictEqual(actual.openPrCount, 0);
     });
   });
 
@@ -63,5 +61,47 @@ describe("handlePrsApiResponse", () => {
 
       expect.equal(actual.openBotPrCount, 2);
     });
+  });
+
+  describe("mostRecentPrOpenedAt", () => {
+    it("returns null if there are no PRs", () => {
+      const actual = handlePrsApiResponse({ data: [] });
+
+      expect.strictEqual(actual.mostRecentPrOpenedAt, null);
+    });
+  });
+
+  it ("returns the latest value of created_at among all elements in the list", () => {
+    const pr1 = { created_at: "2024-01-01T12:34:56Z" };
+    const pr2 = { created_at: "2024-02-02T12:34:56Z" };
+
+    const actual = handlePrsApiResponse({ data: [pr1, pr2] });
+
+    expect.deepStrictEqual(actual.mostRecentPrOpenedAt, new Date(pr2.created_at));
+  });
+
+  describe("oldestOpenPrOpenedAt", () => {
+    it("returns null if there are no PRs", () => {
+      const actual = handlePrsApiResponse({ data: [] });
+
+      expect.deepEqual(actual.oldestOpenPrOpenedAt, null);
+    });
+  });
+
+  it("returns null if there are no open PRs", () => {
+    const closedPr = { created_at: "2024-01-01T12:34:56Z", state: "closed" }
+    const actual = handlePrsApiResponse({ data: [closedPr] });
+
+    expect.deepEqual(actual.oldestOpenPrOpenedAt, null);
+  });
+
+  it ("returns the earliest value of created_at among all elements in the list with a state of 'open'", () => {
+    const closedPr = { created_at: "2023-12-31T12:34:56Z", state: "closed" };
+    const openPr1 = { created_at: "2024-01-01T12:34:56Z", state: "open" };
+    const openPr2 = { created_at: "2024-02-02T12:34:56Z", state: "open" };
+
+    const actual = handlePrsApiResponse({ data: [closedPr, openPr1, openPr2] });
+
+    expect.deepStrictEqual(actual.oldestOpenPrOpenedAt, new Date(openPr1.created_at));
   });
 });
