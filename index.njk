@@ -148,14 +148,62 @@
                   </div>
                 </td>
 
-                <td class="py-2 pl-2 align-text-top">{{ repo.openIssues }}</td>
-                <td class="py-2 pl-2 align-text-top">{{ repo.openBotPrCount }}</td>
-                <td class="py-2 pl-2 align-text-top">{{ repo.openPrCount }}</td>
-                <td class="py-2 pl-2 align-text-top">{{ repo.updatedAt }}</td>
-                <td class="py-2 pl-2 last:pr-2">{{ repo.mostRecentPrOpenedAt }}</td>
-                <td class="py-2 pl-2 last:pr-2">{{ repo.oldestOpenPrOpenedAt }}</td>
-                <td class="py-2 pl-2 last:pr-2">{{ repo.mostRecentIssueOpenedAt }}</td>
-                <td class="py-2 pl-2 last:pr-2">{{ repo.oldestOpenIssueOpenedAt }}</td>
+                <td class="py-2 pl-2 align-text-top last:pr-2">
+                  <span class="relative">
+                    <span class="sticky top-28">
+                      {{ repo.openIssues }}
+                    </span>
+                  </span>
+                </td>
+                <td class="py-2 pl-2 align-text-top last:pr-2">
+                  <span class="relative">
+                    <span class="sticky top-28">
+                      {{ repo.openBotPrCount }}
+                    </span>
+                  </span>
+                </td>
+                <td class="py-2 pl-2 align-text-top last:pr-2">
+                  <span class="relative">
+                    <span class="sticky top-28">
+                      {{ repo.openPrCount }}
+                    </span>
+                  </span>
+                </td>
+                <td class="py-2 pl-2 align-text-top last:pr-2">
+                  <span class="relative">
+                    <span class="sticky top-28">
+                      {{ repo.updatedAt }}
+                    </span>
+                  </span>
+                </td>
+                <td class="py-2 pl-2 align-text-top last:pr-2">
+                  <span class="relative">
+                    <span class="sticky top-28">
+                      {{ repo.mostRecentPrOpenedAt }}
+                    </span>
+                  </span>
+                </td>
+                <td class="py-2 pl-2 align-text-top last:pr-2">
+                  <span class="relative">
+                    <span class="sticky top-28">
+                      {{ repo.oldestOpenPrOpenedAt }}
+                    </span>
+                  </span>
+                </td>
+                <td class="py-2 pl-2 align-text-top last:pr-2">
+                  <span class="relative">
+                    <span class="sticky top-28">
+                      {{ repo.mostRecentIssueOpenedAt }}
+                    </span>
+                  </span>
+                </td>
+                <td class="py-2 pl-2 align-text-top last:pr-2">
+                  <span class="relative">
+                    <span class="sticky top-28">
+                      {{ repo.oldestOpenIssueOpenedAt }}
+                    </span>
+                  </span>
+                </td>
              
               </tr>
               {% else %}
