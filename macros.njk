@@ -46,3 +46,12 @@
 </a>
 </th>
 {% endmacro %}
+
+{% macro tooltip(id, mainText, tooltipText) %}
+<div aria-describedby="{{ id }}" class="group relative inline-block">
+  <span class="border-dotted border-b">{{ mainText }}</span>
+  <div role="tooltip" id="{{ id }}" class="invisible group-focus:visible group-hover:visible absolute -top-8 left-2/4 -translate-x-2/4 text-center z-10 py-0.5 px-2 bg-stone-800 text-white rounded-full after:content-[' '] after:absolute after:top-full after:left-2/4 after:-ml-[4px] after:border-4 after:border-transparent after:border-t-stone-800">
+    {{ tooltipText }}
+  </div>
+</div>
+{% endmacro %}

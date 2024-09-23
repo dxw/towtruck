@@ -45,6 +45,7 @@
                 {{macros.sortableTableHeader("Oldest open PR opened", "oldestOpenPrOpenedAt", sortDirection, sortBy)}}
                 {{macros.sortableTableHeader("Most recent issue opened", "mostRecentIssueOpenedAt", sortDirection, sortBy)}}
                 {{macros.sortableTableHeader("Oldest open issue opened", "oldestOpenIssueOpenedAt", sortDirection, sortBy)}}
+                <th class="py-2 pl-2" scope="col">Dependabot alerts</th>
                 <th class="py-2 pl-2 last:pr-2" scope="col">Dependencies</th>
               </tr>
             </thead>
@@ -63,6 +64,26 @@
                 <td class="py-2 pl-2 last:pr-2">{{ repo.oldestOpenPrOpenedAt }}</td>
                 <td class="py-2 pl-2 last:pr-2">{{ repo.mostRecentIssueOpenedAt }}</td>
                 <td class="py-2 pl-2 last:pr-2">{{ repo.oldestOpenIssueOpenedAt }}</td>
+                <td class="py-2 pl-2 last:pr-2 text-center">
+                  {% if repo.totalOpenAlerts !== undefined %}
+                  <div class="inline-block whitespace-nowrap text-[0px]">
+                    {% set id = [repo.name, "alerts", "critical"] | join("-") %}
+                    {% set mainText = ["<span", " class='font-bold'" if repo.criticalSeverityAlerts, ">", repo.criticalSeverityAlerts, "</span>"] | join('') | safe %}
+                    <div class="inline-block text-sm text-white bg-red-600 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Critical severity alerts")}}</div>
+                    {% set id = [repo.name, "alerts", "high"] | join("-") %}
+                    {% set mainText = ["<span", " class='font-bold'" if repo.highSeverityAlerts, ">", repo.highSeverityAlerts, "</span>"] | join('') | safe %}
+                    <div class="inline-block text-sm text-white bg-red-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "High severity alerts")}}</div>
+                    {% set id = [repo.name, "alerts", "medium"] | join("-") %}
+                    {% set mainText = ["<span", " class='font-bold'" if repo.mediumSeverityAlerts, ">", repo.mediumSeverityAlerts, "</span>"] | join('') | safe %}
+                    <div class="inline-block text-sm text-white bg-orange-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Medium severity alerts")}}</div>
+                    {% set id = [repo.name, "alerts", "low"] | join("-") %}
+                    {% set mainText = ["<span", " class='font-bold'" if repo.lowSeverityAlerts, ">", repo.lowSeverityAlerts, "</span>"] | join('') | safe %}
+                    <div class="inline-block text-sm text-white bg-amber-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Low severity alerts")}}</div>
+                  </div>
+                  {% else %}
+                    <span class="text-stone-400 font-light italic">Dependabot alerts have been disabled for this repository.</span>
+                  {% endif %}
+                </td>
 
                 {% if repo.dependencies.length %}
                 <td class="group py-2 pl-2 last:pr-2 align-text-top space-y-2">
