@@ -1,7 +1,5 @@
 import { EndOfLifeDateApiClient } from "./index.js";
-import { readFromJsonFile } from "../index.js";
-import { writeFile, mkdir } from "fs/promises";
-import path from "path";
+import { TowtruckDatabase } from "../../db/index.js";
 
 /**
  * @typedef {Object} DependencyLifetimes
@@ -16,12 +14,12 @@ import path from "path";
  * @returns {Promise<DependencyLifetimes[]>}
  */
 const fetchAllDependencyLifetimes = async () => {
-  const pathToRepos = "./data/repos.json";
-  const persistedRepoData = await readFromJsonFile(pathToRepos);
+  const db = new TowtruckDatabase();
+  const persistedRepoData = db.getAllRepositories();
 
   const dependencySet = new Set();
-  persistedRepoData.repos
-    .flatMap((repo) => repo.dependencies)
+  Object.entries(persistedRepoData)
+    .flatMap(([, repo]) => repo.main.dependencies)
     .forEach((dependency) => dependencySet.add(dependency.name));
 
   const apiClient = new EndOfLifeDateApiClient();
@@ -48,21 +46,17 @@ const fetchAllDependencyLifetimes = async () => {
  */
 const saveAllDependencyLifetimes = async () => {
   console.info("Fetching all dependency EOL info...");
-  const lifetimes = await fetchAllDependencyLifetimes();
+  const allLifetimes = await fetchAllDependencyLifetimes();
 
   try {
-    const dir = path.dirname("./data/lifetimes.json");
-    await mkdir(dir, { recursive: true });
+    const db = new TowtruckDatabase();
 
     console.info("Saving all dependency EOL info...");
-    const toSave = {
-      lifetimes,
-    };
-
-    await writeFile("./data/lifetimes.json", JSON.stringify(toSave), {
-      encoding: "utf-8",
-      flag: "w",
+    const saveAllLifetimes = db.transaction((lifetimes) => {
+      lifetimes.forEach((item) => db.saveToDependency(item.dependency, "lifetimes", item.lifetimes))
     });
+
+    saveAllLifetimes(allLifetimes);
   } catch (error) {
     console.error("Error saving all dependency EOL info", error);
   }
