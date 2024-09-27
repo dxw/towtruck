@@ -139,3 +139,7 @@ towtruck.private-key.pem
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# SQLite
+*.db-wal
+*.db-shm
