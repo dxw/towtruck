@@ -8,8 +8,7 @@ export const createDestinationDirectory = async () => {
 export const seedTestData = async () => {
   console.info("Seeding test data...");
   await Promise.all([
-    copyFile("./e2es/testData/repos.json", "./data/repos.json"),
-    copyFile("./e2es/testData/lifetimes.json", "./data/lifetimes.json"),
+    copyFile("./e2es/testData/towtruck.db", "./data/towtruck.db"),
   ]);
 };
 
