@@ -1,8 +1,9 @@
 import { createServer } from "http";
 import nunjucks from "nunjucks";
-import { readFromJsonFile, mapRepoFromStorageToUi } from "./utils/index.js";
+import { mapRepoFromStorageToUi } from "./utils/index.js";
 import { getQueryParams } from "./utils/queryParams.js";
 import { sortByType } from "./utils/sorting.js";
+import { TowtruckDatabase } from "./db/index.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -17,10 +18,9 @@ const httpServer = createServer(async (request, response) => {
     return response.end();
   }
 
-  const [ persistedRepoData, persistedLifetimeData ] = await Promise.all([
-    readFromJsonFile("./data/repos.json"),
-    readFromJsonFile("./data/lifetimes.json"),
-  ]);
+  const db = new TowtruckDatabase();
+  const persistedRepoData = db.getAllRepositories();
+  const persistedLifetimeData = db.getAllDependencies();
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData);
 
