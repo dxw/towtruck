@@ -18,13 +18,17 @@ describe("mapRepoFromStorageToUi", () => {
           issuesUrl: "http://api.com/repo1/issues",
           language: null,
           topics: [],
-          openIssues: 0,
-          dependencies: [],
+        },
+        pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
           mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
           oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
         },
+        dependencies: [],
       },
     };
 
@@ -71,13 +75,17 @@ describe("mapRepoFromStorageToUi", () => {
           issuesUrl: "http://api.com/repo1/issues",
           language: "Ruby",
           topics: [],
-          openIssues: 0,
-          dependencies: [],
+        },
+        pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
           mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
           oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
         },
+        dependencies: [],
       },
       repo2: {
         owner: "dxw",
@@ -91,13 +99,17 @@ describe("mapRepoFromStorageToUi", () => {
           issuesUrl: "http://api.com/repo2/issues",
           language: "TypeScript",
           topics: [],
-          openIssues: 0,
-          dependencies: [],
+        },
+        pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
           mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
           oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
         },
+        dependencies: [],
       },
     };
 
@@ -167,9 +179,17 @@ describe("mapRepoFromStorageToUi", () => {
           issuesUrl: "http://api.com/repo1/issues",
           language: null,
           topics: [],
-          openIssues: 0,
-          dependencies: [],
         },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
       },
       repo2: {
         owner: "dxw",
@@ -183,9 +203,17 @@ describe("mapRepoFromStorageToUi", () => {
           issuesUrl: "http://api.com/repo2/issues",
           language: null,
           topics: [],
-          openIssues: 0,
-          dependencies: [],
         },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
       },
       repo3: {
         owner: "dxw",
@@ -199,9 +227,17 @@ describe("mapRepoFromStorageToUi", () => {
           issuesUrl: "http://api.com/repo3/issues",
           language: null,
           topics: [],
-          openIssues: 0,
-          dependencies: [],
         },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
       },
     };
 

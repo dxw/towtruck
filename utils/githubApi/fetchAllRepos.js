@@ -40,9 +40,8 @@ const fetchAllRepos = async () => {
         repository,
         octokit,
       }),
-    ]).then(([dependencies, prInfo, issueInfo , alerts]) => {
-      repo.dependencies = dependencies;
-      repo = { ...repo, ...prInfo, ...issueInfo, ...alerts };
+    ]).then(([dependencies, prInfo, issueInfo, alerts]) => {
+      repo = { repo, dependencies, prInfo, issueInfo, alerts };
     });
 
     repos.push(repo);
@@ -64,8 +63,14 @@ const saveAllRepos = async () => {
     console.info("Saving all repos...");
     const saveAllRepos = db.transaction((repos) => {
       repos.forEach((repo) => {
-        db.saveToRepository(repo.name, "main", repo);
-        db.saveToRepository(repo.name, "owner", repo.owner);
+        const name = repo.repo.name;
+        const owner = repo.repo.owner;
+        db.saveToRepository(name, "main", repo.repo);
+        db.saveToRepository(name, "owner", owner);
+        db.saveToRepository(name, "dependencies", repo.dependencies);
+        db.saveToRepository(name, "pullRequests", repo.prInfo);
+        db.saveToRepository(name, "issues", repo.issueInfo);
+        db.saveToRepository(name, "dependabotAlerts", repo.alerts);
       });
     });
 
