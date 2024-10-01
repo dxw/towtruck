@@ -19,7 +19,7 @@ const fetchAllDependencyLifetimes = async () => {
 
   const dependencySet = new Set();
   Object.entries(persistedRepoData)
-    .flatMap(([, repo]) => repo.main.dependencies)
+    .flatMap(([, repo]) => repo.dependencies)
     .forEach((dependency) => dependencySet.add(dependency.name));
 
   const apiClient = new EndOfLifeDateApiClient();
