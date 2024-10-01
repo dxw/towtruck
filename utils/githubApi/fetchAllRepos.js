@@ -1,11 +1,10 @@
 import { OctokitApp } from "../../octokitApp.js";
-import { writeFile, mkdir } from "fs/promises";
 import { mapRepoFromApiForStorage } from "../index.js";
-import path from "path";
 import { getDependenciesForRepo } from "../renovate/dependencyDashboard.js";
 import { getOpenPRsForRepo } from "./fetchOpenPrs.js";
 import { getOpenIssuesForRepo } from "./fetchOpenIssues.js";
 import { getDependabotAlertsForRepo } from "./fetchDependabotAlerts.js";
+import { TowtruckDatabase } from "../../db/index.js";
 
 /**
  * @typedef {import('../index.js').StoredRepo} StoredRepo
@@ -41,9 +40,8 @@ const fetchAllRepos = async () => {
         repository,
         octokit,
       }),
-    ]).then(([dependencies, prInfo, issueInfo , alerts]) => {
-      repo.dependencies = dependencies;
-      repo = { ...repo, ...prInfo, ...issueInfo, ...alerts };
+    ]).then(([dependencies, prInfo, issueInfo, alerts]) => {
+      repo = { repo, dependencies, prInfo, issueInfo, alerts };
     });
 
     repos.push(repo);
@@ -53,34 +51,30 @@ const fetchAllRepos = async () => {
 };
 
 /**
- * Fetches installation data for the app from the GitHub API
- * @returns {Object}
- */
-const installationOctokit = await OctokitApp.app.octokit.request(
-  "GET /app/installations"
-);
-
-/**
  * Saves all repos to a JSON file
  */
 const saveAllRepos = async () => {
   console.info("Fetching all repos...");
-  const repos = await fetchAllRepos();
+  const allRepos = await fetchAllRepos();
 
   try {
-    const dir = path.dirname("./data/repos.json");
-    await mkdir(dir, { recursive: true });
+    const db = new TowtruckDatabase();
 
     console.info("Saving all repos...");
-    const toSave = {
-      org: installationOctokit.data[0].account.login,
-      repos,
-    };
-
-    await writeFile("./data/repos.json", JSON.stringify(toSave), {
-      encoding: "utf-8",
-      flag: "w",
+    const saveAllRepos = db.transaction((repos) => {
+      repos.forEach((repo) => {
+        const name = repo.repo.name;
+        const owner = repo.repo.owner;
+        db.saveToRepository(name, "main", repo.repo);
+        db.saveToRepository(name, "owner", owner);
+        db.saveToRepository(name, "dependencies", repo.dependencies);
+        db.saveToRepository(name, "pullRequests", repo.prInfo);
+        db.saveToRepository(name, "issues", repo.issueInfo);
+        db.saveToRepository(name, "dependabotAlerts", repo.alerts);
+      });
     });
+
+    saveAllRepos(allRepos);
   } catch (error) {
     console.error("Error saving all repos", error);
   }

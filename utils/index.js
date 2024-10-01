@@ -1,4 +1,3 @@
-import { readFile } from "fs/promises";
 import { differenceInYears, formatDistance, formatDistanceToNow, startOfToday } from "date-fns";
 import { getDependencyEndOfLifeDate, getDependencyState } from "./endOfLifeDateApi/index.js";
 
@@ -64,7 +63,7 @@ const defaultIcon = "bx-question-mark";
  * @returns {UiDependency} 
  */
 export const mapDependencyFromStorageToUi = (dependency, persistedLifetimes) => {
-  const lifetimes = persistedLifetimes.lifetimes.find((item) => item.dependency === dependency.name);
+  const lifetimes = Object.entries(persistedLifetimes).find(([name]) => name === dependency.name)?.[1];
 
   const state = lifetimes === undefined ? "unknown" : getDependencyState(dependency, lifetimes.lifetimes);
   const latestVersion = lifetimes?.lifetimes[0]?.latest;
@@ -139,49 +138,40 @@ export const hashToTailwindColor = (str) => {
  * @returns {RepoData}
  */
 export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
-  const mappedRepos = persistedData.repos.map((repo) => {
-    const newDate = new Date(repo.updatedAt).toLocaleDateString();
+  const mappedRepos = Object.entries(persistedData).map(([, repo]) => {
+    const newDate = new Date(repo.main.updatedAt).toLocaleDateString();
     const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
 
-    const mostRecentPrOpenedAt = repo.mostRecentPrOpenedAt && formatDistanceToNow(repo.mostRecentPrOpenedAt, { addSuffix: true });
-    const oldestOpenPrOpenedAt = repo.oldestOpenPrOpenedAt && formatDistanceToNow(repo.oldestOpenPrOpenedAt, { addSuffix: true });
-    const mostRecentIssueOpenedAt = repo.mostRecentIssueOpenedAt && formatDistanceToNow(repo.mostRecentIssueOpenedAt, { addSuffix: true });
-    const oldestOpenIssueOpenedAt = repo.oldestOpenIssueOpenedAt && formatDistanceToNow(repo.oldestOpenIssueOpenedAt, { addSuffix: true });
+    const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDistanceToNow(repo.pullRequests.mostRecentPrOpenedAt, { addSuffix: true });
+    const oldestOpenPrOpenedAt = repo.pullRequests.oldestOpenPrOpenedAt && formatDistanceToNow(repo.pullRequests.oldestOpenPrOpenedAt, { addSuffix: true });
+    const mostRecentIssueOpenedAt = repo.issues.mostRecentIssueOpenedAt && formatDistanceToNow(repo.issues.mostRecentIssueOpenedAt, { addSuffix: true });
+    const oldestOpenIssueOpenedAt = repo.issues.oldestOpenIssueOpenedAt && formatDistanceToNow(repo.issues.oldestOpenIssueOpenedAt, { addSuffix: true });
 
-    const languageColor = hashToTailwindColor(repo.language);
+    const languageColor = hashToTailwindColor(repo.main.language);
 
     return {
-      ...repo,
+      ...repo.main,
+      ...repo.dependabotAlerts,
+      ...repo.pullRequests,
+      ...repo.issues,
       updatedAt: newDate,
-      updatedAtISO8601: repo.updatedAt,
+      updatedAtISO8601: repo.main.updatedAt,
       dependencies,
       mostRecentPrOpenedAt,
-      mostRecentPrOpenedAtISO8601: repo.mostRecentPrOpenedAt,
+      mostRecentPrOpenedAtISO8601: repo.pullRequests.mostRecentPrOpenedAt,
       oldestOpenPrOpenedAt,
-      oldestOpenPrOpenedAtISO8601: repo.oldestOpenPrOpenedAt,
+      oldestOpenPrOpenedAtISO8601: repo.pullRequests.oldestOpenPrOpenedAt,
       mostRecentIssueOpenedAt,
-      mostRecentIssueOpenedAtISO8601: repo.mostRecentIssueOpenedAt,
+      mostRecentIssueOpenedAtISO8601: repo.issues.mostRecentIssueOpenedAt,
       oldestOpenIssueOpenedAt,
-      oldestOpenIssueOpenedAtISO8601: repo.oldestOpenIssueOpenedAt,
+      oldestOpenIssueOpenedAtISO8601: repo.issues.oldestOpenIssueOpenedAt,
       languageColor,
     };
   });
 
   const totalRepos = mappedRepos.length;
 
-  return { ...persistedData, repos: mappedRepos, totalRepos };
-};
-
-/**
- * Reads data from a JSON file
- * @param {string} filePath - The path to the file to read from
- * @returns {any}
- */
-export const readFromJsonFile = async (filePath) => {
-  const json = await readFile(filePath, { encoding: "utf-8" });
-  const persistedData = JSON.parse(json);
-
-  return persistedData;
+  return { org: Object.entries(persistedData)[0][1].owner, repos: mappedRepos, totalRepos };
 };
 
 /**
@@ -226,6 +216,7 @@ export const readFromJsonFile = async (filePath) => {
  */
 export const mapRepoFromApiForStorage = (repo) => ({
   name: repo.name,
+  owner: repo.owner.login,
   description: repo.description,
   htmlUrl: repo.html_url,
   apiUrl: repo.url,

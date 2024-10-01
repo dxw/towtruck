@@ -5,28 +5,31 @@ import { formatDistanceToNow } from "date-fns";
 
 describe("mapRepoFromStorageToUi", () => {
   it("converts ISO8601 timestamps to human-readable forms", () => {
-    const storedRepos = [
-      {
-        name: "repo1",
-        description: "description1",
-        updatedAt: "2021-01-01T00:00:00Z",
-        htmlUrl: "http://url.com/repo1",
-        apiUrl: "http://api.com/repo1",
-        pullsUrl: "http://api.com/repo1/pulls",
-        issuesUrl: "http://api.com/repo1/issues",
-        language: null,
-        topics: [],
-        openIssues: 0,
-        dependencies: [],
-        mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
-        oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
-        mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
-        oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
-      },
-    ];
-
     const persistedData = {
-      repos: storedRepos,
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
+      },
     };
 
     const expected = [
@@ -59,45 +62,55 @@ describe("mapRepoFromStorageToUi", () => {
   });
 
   it("converts the language string to a Tailwind colour", () => {
-    const storedRepos = [
-      {
-        name: "repo1",
-        description: "description1",
-        updatedAt: "2021-01-01T00:00:00Z",
-        htmlUrl: "http://url.com/repo1",
-        apiUrl: "http://api.com/repo1",
-        pullsUrl: "http://api.com/repo1/pulls",
-        issuesUrl: "http://api.com/repo1/issues",
-        language: "Ruby",
-        topics: [],
-        openIssues: 0,
-        dependencies: [],
-        mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
-        oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
-        mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
-        oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
-      },
-      {
-        name: "repo2",
-        description: "description2",
-        updatedAt: "2021-01-01T00:00:00Z",
-        htmlUrl: "http://url.com/repo2",
-        apiUrl: "http://api.com/repo2",
-        pullsUrl: "http://api.com/repo2/pulls",
-        issuesUrl: "http://api.com/repo2/issues",
-        language: "TypeScript",
-        topics: [],
-        openIssues: 0,
-        dependencies: [],
-        mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
-        oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
-        mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
-        oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
-      },
-    ];
-
     const persistedData = {
-      repos: storedRepos,
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: "Ruby",
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
+      },
+      repo2: {
+        owner: "dxw",
+        main: {
+          name: "repo2",
+          description: "description2",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo2",
+          apiUrl: "http://api.com/repo2",
+          pullsUrl: "http://api.com/repo2/pulls",
+          issuesUrl: "http://api.com/repo2/issues",
+          language: "TypeScript",
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
+      },
     };
 
     const expected = [
@@ -153,49 +166,79 @@ describe("mapRepoFromStorageToUi", () => {
   });
 
   it("returns a count of the number of repos", () => {
-    const storedRepos = [
-      {
-        name: "repo1",
-        description: "description1",
-        updatedAt: "2021-01-01T00:00:00Z",
-        htmlUrl: "http://url.com/repo1",
-        apiUrl: "http://api.com/repo1",
-        pullsUrl: "http://api.com/repo1/pulls",
-        issuesUrl: "http://api.com/repo1/issues",
-        language: null,
-        topics: [],
-        openIssues: 0,
-        dependencies: [],
-      },
-      {
-        name: "repo2",
-        description: "description2",
-        updatedAt: "2021-01-01T00:00:00Z",
-        htmlUrl: "http://url.com/repo2",
-        apiUrl: "http://api.com/repo2",
-        pullsUrl: "http://api.com/repo2/pulls",
-        issuesUrl: "http://api.com/repo2/issues",
-        language: null,
-        topics: [],
-        openIssues: 0,
-        dependencies: [],
-      },
-      {
-        name: "repo3",
-        description: "description3",
-        updatedAt: "2021-01-01T00:00:00Z",
-        htmlUrl: "http://url.com/repo3",
-        apiUrl: "http://api.com/repo3",
-        pullsUrl: "http://api.com/repo3/pulls",
-        issuesUrl: "http://api.com/repo3/issues",
-        language: null,
-        topics: [],
-        openIssues: 0,
-        dependencies: [],
-      },
-    ];
     const persistedData = {
-      repos: storedRepos,
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
+      },
+      repo2: {
+        owner: "dxw",
+        main: {
+          name: "repo2",
+          description: "description2",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo2",
+          apiUrl: "http://api.com/repo2",
+          pullsUrl: "http://api.com/repo2/pulls",
+          issuesUrl: "http://api.com/repo2/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
+      },
+      repo3: {
+        owner: "dxw",
+        main: {
+          name: "repo3",
+          description: "description3",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo3",
+          apiUrl: "http://api.com/repo3",
+          pullsUrl: "http://api.com/repo3/pulls",
+          issuesUrl: "http://api.com/repo3/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
+          oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
+          oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
+        },
+        dependencies: [],
+      },
     };
 
     expect.deepEqual(mapRepoFromStorageToUi(persistedData).totalRepos, 3);
@@ -353,6 +396,7 @@ describe("mapRepoFromStorageToUi", () => {
 
       const repoToSave = {
         name: "security-alert-notifier",
+        owner: "dxw",
         description:
           "Icinga plugin to fetch security vulnerabilities for a GitHub organization.",
         htmlUrl: "https://github.com/dxw/security-alert-notifier",

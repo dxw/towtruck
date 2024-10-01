@@ -1,3 +1,7 @@
 {
-  "recommendations": ["esbenp.prettier-vscode", "ms-playwright.playwright"]
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "ms-playwright.playwright",
+    "yy0931.vscode-sqlite3-editor"
+  ]
 }
