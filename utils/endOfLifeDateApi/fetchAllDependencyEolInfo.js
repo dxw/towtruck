@@ -44,7 +44,7 @@ const fetchAllDependencyLifetimes = async () => {
 /**
  * Saves all lifetime information for all repository dependencies to a JSON file.
  */
-const saveAllDependencyLifetimes = async () => {
+export const saveAllDependencyLifetimes = async () => {
   console.info("Fetching all dependency EOL info...");
   const allLifetimes = await fetchAllDependencyLifetimes();
 
