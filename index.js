@@ -4,6 +4,7 @@ import { mapRepoFromStorageToUi } from "./utils/index.js";
 import { getQueryParams } from "./utils/queryParams.js";
 import { sortByType } from "./utils/sorting.js";
 import { TowtruckDatabase } from "./db/index.js";
+import { handleWebhooks } from "./webhooks/index.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -11,6 +12,8 @@ nunjucks.configure({
 });
 
 const httpServer = createServer(async (request, response) => {
+  if (await handleWebhooks(request, response)) return;
+
   const url = new URL(request.url, `http://${request.headers.host}`);
 
   if (url.pathname !== "/") {
