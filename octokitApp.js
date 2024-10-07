@@ -1,4 +1,4 @@
-import { App, createNodeMiddleware } from "@octokit/app";
+import { App } from "@octokit/app";
 
 const APP_ID = process.env.APP_ID;
 const PRIVATE_KEY = process.env.PRIVATE_KEY;
@@ -20,10 +20,4 @@ const app = new App({
   },
 });
 
-app.webhooks.onAny(({ name }) => {
-  console.log(name, "event received");
-});
-
-const middleware = createNodeMiddleware(app);
-
-export const OctokitApp = { app, middleware };
+export const OctokitApp = { app };
