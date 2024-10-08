@@ -36,7 +36,7 @@ const httpServer = createServer(async (request, response) => {
   return response.end(template);
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.info(`Server is running on port ${PORT}`);
 });
