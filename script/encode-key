@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+cat $1 | openssl base64 | tr -d '\n'
+echo
