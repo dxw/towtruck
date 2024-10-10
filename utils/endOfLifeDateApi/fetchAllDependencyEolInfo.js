@@ -1,6 +1,3 @@
-import { EndOfLifeDateApiClient } from "./index.js";
-import { TowtruckDatabase } from "../../db/index.js";
-
 /**
  * @typedef {Object} DependencyLifetimes
  * @property {string} dependency - The name of the dependency
@@ -11,18 +8,17 @@ import { TowtruckDatabase } from "../../db/index.js";
  * Fetches all lifetime information for all repository dependencies from the endoflife.date
  * API.
  * Dependencies for which no information could be found are ignored.
+ * @param {TowtruckDatabase} db
+ * @param {EndOfLifeDateApiClient} apiClient
  * @returns {Promise<DependencyLifetimes[]>}
  */
-const fetchAllDependencyLifetimes = async () => {
-  const db = new TowtruckDatabase();
+export const fetchAllDependencyLifetimes = async (db, apiClient) => {
   const persistedRepoData = db.getAllRepositories();
 
   const dependencySet = new Set();
   Object.entries(persistedRepoData)
     .flatMap(([, repo]) => repo.dependencies)
     .forEach((dependency) => dependencySet.add(dependency.name));
-
-  const apiClient = new EndOfLifeDateApiClient();
 
   const lifetimes = await Promise.all(
     dependencySet.values().map(async (dependency) => {
@@ -43,14 +39,11 @@ const fetchAllDependencyLifetimes = async () => {
 
 /**
  * Saves all lifetime information for all repository dependencies to a JSON file.
+ * @param {DependencyLifetimes[]} allLifetimes
+ * @param {TowtruckDatabase} db
  */
-export const saveAllDependencyLifetimes = async () => {
-  console.info("Fetching all dependency EOL info...");
-  const allLifetimes = await fetchAllDependencyLifetimes();
-
+export const saveAllDependencyLifetimes = async (allLifetimes, db) => {
   try {
-    const db = new TowtruckDatabase();
-
     console.info("Saving all dependency EOL info...");
     const saveAllLifetimes = db.transaction((lifetimes) => {
       lifetimes.forEach((item) => db.saveToDependency(item.dependency, "lifetimes", item.lifetimes))
@@ -61,5 +54,3 @@ export const saveAllDependencyLifetimes = async () => {
     console.error("Error saving all dependency EOL info", error);
   }
 };
-
-await saveAllDependencyLifetimes();
