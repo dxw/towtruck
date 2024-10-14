@@ -23,7 +23,7 @@ jobs:
           node-version: ${{ steps.nvm.outputs.NODE_VERSION }}
       - name: Install dependencies
         run: |
-          ./script/setup
+          ./script/setup --ci
       - name: Run lint & test
         run: |
           ./script/test

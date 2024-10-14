@@ -17,5 +17,8 @@ fi
 
 rm -rf node_modules
 
-script/bootstrap
-
+if [ "$1" = "--ci" ]; then
+  npm install
+else
+  script/bootstrap
+fi
