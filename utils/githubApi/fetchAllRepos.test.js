@@ -324,63 +324,63 @@ describe("saveAllRepos", () => {
     expect.strictEqual(db.saveToRepository.mock.callCount(), 12);
 
     expect.deepStrictEqual(db.saveToRepository.mock.calls[0].arguments, [
-      repo1.repo.name,
+      "dxw/repo1",
       "main",
       repo1.repo,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[1].arguments, [
-      repo1.repo.name,
+      "dxw/repo1",
       "owner",
       repo1.repo.owner,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[2].arguments, [
-      repo1.repo.name,
+      "dxw/repo1",
       "dependencies",
       repo1.dependencies,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[3].arguments, [
-      repo1.repo.name,
+      "dxw/repo1",
       "pullRequests",
       repo1.prInfo,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[4].arguments, [
-      repo1.repo.name,
+      "dxw/repo1",
       "issues",
       repo1.issueInfo,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[5].arguments, [
-      repo1.repo.name,
+      "dxw/repo1",
       "dependabotAlerts",
       repo1.alerts,
     ]);
 
     expect.deepStrictEqual(db.saveToRepository.mock.calls[6].arguments, [
-      repo2.repo.name,
+      "dxw/repo2",
       "main",
       repo2.repo,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[7].arguments, [
-      repo2.repo.name,
+      "dxw/repo2",
       "owner",
       repo2.repo.owner,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[8].arguments, [
-      repo2.repo.name,
+      "dxw/repo2",
       "dependencies",
       repo2.dependencies,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[9].arguments, [
-      repo2.repo.name,
+      "dxw/repo2",
       "pullRequests",
       repo2.prInfo,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[10].arguments, [
-      repo2.repo.name,
+      "dxw/repo2",
       "issues",
       repo2.issueInfo,
     ]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[11].arguments, [
-      repo2.repo.name,
+      "dxw/repo2",
       "dependabotAlerts",
       repo2.alerts,
     ]);
