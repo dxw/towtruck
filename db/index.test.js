@@ -228,6 +228,61 @@ describe("TowtruckDatabase", () => {
     });
   });
 
+  describe("getAllRepositoriesForOrg", () => {
+    it("retrieves the expected data from the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+
+      const testRepoSomeData = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      const testRepoSomeOtherData = {
+        foo: "bar",
+        baz: false,
+        quux: 0.123456789,
+      };
+
+      const anotherRepoSomeData = [1, "foo", true, null];
+
+      const expected = {
+        "org/test-repo": {
+          "some-data": testRepoSomeData,
+          "some-other-data": testRepoSomeOtherData,
+        },
+        "org/another-repo": {
+          "some-data": anotherRepoSomeData,
+        },
+      };
+
+      insertStatement.run("repository", "org/test-repo", "some-data", JSON.stringify(testRepoSomeData));
+      insertStatement.run("repository", "org/test-repo", "some-other-data", JSON.stringify(testRepoSomeOtherData));
+      insertStatement.run("repository", "org/another-repo", "some-data", JSON.stringify(anotherRepoSomeData));
+      insertStatement.run("repository", "another-org/test-repo", "some-data", JSON.stringify({}));
+
+      const actual = db.getAllRepositoriesForOrg("org");
+
+      expect.deepStrictEqual(actual, expected);
+    });
+
+    it("returns an empty object when no repositories exist for the given org", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      insertStatement.run("repository", "another-org/test-repo", "some-data", JSON.stringify({}));
+
+      const actual = db.getAllRepositoriesForOrg("org");
+
+      expect.deepStrictEqual(actual, {});
+    });
+  });
+
   describe("deleteAllRepositories", () => {
     it("removes the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);

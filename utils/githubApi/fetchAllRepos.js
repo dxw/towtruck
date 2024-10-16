@@ -66,8 +66,11 @@ export const saveAllRepos = async (allRepos, db) => {
     console.info("Saving all repos...");
     const saveAllRepos = db.transaction((repos) => {
       repos.forEach((repo) => {
-        const name = repo.repo.name;
+        const repoName = repo.repo.name;
         const owner = repo.repo.owner;
+
+        const name = `${owner}/${repoName}`;
+        
         db.saveToRepository(name, "main", repo.repo);
         db.saveToRepository(name, "owner", owner);
         db.saveToRepository(name, "dependencies", repo.dependencies);

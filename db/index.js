@@ -30,6 +30,7 @@ export class TowtruckDatabase {
   #saveStatement;
   #getStatement;
   #getAllForNameStatement;
+  #getAllForNameLikeStatement;
   #getAllForScopeStatement;
   #deleteAllForScopeStatement;
 
@@ -39,6 +40,7 @@ export class TowtruckDatabase {
     this.#saveStatement = this.#db.prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?) ON CONFLICT DO UPDATE SET value = excluded.value;");
     this.#getStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = ? AND name = ? AND key = ?;");
     this.#getAllForNameStatement = this.#db.prepare("SELECT key, value FROM towtruck_data WHERE scope = ? AND name = ?;");
+    this.#getAllForNameLikeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ? AND name LIKE ?;")
     this.#getAllForScopeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ?;");
     this.#deleteAllForScopeStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ?;");
   }
@@ -58,6 +60,21 @@ export class TowtruckDatabase {
 
     const result = {};
     rows.forEach((row) => result[row.key] = JSON.parse(row.value));
+
+    return result;
+  }
+
+  #getAllForNameLike(scope, namePattern) {
+    const rows = this.#getAllForNameLikeStatement.all(scope, namePattern);
+
+    const result = {};
+    rows.forEach((row) => {
+      if (!result[row.name]) {
+        result[row.name] = {};
+      }
+
+      result[row.name][row.key] = JSON.parse(row.value);
+    });
 
     return result;
   }
@@ -95,6 +112,10 @@ export class TowtruckDatabase {
 
   getAllRepositories() {
     return this.#getAllForScope("repository");
+  }
+
+  getAllRepositoriesForOrg(org) {
+    return this.#getAllForNameLike("repository", `${org}/%`);
   }
 
   deleteAllRepositories() {
