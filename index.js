@@ -5,6 +5,7 @@ import { getQueryParams } from "./utils/queryParams.js";
 import { sortByType } from "./utils/sorting.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
+import { handleOAuthCallback, getTokenOrPromptForLogin } from "./auth/index.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -12,14 +13,17 @@ nunjucks.configure({
 });
 
 const httpServer = createServer(async (request, response) => {
+  if (await handleOAuthCallback(request, response)) return;
   if (await handleWebhooks(request, response)) return;
-
-  const url = new URL(request.url, `http://${request.headers.host}`);
 
   if (url.pathname !== "/") {
     response.writeHead(404);
     return response.end();
   }
+
+  const token = await getTokenOrPromptForLogin(request, response);
+
+  if (!token) return;
 
   const db = new TowtruckDatabase();
   const persistedRepoData = db.getAllRepositories();
