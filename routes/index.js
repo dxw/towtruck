@@ -1,9 +1,10 @@
-import { index, org } from "./handlers.js";
+import { index, org, logout } from "./handlers.js";
 import { match } from "./match.js";
 
 const pathHandlers = {
   "/": index,
   "/{org}": org,
+  "/logout": logout,
 };
 
 export const handleRoutes = async (token, request, response) => {
