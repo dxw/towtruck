@@ -1,4 +1,5 @@
 import nunjucks from "nunjucks";
+import { cookie } from "../auth/cookie.js";
 import { mapRepoFromStorageToUi } from "../utils/index.js";
 import { getQueryParams } from "../utils/queryParams.js";
 import { sortByType } from "../utils/sorting.js";
@@ -20,6 +21,7 @@ export const index = async (token, request, response) => {
   
   const template = nunjucks.render("index.njk", {
     orgs,
+    loggedIn: true
   });
 
   return response.end(template);
@@ -51,7 +53,17 @@ export const org = async (token, request, response, {org}) => {
     org,
     ...reposForUi,
     repos: sortByType(reposForUi.repos, sortDirection, sortBy),
+    loggedIn: true,
   });
 
   return response.end(template);
 }
+
+export const logout = async (token, request, response) => {
+  response.writeHead(302, {
+    "Location": "/",
+    ...cookie("Token", "", "/", new Date(0)),
+  });
+
+  return response.end();
+};
