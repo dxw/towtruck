@@ -171,7 +171,7 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
 
   const totalRepos = mappedRepos.length;
 
-  return { org: Object.entries(persistedData)[0][1].owner, repos: mappedRepos, totalRepos };
+  return { repos: mappedRepos, totalRepos };
 };
 
 /**
