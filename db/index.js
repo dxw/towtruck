@@ -31,6 +31,7 @@ export class TowtruckDatabase {
   #getStatement;
   #getAllForNameStatement;
   #getAllForScopeStatement;
+  #deleteAllForScopeStatement;
 
   constructor(filename = "./data/towtruck.db", options) {
     this.#db = initialiseDatabase(filename, options);
@@ -39,6 +40,7 @@ export class TowtruckDatabase {
     this.#getStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = ? AND name = ? AND key = ?;");
     this.#getAllForNameStatement = this.#db.prepare("SELECT key, value FROM towtruck_data WHERE scope = ? AND name = ?;");
     this.#getAllForScopeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ?;");
+    this.#deleteAllForScopeStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ?;");
   }
 
   #save(scope, name, key, data) {
@@ -75,6 +77,10 @@ export class TowtruckDatabase {
     return result;
   }
 
+  #deleteAllForScope(scope) {
+    return this.#deleteAllForScopeStatement.run(scope);
+  }
+
   saveToRepository(name, key, data) {
     return this.#save("repository", name, key, data);
   }
@@ -91,6 +97,10 @@ export class TowtruckDatabase {
     return this.#getAllForScope("repository");
   }
 
+  deleteAllRepositories() {
+    return this.#deleteAllForScope("repository");
+  }
+
   saveToDependency(name, key, data) {
     return this.#save("dependency", name, key, data);
   }
@@ -105,6 +115,10 @@ export class TowtruckDatabase {
 
   getAllDependencies() {
     return this.#getAllForScope("dependency");
+  }
+
+  deleteAllDependencies() {
+    return this.#deleteAllForScope("dependency");
   }
 
   transaction(fn) {

@@ -228,6 +228,43 @@ describe("TowtruckDatabase", () => {
     });
   });
 
+  describe("deleteAllRepositories", () => {
+    it("removes the expected data from the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const selectStatement = new Database(testDbPath).prepare("SELECT COUNT(*) FROM towtruck_data WHERE scope = 'repository';");
+
+      const testRepoSomeData = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      const testRepoSomeOtherData = {
+        foo: "bar",
+        baz: false,
+        quux: 0.123456789,
+      };
+
+      const anotherRepoSomeData = [1, "foo", true, null];
+
+      insertStatement.run("repository", "test-repo", "some-data", JSON.stringify(testRepoSomeData));
+      insertStatement.run("repository", "test-repo", "some-other-data", JSON.stringify(testRepoSomeOtherData));
+      insertStatement.run("repository", "another-repo", "some-data", JSON.stringify(anotherRepoSomeData));
+      insertStatement.run("dependency", "test-dependency", "some-data", JSON.stringify({}));
+
+      db.deleteAllRepositories();
+
+      const actual = selectStatement.get();
+
+      expect.deepStrictEqual(actual, { "COUNT(*)": 0 });
+    });
+  });
+
   describe("saveToDependency", () => {
     it("inserts the expected data into the table", () => {
       const db = new TowtruckDatabase(testDbPath);
@@ -413,6 +450,43 @@ describe("TowtruckDatabase", () => {
       const actual = db.getAllDependencies();
 
       expect.deepStrictEqual(actual, {});
+    });
+  });
+
+  describe("deleteAllDependencies", () => {
+    it("removes the expected data from the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const selectStatement = new Database(testDbPath).prepare("SELECT COUNT(*) FROM towtruck_data WHERE scope = 'dependency';");
+
+      const testDepSomeData = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      const testDepSomeOtherData = {
+        foo: "bar",
+        baz: false,
+        quux: 0.123456789,
+      };
+
+      const anotherDepSomeData = [1, "foo", true, null];
+
+      insertStatement.run("dependency", "test-dep", "some-data", JSON.stringify(testDepSomeData));
+      insertStatement.run("dependency", "test-dep", "some-other-data", JSON.stringify(testDepSomeOtherData));
+      insertStatement.run("dependency", "another-dep", "some-data", JSON.stringify(anotherDepSomeData));
+      insertStatement.run("repository", "test-repository", "some-data", JSON.stringify({}));
+
+      db.deleteAllDependencies();
+
+      const actual = selectStatement.get();
+
+      expect.deepStrictEqual(actual, { "COUNT(*)": 0 });
     });
   });
 });
