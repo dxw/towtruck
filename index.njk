@@ -2,199 +2,25 @@
 
 {% block content %}
 <div class="bg-stone-50 dark:bg-stone-700 rounded-lg border-b-4 border-stone-200 dark:border-stone-900 space-y-4">
-  <h2 class="bg-white dark:bg-stone-600 rounded-t-lg border-b-2 border-stone-100 dark:border-stone-800 text-xl font-bold p-4">{{ org }}</h2>
+  <h2 class="bg-white dark:bg-stone-600 rounded-t-lg border-b-2 border-stone-100 dark:border-stone-800 text-xl font-bold p-4">Organisations</h2>
+  {% if orgs.length %}
   <p class="mx-4">
-    {% if totalRepos === 1 %}
-    There is <span class="font-bold">1</span> repository
+    {% if orgs.length === 1 %}
+    There is <span class="font-bold">1</span> organisation
     {% else %} 
-    There are <span class="font-bold">{{ totalRepos }}</span> repositories
+    There are <span class="font-bold">{{ orgs.length }}</span> organisations
     {% endif %}
-    that Towtruck is tracking for <span class="font-bold">{{ org }}</span>.
+    using Towtruck that you are a member of.
   </p>
-  <div class="mx-4">
-    <table class="table-fixed w-full mb-4 border-y border-stone-200 dark:border-stone-900">
-      <thead class="sticky top-0 z-20 bg-white dark:bg-stone-600 border-b border-stone-200 dark:border-stone-900 text-left">
-        <tr class="space-x-2">
-          <th class="py-2 pl-2 w-5/12" scope="col">Repository</th>
-          {{macros.sortableTableHeader("Open issues count", "openIssues", sortDirection, sortBy)}}
-          {{macros.sortableTableHeader("Open bot PR count", "openBotPrCount", sortDirection, sortBy)}}
-          {{macros.sortableTableHeader("Open PR count", "openPrCount", sortDirection, sortBy)}}
-          {{macros.sortableTableHeader("Updated at", "updatedAt", sortDirection, sortBy)}}
-          {{macros.sortableTableHeader("Most recent PR opened", "mostRecentPrOpenedAt", sortDirection, sortBy)}}
-          {{macros.sortableTableHeader("Oldest open PR opened", "oldestOpenPrOpenedAt", sortDirection, sortBy)}}
-          {{macros.sortableTableHeader("Most recent issue opened", "mostRecentIssueOpenedAt", sortDirection, sortBy)}}
-          {{macros.sortableTableHeader("Oldest open issue opened", "oldestOpenIssueOpenedAt", sortDirection, sortBy)}}
-        </tr>
-      </thead>
-      <tbody>
-        {% for repo in repos %}
-        <tr class="even:bg-white dark:even:bg-stone-600">
-          <td class="py-2 pl-2 align-text-top" scope="row">
-            <div class="text-[0px]">
-              <a target="_blank" class="inline-block text-base text-sky-600 dark:text-sky-500 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a>
-              {% if repo.language %}
-              <span class="inline-block text-xs text-{{ repo.languageColor }}-600 dark:text-{{ repo.languageColor }}-400 border-{{ repo.languageColor }}-600 dark:border-{{ repo.languageColor }}-400 border rounded-lg ml-2 py-1 px-2">{{ repo.language }}</span>
-              {% endif %}
-              {% if repo.totalOpenAlerts !== undefined %}
-              <div class="inline-block whitespace-nowrap text-[0px] ml-2 align-[-1px]">
-                {% set id = [repo.name, "alerts", "critical"] | join("-") %}
-                {% set mainText = ["<span", " class='font-bold'" if repo.criticalSeverityAlerts, ">", repo.criticalSeverityAlerts, "</span>"] | join('') | safe %}
-                <div class="inline-block text-sm text-white bg-red-600 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Critical severity alerts")}}</div>
-                {% set id = [repo.name, "alerts", "high"] | join("-") %}
-                {% set mainText = ["<span", " class='font-bold'" if repo.highSeverityAlerts, ">", repo.highSeverityAlerts, "</span>"] | join('') | safe %}
-                <div class="inline-block text-sm text-white bg-red-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "High severity alerts")}}</div>
-                {% set id = [repo.name, "alerts", "medium"] | join("-") %}
-                {% set mainText = ["<span", " class='font-bold'" if repo.mediumSeverityAlerts, ">", repo.mediumSeverityAlerts, "</span>"] | join('') | safe %}
-                <div class="inline-block text-sm text-white bg-orange-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Medium severity alerts")}}</div>
-                {% set id = [repo.name, "alerts", "low"] | join("-") %}
-                {% set mainText = ["<span", " class='font-bold'" if repo.lowSeverityAlerts, ">", repo.lowSeverityAlerts, "</span>"] | join('') | safe %}
-                <div class="inline-block text-sm text-white bg-amber-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Low severity alerts")}}</div>
-              </div>
-              {% else %}
-                <span class="text-stone-400 font-light italic">Dependabot alerts have been disabled for this repository.</span>
-              {% endif %}
-            </div>
-            <p class="mt-2">{{ repo.description }}</p>
-
-            {% if repo.topics.length %}
-            <div class="mt-4">
-              {% for topic in repo.topics %}
-              <span class="text-xs text-stone-600 dark:text-stone-400 bg-stone-200 dark:bg-stone-800 rounded-full py-1 px-2">{{ topic }}</span>
-              {% endfor %}
-            </div>
-            {% endif %}
-
-            <hr class="mt-4 w-96 border-stone-200 dark:border-stone-400" />
-
-            <div class="mt-4 mb-2">
-              {% if repo.dependencies.length %}
-              <div class="group space-y-2">
-                <p>
-                  {% if repo.dependencies.length === 1 %}
-                  There is <span class="font-bold">1</span> dependency:
-                  {% else %}
-                  There are <span class="font-bold">{{ repo.dependencies.length }}</span> dependencies:
-                  {% endif %}
-                  <label>
-                    <input class="hidden" type="checkbox" />
-                    <span class="text-sm bg-stone-500 text-white rounded-lg py-1 px-2 hidden group-has-[:checked]:inline">Hide</span>
-                    <span class="text-sm bg-stone-500 text-white rounded-lg py-1 px-2 group-has-[:checked]:hidden">Show</span>
-                  </label>
-                </p>
-                <ul class="space-y-2 hidden group-has-[:checked]:block">
-                  {% for dependency in repo.dependencies %}
-                    <li>
-                      <div class="inline-block whitespace-nowrap text-[0px]">
-                        <span>
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-200 dark:bg-{{ dependency.color }}-800 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
-                          {% if dependency.version %}
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-300 dark:bg-{{ dependency.color }}-900 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
-                          {% endif %}
-                          {% if dependency.tag %}
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-400 dark:bg-{{ dependency.color }}-950 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
-                          {% endif %}
-                        </span>
-                        <span class="inline-block w-1"></span>
-                        <span>
-                          {% if dependency.isOutdated %}
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-500 dark:bg-{{ dependency.color }}-600 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">  
-                            <i class="align-[-1px] bx {{dependency.icon}}"></i>
-                            {{ dependency.changelog }}
-                            v{{ dependency.latestVersion }}
-                          </span>
-                          {% endif %}
-                          {% if dependency.isEndOfLifeSoon %}
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-700 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
-                            <i class="align-[-1px] bx bxs-hourglass"></i>
-                            <span class="font-sans">Support ends {{ dependency.endOfLifeRelative }}</span>
-                          </span>
-                          {% elif dependency.isOutOfSupport %}
-                          <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-700 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
-                            <i class="align-[-1px] bx bxs-hourglass-bottom"></i>
-                            <span class="font-sans">Support ended {{ dependency.endOfLifeRelative }}</span>
-                          </span>
-                          {% endif %}
-                        </span>
-                      </div>
-                    </li>
-                  {% endfor %}
-                </ul>
-              </div>
-              {% else %}
-                <span class="text-stone-400 font-light italic">
-                  No dependencies have been discovered.
-                  <br/>
-                  Please make sure that Renovate has been configured on the repository to produce a dependency dashboard.
-                </span>
-              {% endif %}
-            </div>
-          </td>
-
-          <td class="py-2 pl-2 align-text-top last:pr-2">
-            <span class="relative">
-              <span class="sticky top-28">
-                {{ repo.openIssues }}
-              </span>
-            </span>
-          </td>
-          <td class="py-2 pl-2 align-text-top last:pr-2">
-            <span class="relative">
-              <span class="sticky top-28">
-                {{ repo.openBotPrCount }}
-              </span>
-            </span>
-          </td>
-          <td class="py-2 pl-2 align-text-top last:pr-2">
-            <span class="relative">
-              <span class="sticky top-28">
-                {{ repo.openPrCount }}
-              </span>
-            </span>
-          </td>
-          <td class="py-2 pl-2 align-text-top last:pr-2">
-            <span class="relative">
-              <span class="sticky top-28">
-                {{ repo.updatedAt }}
-              </span>
-            </span>
-          </td>
-          <td class="py-2 pl-2 align-text-top last:pr-2">
-            <span class="relative">
-              <span class="sticky top-28">
-                {{ repo.mostRecentPrOpenedAt }}
-              </span>
-            </span>
-          </td>
-          <td class="py-2 pl-2 align-text-top last:pr-2">
-            <span class="relative">
-              <span class="sticky top-28">
-                {{ repo.oldestOpenPrOpenedAt }}
-              </span>
-            </span>
-          </td>
-          <td class="py-2 pl-2 align-text-top last:pr-2">
-            <span class="relative">
-              <span class="sticky top-28">
-                {{ repo.mostRecentIssueOpenedAt }}
-              </span>
-            </span>
-          </td>
-          <td class="py-2 pl-2 align-text-top last:pr-2">
-            <span class="relative">
-              <span class="sticky top-28">
-                {{ repo.oldestOpenIssueOpenedAt }}
-              </span>
-            </span>
-          </td>
-        
-        </tr>
-        {% else %}
-        <tr>
-          <td class="py-2 px-2 text-center text-stone-400 font-light italic">No repositories found.</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
-  </div>
+  <ul class="mx-4 pb-4 space-y-2">
+    {% for org in orgs %}
+    <li><a class="inline-block text-base text-sky-600 dark:text-sky-500 hover:underline" href="/{{ org }}">{{ org }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="mx-4 pb-4">
+    You are not a member of any organisations that are using Towtruck.
+  </p>
+  {% endif %}
 </div>
 {% endblock %}
