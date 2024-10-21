@@ -11,6 +11,8 @@ ARG WEBHOOK_SECRET
 
 COPY . .
 
+RUN mkdir -p /data
+
 RUN touch .env \
   && echo "APP_ID=$APP_ID" >> .env \
   && echo "PRIVATE_KEY=$PRIVATE_KEY" >> .env \
