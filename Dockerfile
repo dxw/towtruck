@@ -1,7 +1,7 @@
 FROM node:22.9.0-slim
 
 WORKDIR /towtruck
-VOLUME /data
+VOLUME data
 
 ARG APP_ID
 ARG PRIVATE_KEY
@@ -11,7 +11,7 @@ ARG WEBHOOK_SECRET
 
 COPY . .
 
-RUN mkdir -p /data
+RUN mkdir -p data
 
 RUN touch .env \
   && echo "APP_ID=$APP_ID" >> .env \
