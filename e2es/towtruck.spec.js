@@ -5,7 +5,11 @@ test("has dependency info", async ({ page, baseURL }) => {
 
   await expect(page).toHaveTitle(/Towtruck/);
 
-  page.getByText("There are 3 repositories that Towtruck is tracking for dxw.");
+  expect(await page.getByText("There is 1 organisation using Towtruck that you are a member of.").count()).toBe(1);
+
+  await page.getByRole("link", { name: "dxw", exact: true }).click();
+
+  expect(await page.getByText("There are 3 repositories that Towtruck is tracking for dxw.").count()).toBe(1);
 
   const tableHeadings = [
     "Name",
