@@ -1,0 +1,14 @@
+{% extends "base.njk" %}
+
+{% block content %}
+<div class="bg-stone-50 dark:bg-stone-700 rounded-lg border-b-4 border-stone-200 dark:border-stone-900 p-12 space-y-4 m-auto mt-32">
+  <div class="text-center">To use Towtruck, you must login.</div>
+  <br />
+  <div class="text-center">
+    <a href="/api/github/oauth/login" role="button" class="px-2 py-1 text-sm bg-stone-500 text-white rounded-lg">
+      <i class="align-[-1px] pr-1 bx bxl-github"></i>
+      Login with GitHub
+    </a>
+  </div>
+</div>
+{% endblock %}
