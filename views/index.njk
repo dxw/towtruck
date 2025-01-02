@@ -1,0 +1,26 @@
+{% extends "./_base.njk" %}
+
+{% block content %}
+<div class="bg-stone-50 dark:bg-stone-700 rounded-lg border-b-4 border-stone-200 dark:border-stone-900 space-y-4">
+  <h2 class="bg-white dark:bg-stone-600 rounded-t-lg border-b-2 border-stone-100 dark:border-stone-800 text-xl font-bold p-4">Organisations</h2>
+  {% if orgs.length %}
+  <p class="mx-4">
+    {% if orgs.length === 1 %}
+    There is <span class="font-bold">1</span> organisation
+    {% else %} 
+    There are <span class="font-bold">{{ orgs.length }}</span> organisations
+    {% endif %}
+    using Towtruck that you are a member of.
+  </p>
+  <ul class="mx-4 pb-4 space-y-2">
+    {% for org in orgs %}
+    <li><a class="inline-block text-base text-sky-600 dark:text-sky-500 hover:underline" href="/{{ org }}">{{ org }}</a></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="mx-4 pb-4">
+    You are not a member of any organisations that are using Towtruck.
+  </p>
+  {% endif %}
+</div>
+{% endblock %}
