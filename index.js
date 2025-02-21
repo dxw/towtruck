@@ -8,7 +8,7 @@ import { expressjwt } from "express-jwt";
 import jwt from "jsonwebtoken";
 import { OctokitApp } from "./octokitApp.js";
 import { Config } from "./config.js";
-import { getUser } from "./auth/index.js";
+import { User, getUser, saveUser } from "./auth/index.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -27,6 +27,14 @@ httpServer.use(expressjwt({
     return match?.[1];
   },
 }));
+httpServer.use((request, _response, next) => {
+  if (request.auth) {
+    const db = new TowtruckDatabase();
+    request.currentUser = getUser(db, request.auth.username);
+  }
+
+  next();
+});
 
 httpServer.engine("njk", nunjucks.render);
 
@@ -34,7 +42,7 @@ httpServer.set("views", "./views");
 httpServer.set("view engine", "njk");
 
 httpServer.get("/", (request, response) => {
-  if (!request.auth) {
+  if (!request.currentUser) {
     return response.render("login", {
       loginMethods: Config.loginMethods,
     });
@@ -53,7 +61,14 @@ httpServer.get("/", (request, response) => {
     sortDirection,
     ...reposForUi,
     repos: sortByType(reposForUi.repos, sortDirection, sortBy),
+    currentUser: request.currentUser
   });
+});
+
+httpServer.get("/logout", (_request, response) => {
+  return response
+    .setHeader("set-cookie", `Token=; Expires=${new Date(0).toUTCString()}; SameSite=Strict; HttpOnly; Path=/;`)
+    .render("login-refresh");
 });
 
 httpServer.post("/login", (request, response) => {
@@ -86,9 +101,15 @@ httpServer.get("/login/github", async (request, response) => {
   }
 
   const { authentication: { token: githubApiToken } } = await OctokitApp.app.oauth.createToken({ code: request.query.code });
-  const data = await OctokitApp.app.oauth.checkToken({ token: githubApiToken });
+  const { data: { user: { login: username } } } = await OctokitApp.app.oauth.checkToken({ token: githubApiToken });
 
-  const token = jwt.sign({ username: data.data.user.login }, Config.privateKey, { algorithm: 'RS256', expiresIn: Config.tokenExpiry });
+  const { data: orgs } = await (await OctokitApp.app.oauth.getUserOctokit({ token: githubApiToken })).request("GET /user/orgs");
+  const user = new User(username, orgs.map(data => data.login), "github");
+
+  const db = new TowtruckDatabase();
+  saveUser(db, user);
+
+  const token = jwt.sign({ username }, Config.privateKey, { algorithm: 'RS256', expiresIn: Config.tokenExpiry });
   const { exp } = jwt.decode(token);
 
   return response
