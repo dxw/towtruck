@@ -33,6 +33,7 @@ export class TowtruckDatabase {
   #getAllForNameLikeStatement;
   #getAllForScopeStatement;
   #deleteAllForScopeStatement;
+  #getAllOrgNamesStatement;
 
   constructor(filename = "./data/towtruck.db", options) {
     this.#db = initialiseDatabase(filename, options);
@@ -43,6 +44,7 @@ export class TowtruckDatabase {
     this.#getAllForNameLikeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ? AND name LIKE ?;")
     this.#getAllForScopeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ?;");
     this.#deleteAllForScopeStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ?;");
+    this.#getAllOrgNamesStatement = this.#db.prepare("SELECT DISTINCT SUBSTRING(name, 1, INSTR(name, '/') - 1) AS org_name FROM towtruck_data WHERE scope = 'repository';");
   }
 
   #save(scope, name, key, data) {
@@ -160,6 +162,10 @@ export class TowtruckDatabase {
 
   deleteAllUsers() {
     return this.#deleteAllForScope("user");
+  }
+
+  getAllOrgNames() {
+    return this.#getAllOrgNamesStatement.all().map(result => result.org_name);
   }
 
   transaction(fn) {
