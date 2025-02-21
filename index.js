@@ -8,6 +8,7 @@ import { expressjwt } from "express-jwt";
 import jwt from "jsonwebtoken";
 import { OctokitApp } from "./octokitApp.js";
 import { Config } from "./config.js";
+import { getUser } from "./auth/index.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -16,6 +17,7 @@ nunjucks.configure({
 
 const httpServer = express();
 httpServer.use(handleWebhooks);
+httpServer.use(express.urlencoded());
 httpServer.use(expressjwt({
   secret: Config.privateKey,
   algorithms: ["RS256"],
@@ -52,6 +54,30 @@ httpServer.get("/", (request, response) => {
     ...reposForUi,
     repos: sortByType(reposForUi.repos, sortDirection, sortBy),
   });
+});
+
+httpServer.post("/login", (request, response) => {
+  if (!Config.loginMethods.usernamePassword) {
+    return response.status(404).render("404", { url: request.path });
+  }
+
+  const db = new TowtruckDatabase();
+
+  const user = getUser(db, request.body.username);
+
+  if (!user || !user.passwordMatches(request.body.password)) {
+    return response.render("login", {
+      loginMethods: Config.loginMethods,
+      errors: [ "The username or password is incorrect." ]
+    });
+  }
+
+  const token = jwt.sign({ username: user.username }, Config.privateKey, { algorithm: 'RS256', expiresIn: Config.tokenExpiry });
+  const { exp } = jwt.decode(token);
+
+  return response
+    .setHeader("set-cookie", `Token=${token}; Expires=${new Date(exp * 1000).toUTCString()}; SameSite=Strict; HttpOnly; Path=/;`)
+    .render("login-refresh");
 });
 
 httpServer.get("/login/github", async (request, response) => {
