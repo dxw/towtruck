@@ -769,4 +769,26 @@ describe("TowtruckDatabase", () => {
       expect.deepStrictEqual(actual, { "COUNT(*)": 0 });
     });
   });
+
+  describe("getAllOrgNames", () => {
+    it("retrieves the expected data from the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+
+      const expected = [
+        "org",
+        "another-org"
+      ];
+
+      insertStatement.run("repository", "org/test-repo", "some-data", JSON.stringify({}));
+      insertStatement.run("repository", "org/test-repo", "some-other-data", JSON.stringify({}));
+      insertStatement.run("repository", "org/another-repo", "some-data", JSON.stringify({}));
+      insertStatement.run("repository", "another-org/test-repo", "some-data", JSON.stringify({}));
+
+      const actual = db.getAllOrgNames();
+
+      expect(actual.sort(), expected.sort());
+    });
+  });
 });
