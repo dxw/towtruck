@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "seed": "npm run seed:repos && npm run seed:lifetimes",
     "seed:repos": "node --env-file=.env ./seed/repos.js",
-    "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js"
+    "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js",
+    "seed:testUsers": "node --env-file=.env ./seed/testUsers.js"
   },
   "author": "dxw",
   "license": "MIT",
