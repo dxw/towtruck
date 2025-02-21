@@ -544,4 +544,229 @@ describe("TowtruckDatabase", () => {
       expect.deepStrictEqual(actual, { "COUNT(*)": 0 });
     });
   });
+
+  describe("saveToUser", () => {
+    it("inserts the expected data into the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const data = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      const expected = {
+        id: 1,
+        scope: "user",
+        name: "test-user",
+        key: "some-data",
+        value: JSON.stringify(data),
+      };
+
+      const result = db.saveToUser("test-user", "some-data", data);
+      const actual = new Database(testDbPath).prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;").get(result.lastInsertRowid);
+
+      expect.deepStrictEqual(actual, expected);
+    });
+
+    it("updates the row if the data already exists", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const original = insertStatement.run("user", "test-user", "some-data", JSON.stringify({}));
+
+      const data = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      const expected = {
+        id: 1,
+        scope: "user",
+        name: "test-user",
+        key: "some-data",
+        value: JSON.stringify(data),
+      };
+
+      db.saveToUser("test-user", "some-data", data);
+      const actual = new Database(testDbPath).prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;").get(original.lastInsertRowid);
+
+      expect.deepStrictEqual(actual, expected);
+    });
+  });
+
+  describe("getFromUser", () => {
+    it("retrieves the expected data from the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+
+      const expected = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      insertStatement.run("user", "test-user", "some-data", JSON.stringify(expected));
+      insertStatement.run("user", "test-user", "some-other-data", JSON.stringify({}));
+      insertStatement.run("user", "another-user", "some-data", JSON.stringify({}));
+      insertStatement.run("repository", "test-repo", "some-data", JSON.stringify({}));
+
+      const actual = db.getFromUser("test-user", "some-data");
+
+      expect.deepStrictEqual(actual, expected);
+    });
+
+    it("returns undefined when the given key doesn't exist", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const actual = db.getFromUser("test-user", "some-data");
+
+      expect.strictEqual(actual, undefined);
+    });
+  });
+
+  describe("getAllFromUser", () => {
+    it("retrieves the expected data from the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+
+      const someData = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      const someOtherData = {
+        foo: "bar",
+        baz: false,
+        quux: 0.123456789,
+      };
+
+      const expected = {
+        "some-data": someData,
+        "some-other-data": someOtherData,
+      };
+
+      insertStatement.run("user", "test-user", "some-data", JSON.stringify(someData));
+      insertStatement.run("user", "test-user", "some-other-data", JSON.stringify(someOtherData));
+      insertStatement.run("user", "another-user", "some-data", JSON.stringify({}));
+      insertStatement.run("repository", "test-repository", "some-data", JSON.stringify({}));
+
+      const actual = db.getAllFromUser("test-user");
+
+      expect.deepStrictEqual(actual, expected);
+    });
+
+    it("returns an empty object when the given user doesn't exist", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const actual = db.getAllFromUser("test-user");
+
+      expect.deepStrictEqual(actual, {});
+    });
+  });
+
+  describe("getAllUsers", () => {
+    it("retrieves the expected data from the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+
+      const testUserSomeData = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      const testUserSomeOtherData = {
+        foo: "bar",
+        baz: false,
+        quux: 0.123456789,
+      };
+
+      const anotherUserSomeData = [1, "foo", true, null];
+
+      const expected = {
+        "test-user": {
+          "some-data": testUserSomeData,
+          "some-other-data": testUserSomeOtherData,
+        },
+        "another-user": {
+          "some-data": anotherUserSomeData,
+        },
+      };
+
+      insertStatement.run("user", "test-user", "some-data", JSON.stringify(testUserSomeData));
+      insertStatement.run("user", "test-user", "some-other-data", JSON.stringify(testUserSomeOtherData));
+      insertStatement.run("user", "another-user", "some-data", JSON.stringify(anotherUserSomeData));
+      insertStatement.run("repository", "test-repository", "some-data", JSON.stringify({}));
+
+      const actual = db.getAllUsers();
+
+      expect.deepStrictEqual(actual, expected);
+    });
+
+    it("returns an empty object when no users exist", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const actual = db.getAllUsers();
+
+      expect.deepStrictEqual(actual, {});
+    });
+  });
+
+  describe("deleteAllUsers", () => {
+    it("removes the expected data from the table", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const selectStatement = new Database(testDbPath).prepare("SELECT COUNT(*) FROM towtruck_data WHERE scope = 'user';");
+
+      const testUserSomeData = {
+        array: [1, 2, 3],
+        text: "Text",
+        object: {
+          boolean: true,
+          missing: null,
+        },
+      };
+
+      const testUserSomeOtherData = {
+        foo: "bar",
+        baz: false,
+        quux: 0.123456789,
+      };
+
+      const anotherUserSomeData = [1, "foo", true, null];
+
+      insertStatement.run("user", "test-user", "some-data", JSON.stringify(testUserSomeData));
+      insertStatement.run("user", "test-user", "some-other-data", JSON.stringify(testUserSomeOtherData));
+      insertStatement.run("user", "another-user", "some-data", JSON.stringify(anotherUserSomeData));
+      insertStatement.run("repository", "test-repository", "some-data", JSON.stringify({}));
+
+      db.deleteAllUsers();
+
+      const actual = selectStatement.get();
+
+      expect.deepStrictEqual(actual, { "COUNT(*)": 0 });
+    });
+  });
 });
