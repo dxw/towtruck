@@ -7,7 +7,7 @@ const app = new App({
   oauth: {
     clientId: Config.gitHub.clientId,
     clientSecret: Config.gitHub.clientSecret,
-    redirectUrl: `${Config.redirectUrlBase}/api/github/oauth/callback`,
+    redirectUrl: `${Config.redirectUrlBase}/login/github`,
     clientType: "github-app"
   },
   webhooks: {
