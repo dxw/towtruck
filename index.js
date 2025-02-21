@@ -49,7 +49,33 @@ httpServer.get("/", (request, response) => {
   }
 
   const db = new TowtruckDatabase();
-  const persistedRepoData = db.getAllRepositories();
+  const orgs = db.getAllOrgNames();
+
+  return response.render("index", {
+    orgs: request.currentUser.orgs.filter(o => orgs.includes(o)),
+    currentUser: request.currentUser
+  });
+});
+
+httpServer.get("/orgs/:org", (request, response) => {
+  if (!request.currentUser) {
+    return response.render("login", {
+      loginMethods: Config.loginMethods,
+    });
+  }
+
+  if (!request.currentUser.orgs.includes(request.params.org)) {
+    return response.status(404).render("404", { url: request.path });
+  }
+
+  const db = new TowtruckDatabase();
+  const orgs = db.getAllOrgNames();
+
+  if (!orgs.includes(request.params.org)) {
+    return response.status(404).render("404", { url: request.path });
+  }
+
+  const persistedRepoData = db.getAllRepositoriesForOrg(request.params.org);
   const persistedLifetimeData = db.getAllDependencies();
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData);
