@@ -142,6 +142,26 @@ export class TowtruckDatabase {
     return this.#deleteAllForScope("dependency");
   }
 
+  saveToUser(name, key, data) {
+    return this.#save("user", name, key, data);
+  }
+
+  getFromUser(name, key) {
+    return this.#get("user", name, key);
+  }
+
+  getAllFromUser(name) {
+    return this.#getAllForName("user", name);
+  }
+
+  getAllUsers() {
+    return this.#getAllForScope("user");
+  }
+
+  deleteAllUsers() {
+    return this.#deleteAllForScope("user");
+  }
+
   transaction(fn) {
     return this.#db.transaction(fn);
   }
