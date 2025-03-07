@@ -1,4 +1,4 @@
-FROM node:22.13.0-slim
+FROM node:22.14.0-slim
 
 WORKDIR /towtruck
 VOLUME data
