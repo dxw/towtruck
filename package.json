@@ -13,7 +13,8 @@
     "format": "prettier --write .",
     "seed": "npm run seed:repos && npm run seed:lifetimes",
     "seed:repos": "node --env-file=.env ./seed/repos.js",
-    "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js"
+    "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js",
+    "seed:testUsers": "node --env-file=.env ./seed/testUsers.js"
   },
   "author": "dxw",
   "license": "MIT",
@@ -22,6 +23,7 @@
     "better-sqlite3": "^11.3.0",
     "date-fns": "^4.1.0",
     "express": "^5.0.0",
+    "express-jwt": "^8.5.1",
     "nunjucks": "^3.2.4",
     "undici": "^6.19.8"
   },

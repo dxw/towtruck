@@ -16,8 +16,9 @@
       <nav class="w-full flex items-baseline p-6 border-b-4 border-stone-200 dark:border-stone-900">
         <h1 class="inline-block text-3xl"><a href="/" class="hover:underline">Towtruck</a></h1>
         <div class="grow leading-9">&zwj;</div>
-        {% if loggedIn %}
-        <div class="leading-9"><a href="/logout" class="hover:underline">Logout</a></div>
+        {% if currentUser %}
+        <div class="leading-9">Hello <strong>{{ currentUser.username }}</strong>!</div>
+        <div class="pl-5 leading-9"><a href="/logout" class="hover:underline">Logout</a></div>
         {% endif %}
       </nav>
     </header>

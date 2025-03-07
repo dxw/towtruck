@@ -33,19 +33,19 @@ export default defineConfig({
 
   projects: [
     {
-      name: "setup data",
-      testMatch: /seed\.test\.data\.js/,
+      name: "setup",
+      testMatch: /.*\.setup\.js/,
     },
     {
       name: "chromium",
       use: { ...devices["Desktop Chrome"] },
-      dependencies: ["setup data"],
+      dependencies: ["setup"],
     },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "node ./e2es/seedTestData.js && script/server",
+    command: "script/server",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: !process.env.CI,
   },
