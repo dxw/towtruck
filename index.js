@@ -4,6 +4,7 @@ import { mapRepoFromStorageToUi } from "./utils/index.js";
 import { sortByType } from "./utils/sorting.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
+import { Config } from "./config.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -39,7 +40,6 @@ httpServer.all("*path", (request, response) => {
   return response.status(404).render("404", { url: request.path });
 });
 
-const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
-  console.info(`Server is running on port ${PORT}`);
+httpServer.listen(Config.port, () => {
+  console.info(`Server is running on port ${Config.port}`);
 });

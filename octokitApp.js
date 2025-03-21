@@ -1,26 +1,17 @@
 import { App } from "@octokit/app";
-
-const APP_ID = process.env.APP_ID;
-const PRIVATE_KEY = process.env.PRIVATE_KEY;
-const CLIENT_ID = process.env.CLIENT_ID;
-const CLIENT_SECRET = process.env.CLIENT_SECRET;
-const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
-const REDIRECT_URL_BASE = process.env.REDIRECT_URL_BASE;
-
-const privateKey = Buffer.from(PRIVATE_KEY, 'base64').toString('ascii');
-const redirectUrl = `${REDIRECT_URL_BASE}/api/github/oauth/callback`;
+import { Config } from "./config.js";
 
 const app = new App({
-  appId: APP_ID,
-  privateKey,
+  appId: Config.gitHub.appId,
+  privateKey: Config.privateKey,
   oauth: {
-    clientId: CLIENT_ID,
-    clientSecret: CLIENT_SECRET,
-    redirectUrl,
+    clientId: Config.gitHub.clientId,
+    clientSecret: Config.gitHub.clientSecret,
+    redirectUrl: `${Config.redirectUrlBase}/api/github/oauth/callback`,
     clientType: "github-app"
   },
   webhooks: {
-    secret: WEBHOOK_SECRET,
+    secret: Config.gitHub.webhookSecret,
   },
 });
 
