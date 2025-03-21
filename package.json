@@ -21,6 +21,7 @@
     "@octokit/app": "^15.1.0",
     "better-sqlite3": "^11.3.0",
     "date-fns": "^4.1.0",
+    "express": "^5.0.0",
     "nunjucks": "^3.2.4",
     "undici": "^6.19.8"
   },
