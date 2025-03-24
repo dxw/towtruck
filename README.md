@@ -7,8 +7,8 @@ Please review the [High Level Design document](/doc/high-level-design.md) if thi
 
 ## Prerequisites
 
-You must have [nvm](https://github.com/nvm-sh/nvm) installed. It is available on brew.
-With `nvm` installed you should be able to run `script/setup` followed by `script/server` to run the application.
+You must have [nvm](https://github.com/nvm-sh/nvm) or [nodenv](https://github.com/nodenv/nodenv) installed. Both are available via Homebrew.
+With either installed you should be able to run `script/setup` followed by `script/server` to run the application.
 
 
 ## Configuration

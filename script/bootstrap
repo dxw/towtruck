@@ -8,11 +8,19 @@ set -e
 cd "$(dirname "$0")/.."
 
 
-export NVM_DIR=$HOME/.nvm;
-source $NVM_DIR/nvm.sh;
+if command -v nvm 2>&1; then
+    export NVM_DIR=$HOME/.nvm;
+    source $NVM_DIR/nvm.sh;
 
-echo "==> Installing node version..."
-nvm install
+    echo "==> Installing node version..."
+    nvm install
+elif command -v nodenv 2>&1; then
+    echo "==> Installing node version..."
+    nodenv install --skip-existing
+else
+    echo "ERROR: nvm or nodenv not found"
+    exit 1
+fi
 
 
 echo "==> Installing node modules..."
