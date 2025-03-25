@@ -15,7 +15,8 @@ if [ ! -f .env.test ]; then
   cp .env.example .env
 fi
 
-rm -rf node_modules
+rm -rf data node_modules
+mkdir data
 
 if [ "$1" = "--ci" ]; then
   npm install
