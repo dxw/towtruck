@@ -35,6 +35,10 @@ httpServer.get("/", (request, response) => {
   });
 });
 
+httpServer.all("*path", (request, response) => {
+  return response.status(404).render("404", { url: request.path });
+});
+
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.info(`Server is running on port ${PORT}`);
