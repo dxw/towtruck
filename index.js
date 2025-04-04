@@ -13,6 +13,11 @@ nunjucks.configure({
 const httpServer = express();
 httpServer.use(handleWebhooks);
 
+httpServer.engine("njk", nunjucks.render);
+
+httpServer.set("views", "./views");
+httpServer.set("view engine", "njk");
+
 httpServer.get("/", (request, response) => {
   const db = new TowtruckDatabase();
   const persistedRepoData = db.getAllRepositories();
@@ -22,14 +27,12 @@ httpServer.get("/", (request, response) => {
 
   const { sortDirection, sortBy } = request.query;
 
-  const template = nunjucks.render("index.njk", {
+  return response.render("index", {
     sortBy,
     sortDirection,
     ...reposForUi,
     repos: sortByType(reposForUi.repos, sortDirection, sortBy),
   });
-
-  return response.end(template);
 });
 
 const PORT = process.env.PORT || 3000;
