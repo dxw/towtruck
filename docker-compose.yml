@@ -2,7 +2,8 @@ services:
   towtruck:
     build: .
     ports:
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
+      - "[::1]:3000:3000"
     environment:
       APP_ID: $APP_ID
       PRIVATE_KEY: $PRIVATE_KEY
