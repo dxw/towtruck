@@ -5,7 +5,11 @@
  * @returns {Promise<number>}
  */
 export const getOpenPRsForRepo = async ({ octokit, repository }) => {
-  return octokit.request(repository.pulls_url).then(handlePrsApiResponse);
+  return octokit.request(repository.pulls_url).then(handlePrsApiResponse)
+    .catch((error) => {
+      console.error(error);
+      return {};
+    });;
 };
 
 const depdencyUpdateBots = ["renovate[bot]", "dependabot[bot]"];
