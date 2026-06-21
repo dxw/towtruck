@@ -1,0 +1,11 @@
+{% extends "./_base.njk" %}
+
+{% block content %}
+<div class="bg-stone-50 dark:bg-stone-700 rounded-lg border-b-4 border-stone-200 dark:border-stone-900 p-12 space-y-4 m-auto mt-32">
+  <div class="text-center">The requested page <strong>{{ url }}</strong> could not be found.</div>
+  <hr />
+  <div class="text-center">
+    <a class="inline-block text-base text-sky-600 dark:text-sky-500 hover:underline" href="/">Return to the home page.</a>
+  </div>
+</div>
+{% endblock %}
