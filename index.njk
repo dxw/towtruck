@@ -57,16 +57,16 @@
                     <div class="inline-block whitespace-nowrap text-[0px] ml-2 align-[-1px]">
                       {% set id = [repo.name, "alerts", "critical"] | join("-") %}
                       {% set mainText = ["<span", " class='font-bold'" if repo.criticalSeverityAlerts, ">", repo.criticalSeverityAlerts, "</span>"] | join('') | safe %}
-                      <div class="inline-block text-sm text-white bg-red-600 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Critical severity alerts")}}</div>
+                      <div class="bg-gray-300 {% if repo.criticalSeverityAlerts != 0 %}bg-red-600{% endif %} inline-block text-sm text-white first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Critical severity alerts")}}</div>
                       {% set id = [repo.name, "alerts", "high"] | join("-") %}
                       {% set mainText = ["<span", " class='font-bold'" if repo.highSeverityAlerts, ">", repo.highSeverityAlerts, "</span>"] | join('') | safe %}
-                      <div class="inline-block text-sm text-white bg-red-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "High severity alerts")}}</div>
+                      <div class="bg-gray-300 {% if repo.highSeverityAlerts != 0 %}bg-red-500{% endif %} inline-block text-sm text-white first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "High severity alerts")}}</div>
                       {% set id = [repo.name, "alerts", "medium"] | join("-") %}
                       {% set mainText = ["<span", " class='font-bold'" if repo.mediumSeverityAlerts, ">", repo.mediumSeverityAlerts, "</span>"] | join('') | safe %}
-                      <div class="inline-block text-sm text-white bg-orange-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Medium severity alerts")}}</div>
+                      <div class="bg-gray-300 {% if repo.mediumSeverityAlerts != 0 %}bg-orange-500{% endif %} inline-block text-sm text-white  first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Medium severity alerts")}}</div>
                       {% set id = [repo.name, "alerts", "low"] | join("-") %}
                       {% set mainText = ["<span", " class='font-bold'" if repo.lowSeverityAlerts, ">", repo.lowSeverityAlerts, "</span>"] | join('') | safe %}
-                      <div class="inline-block text-sm text-white bg-amber-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Low severity alerts")}}</div>
+                      <div class="bg-gray-300 {% if repo.lowSeverityAlerts != 0 %}bg-amber-500{% endif %} inline-block text-sm text-white  first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Low severity alerts")}}</div>
                     </div>
                     {% else %}
                       <span class="text-stone-400 font-light italic">Dependabot alerts have been disabled for this repository.</span>
