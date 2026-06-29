@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { mapRepoFromStorageToUi, mapRepoFromApiForStorage, hashToTailwindColor } from "./index.js";
+import { mapRepoFromStorageToUi, mapRepoFromApiForStorage, hashToTailwindColor, filterReposWithOpenPrs } from "./index.js";
 import { formatDistanceToNow } from "date-fns";
 
 describe("mapRepoFromStorageToUi", () => {
@@ -470,4 +470,48 @@ describe("hashToTailwindColor", () => {
       expect.strictEqual(actual, expected);
     }
   });
-})
+});
+
+describe("filterReposWithOpenPrs", () => {
+  it("keeps only repos with at least one open PR and updates totalRepos", () => {
+    const repoData = {
+      org: "dxw",
+      totalRepos: 3,
+      repos: [
+        { name: "repo-with-prs", openPrCount: 2 },
+        { name: "repo-without-prs", openPrCount: 0 },
+        { name: "repo-with-more-prs", openPrCount: 5 },
+      ],
+    };
+
+    const actual = filterReposWithOpenPrs(repoData);
+
+    expect.deepEqual(actual, {
+      org: "dxw",
+      totalRepos: 2,
+      repos: [
+        { name: "repo-with-prs", openPrCount: 2 },
+        { name: "repo-with-more-prs", openPrCount: 5 },
+      ],
+    });
+  });
+
+  it("returns an empty list when no repos have open PRs", () => {
+    const repoData = {
+      org: "dxw",
+      totalRepos: 2,
+      repos: [
+        { name: "repo-1", openPrCount: 0 },
+        { name: "repo-2", openPrCount: 0 },
+      ],
+    };
+
+    const actual = filterReposWithOpenPrs(repoData);
+
+    expect.deepEqual(actual, {
+      org: "dxw",
+      totalRepos: 0,
+      repos: [],
+    });
+  });
+});

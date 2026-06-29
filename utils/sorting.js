@@ -58,32 +58,38 @@ export const sortByISO8601Timestamp = (repos, sortDirection, key) => {
  * @returns {UiRepo[]} The sorted array of repository objects.
  */
 export const sortByType = (repos, sortDirection, sortBy) => {
+  if (!sortBy) {
+    return sortByNumericValue(repos, "desc", "openBotPrCount");
+  }
+
+  const safeSortDirection = sortDirection || "desc";
+
   switch (sortBy) {
     case "openPrCount":
-      return sortByNumericValue(repos, sortDirection, "openPrCount");
+      return sortByNumericValue(repos, safeSortDirection, "openPrCount");
 
     case "openBotPrCount":
-      return sortByNumericValue(repos, sortDirection, "openBotPrCount");
+      return sortByNumericValue(repos, safeSortDirection, "openBotPrCount");
 
     case "openIssues":
-      return sortByNumericValue(repos, sortDirection, "openIssues");
+      return sortByNumericValue(repos, safeSortDirection, "openIssues");
 
     case "updatedAt":
-      return sortByISO8601Timestamp(repos, sortDirection, "updatedAtISO8601");
+      return sortByISO8601Timestamp(repos, safeSortDirection, "updatedAtISO8601");
 
     case "mostRecentPrOpenedAt":
-      return sortByISO8601Timestamp(repos, sortDirection, "mostRecentPrOpenedAtISO8601");
+      return sortByISO8601Timestamp(repos, safeSortDirection, "mostRecentPrOpenedAtISO8601");
 
     case "oldestOpenPrOpenedAt":
-      return sortByISO8601Timestamp(repos, sortDirection, "oldestOpenPrOpenedAtISO8601");
+      return sortByISO8601Timestamp(repos, safeSortDirection, "oldestOpenPrOpenedAtISO8601");
 
     case "mostRecentIssueOpenedAt":
-      return sortByISO8601Timestamp(repos, sortDirection, "mostRecentIssueOpenedAtISO8601");
+      return sortByISO8601Timestamp(repos, safeSortDirection, "mostRecentIssueOpenedAtISO8601");
 
     case "oldestOpenIssueOpenedAt":
-      return sortByISO8601Timestamp(repos, sortDirection, "oldestOpenIssueOpenedAtISO8601");
+      return sortByISO8601Timestamp(repos, safeSortDirection, "oldestOpenIssueOpenedAtISO8601");
 
     default:
-      return repos;
+      return sortByNumericValue(repos, "desc", "openBotPrCount");
   }
 };

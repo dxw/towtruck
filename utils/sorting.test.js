@@ -117,14 +117,18 @@ describe("sortByType", () => {
     );
   });
 
-  it("returns the original array if the sortBy parameter is passed", () => {
+  it("defaults to sorting by openBotPrCount in descending order when sortBy is not provided", () => {
     const reposToSort = [
-      { name: "Repo 1", openIssues: 5 },
-      { name: "Repo 2", openIssues: 3 },
-      { name: "Repo 3", openIssues: 7 },
+      { name: "Repo 1", openBotPrCount: 5 },
+      { name: "Repo 2", openBotPrCount: 3 },
+      { name: "Repo 3", openBotPrCount: 7 },
     ];
 
-    expect.deepEqual(sortByType(reposToSort, "asc", null), reposToSort);
+    expect.deepEqual(sortByType(reposToSort, "asc", null), [
+      { name: "Repo 3", openBotPrCount: 7 },
+      { name: "Repo 1", openBotPrCount: 5 },
+      { name: "Repo 2", openBotPrCount: 3 },
+    ]);
   });
 
   it('sorts the repos by the date they were last updated if "updatedAt" is provided', () => {
@@ -190,5 +194,34 @@ describe("sortByType", () => {
       sortByType(reposToSort, "asc", "oldestOpenIssueOpenedAt"),
       sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenIssueOpenedAtISO8601")
     );
+  });
+
+  it("sorts by openPrCount in descending order when given 'desc'", () => {
+    const reposToSort = [
+      { name: "Repo 1", openPrCount: 2 },
+      { name: "Repo 2", openPrCount: 7 },
+      { name: "Repo 3", openPrCount: 5 },
+    ];
+
+    expect.deepEqual(sortByType(reposToSort, "desc", "openPrCount"), [
+      { name: "Repo 2", openPrCount: 7 },
+      { name: "Repo 3", openPrCount: 5 },
+      { name: "Repo 1", openPrCount: 2 },
+    ]);
+  });
+
+
+  it("defaults to sorting by openBotPrCount in descending order when sortBy is unknown", () => {
+    const reposToSort = [
+      { name: "Repo 1", openBotPrCount: 2 },
+      { name: "Repo 2", openBotPrCount: 7 },
+      { name: "Repo 3", openBotPrCount: 5 },
+    ];
+
+    expect.deepEqual(sortByType(reposToSort, "asc", "unknown"), [
+      { name: "Repo 2", openBotPrCount: 7 },
+      { name: "Repo 3", openBotPrCount: 5 },
+      { name: "Repo 1", openBotPrCount: 2 },
+    ]);
   });
 });

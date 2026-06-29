@@ -5,6 +5,8 @@ test("has dependency info", async ({ page, baseURL }) => {
 
   await expect(page).toHaveTitle(/Towtruck/);
 
+  await assertFirstDependencyRow("govuk-blogs", page);
+
   page.getByText("There are 3 repositories that Towtruck is tracking for dxw.");
 
   const tableHeadings = [
