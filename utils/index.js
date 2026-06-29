@@ -138,40 +138,40 @@ export const hashToTailwindColor = (str) => {
  * @returns {RepoData}
  */
 export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
-  const mappedRepos = Object.entries(persistedData).map(([, repo]) => {
-    const newDate = new Date(repo.main.updatedAt).toLocaleDateString();
-    const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
+   const mappedRepos = Object.entries(persistedData).map(([, repo]) => {
+     const newDate = new Date(repo.main.updatedAt).toLocaleDateString();
+     const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
 
-    const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDistanceToNow(repo.pullRequests.mostRecentPrOpenedAt, { addSuffix: true });
-    const oldestOpenPrOpenedAt = repo.pullRequests.oldestOpenPrOpenedAt && formatDistanceToNow(repo.pullRequests.oldestOpenPrOpenedAt, { addSuffix: true });
-    const mostRecentIssueOpenedAt = repo.issues.mostRecentIssueOpenedAt && formatDistanceToNow(repo.issues.mostRecentIssueOpenedAt, { addSuffix: true });
-    const oldestOpenIssueOpenedAt = repo.issues.oldestOpenIssueOpenedAt && formatDistanceToNow(repo.issues.oldestOpenIssueOpenedAt, { addSuffix: true });
+     const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDistanceToNow(repo.pullRequests.mostRecentPrOpenedAt, { addSuffix: true });
+     const oldestOpenPrOpenedAt = repo.pullRequests.oldestOpenPrOpenedAt && formatDistanceToNow(repo.pullRequests.oldestOpenPrOpenedAt, { addSuffix: true });
+     const mostRecentIssueOpenedAt = repo.issues.mostRecentIssueOpenedAt && formatDistanceToNow(repo.issues.mostRecentIssueOpenedAt, { addSuffix: true });
+     const oldestOpenIssueOpenedAt = repo.issues.oldestOpenIssueOpenedAt && formatDistanceToNow(repo.issues.oldestOpenIssueOpenedAt, { addSuffix: true });
 
-    const languageColor = hashToTailwindColor(repo.main.language);
+     const languageColor = hashToTailwindColor(repo.main.language);
 
-    return {
-      ...repo.main,
-      ...repo.dependabotAlerts,
-      ...repo.pullRequests,
-      ...repo.issues,
-      updatedAt: newDate,
-      updatedAtISO8601: repo.main.updatedAt,
-      dependencies,
-      mostRecentPrOpenedAt,
-      mostRecentPrOpenedAtISO8601: repo.pullRequests.mostRecentPrOpenedAt,
-      oldestOpenPrOpenedAt,
-      oldestOpenPrOpenedAtISO8601: repo.pullRequests.oldestOpenPrOpenedAt,
-      mostRecentIssueOpenedAt,
-      mostRecentIssueOpenedAtISO8601: repo.issues.mostRecentIssueOpenedAt,
-      oldestOpenIssueOpenedAt,
-      oldestOpenIssueOpenedAtISO8601: repo.issues.oldestOpenIssueOpenedAt,
-      languageColor,
-    };
-  });
+     return {
+       ...repo.main,
+       ...repo.dependabotAlerts,
+       ...repo.pullRequests,
+       ...repo.issues,
+       updatedAt: newDate,
+       updatedAtISO8601: repo.main.updatedAt,
+       dependencies,
+       mostRecentPrOpenedAt,
+       mostRecentPrOpenedAtISO8601: repo.pullRequests.mostRecentPrOpenedAt,
+       oldestOpenPrOpenedAt,
+       oldestOpenPrOpenedAtISO8601: repo.pullRequests.oldestOpenPrOpenedAt,
+       mostRecentIssueOpenedAt,
+       mostRecentIssueOpenedAtISO8601: repo.issues.mostRecentIssueOpenedAt,
+       oldestOpenIssueOpenedAt,
+       oldestOpenIssueOpenedAtISO8601: repo.issues.oldestOpenIssueOpenedAt,
+       languageColor,
+     };
+   }).filter((repo) => repo.openPrCount > 0);
 
-  const totalRepos = mappedRepos.length;
+   const totalRepos = mappedRepos.length;
 
-  return { org: Object.entries(persistedData)[0][1].owner, repos: mappedRepos, totalRepos };
+   return { org: Object.entries(persistedData)[0][1].owner, repos: mappedRepos, totalRepos };
 };
 
 /**
