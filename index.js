@@ -21,7 +21,8 @@ httpServer.get("/", (request, response) => {
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData);
   const filteredReposForUi = filterReposWithOpenPrs(reposForUi);
 
-  const { sortDirection, sortBy } = request.query;
+  const sortBy = request.query.sortBy || "openBotPrCount";
+  const sortDirection = request.query.sortDirection || "desc";
 
   const template = nunjucks.render("index.njk", {
     sortBy,
