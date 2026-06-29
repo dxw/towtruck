@@ -175,6 +175,21 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
 };
 
 /**
+ * Filters UI repo data to repositories that currently have open pull requests.
+ * @param {RepoData} repoData
+ * @returns {RepoData}
+ */
+export const filterReposWithOpenPrs = (repoData) => {
+  const repos = repoData.repos.filter((repo) => repo.openPrCount > 0);
+
+  return {
+    ...repoData,
+    repos,
+    totalRepos: repos.length,
+  };
+};
+
+/**
  * @typedef {Object} ApiRepo
  * @property {string} name - The name of the repo Eg "dalmation".
  * @property {string} description - A brief description of the repo.
