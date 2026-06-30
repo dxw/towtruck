@@ -68,6 +68,16 @@ In order for Towtruck to communicate with the GitHub API, it needs several piece
 - `WEBHOOK_SECRET`: A user-defined secret used to authenticate GitHub to Towtruck for receiving webhooks. This must be exactly the same as it is entered in the app settings on GitHub.
 
 
+### Google SSO authentication
+
+The following additional environment variables are required:
+- `GOOGLE_CLIENT_ID`: The OAuth 2.0 client ID from Google Cloud Console.
+- `GOOGLE_CLIENT_SECRET`: The OAuth 2.0 client secret from Google Cloud Console.
+- `SESSION_SECRET`: A long, randomly-generated string used to sign session cookies. Generate one with e.g. `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`.
+- `BASE_URL`: The public base URL of the application (e.g. `https://your-app.example.com`). Used to construct the OAuth callback URL. Must not have a trailing slash.
+
+These are kept in 1pw.
+
 ### Seeding
 
 Once all the other setup steps have been completed run `script/seed` or `script/bootstrap --seed` to seed the data. 
