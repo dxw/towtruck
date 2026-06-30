@@ -269,6 +269,7 @@ describe("fetchForRepo", () => {
       lowSeverityAlerts: 1,
       totalOpenAlerts: 4,
       oldestOpenAlertCreatedAt: null,
+      otherOpenAlertsCreatedAt: [],
       hasOpenAlertOlderThan14Days: false,
     };
 

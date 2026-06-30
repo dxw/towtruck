@@ -119,6 +119,7 @@ describe("handleDependabotAlertsApiResponse", () => {
 
       expect.strictEqual(actual.hasOpenAlertOlderThan14Days, true);
       expect.strictEqual(actual.oldestOpenAlertCreatedAt, fifteenDaysAgo);
+      expect.deepStrictEqual(actual.otherOpenAlertsCreatedAt, [oneDayAgo]);
 
       dateNowSpy.mock.restore();
     });
@@ -138,6 +139,7 @@ describe("handleDependabotAlertsApiResponse", () => {
 
       expect.strictEqual(actual.hasOpenAlertOlderThan14Days, false);
       expect.strictEqual(actual.oldestOpenAlertCreatedAt, fourteenDaysAgo);
+      expect.deepStrictEqual(actual.otherOpenAlertsCreatedAt, []);
 
       dateNowSpy.mock.restore();
     });
@@ -153,6 +155,33 @@ describe("handleDependabotAlertsApiResponse", () => {
 
       expect.strictEqual(actual.hasOpenAlertOlderThan14Days, false);
       expect.strictEqual(actual.oldestOpenAlertCreatedAt, null);
+      expect.deepStrictEqual(actual.otherOpenAlertsCreatedAt, []);
+    });
+
+    it("returns remaining open alert timestamps sorted oldest-first", () => {
+      const alert1 = {
+        state: "open",
+        created_at: "2026-06-20T00:00:00Z",
+        security_vulnerability: { severity: "low" },
+      };
+      const alert2 = {
+        state: "open",
+        created_at: "2026-06-10T00:00:00Z",
+        security_vulnerability: { severity: "high" },
+      };
+      const alert3 = {
+        state: "open",
+        created_at: "2026-06-15T00:00:00Z",
+        security_vulnerability: { severity: "critical" },
+      };
+
+      const actual = handleDependabotAlertsApiResponse({ data: [alert1, alert2, alert3] });
+
+      expect.strictEqual(actual.oldestOpenAlertCreatedAt, "2026-06-10T00:00:00Z");
+      expect.deepStrictEqual(actual.otherOpenAlertsCreatedAt, [
+        "2026-06-15T00:00:00Z",
+        "2026-06-20T00:00:00Z",
+      ]);
     });
   });
 });

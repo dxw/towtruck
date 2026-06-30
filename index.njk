@@ -109,29 +109,48 @@
               </div>
 
               {% if repo.totalOpenAlerts !== undefined %}
-              <div class="flex flex-wrap gap-0 mt-2 text-[0px]">
-                {% set id = [repo.name, "alerts", "critical"] | join("-") %}
-                {% set mainText = ["<span", " class='font-bold'" if repo.criticalSeverityAlerts, ">", repo.criticalSeverityAlerts, "</span>"] | join('') | safe %}
-                {% set hasAlerts = repo.criticalSeverityAlerts and repo.criticalSeverityAlerts > 0 %}
-                <div class="inline-block text-sm {% if hasAlerts %}text-white bg-red-600{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Critical severity alerts")}}</div>
-                {% set id = [repo.name, "alerts", "high"] | join("-") %}
-                {% set mainText = ["<span", " class='font-bold'" if repo.highSeverityAlerts, ">", repo.highSeverityAlerts, "</span>"] | join('') | safe %}
-                {% set hasAlerts = repo.highSeverityAlerts and repo.highSeverityAlerts > 0 %}
-                <div class="inline-block text-sm {% if hasAlerts %}text-white bg-red-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "High severity alerts")}}</div>
-                {% set id = [repo.name, "alerts", "medium"] | join("-") %}
-                {% set mainText = ["<span", " class='font-bold'" if repo.mediumSeverityAlerts, ">", repo.mediumSeverityAlerts, "</span>"] | join('') | safe %}
-                {% set hasAlerts = repo.mediumSeverityAlerts and repo.mediumSeverityAlerts > 0 %}
-                <div class="inline-block text-sm {% if hasAlerts %}text-white bg-orange-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Medium severity alerts")}}</div>
-                {% set id = [repo.name, "alerts", "low"] | join("-") %}
-                {% set mainText = ["<span", " class='font-bold'" if repo.lowSeverityAlerts, ">", repo.lowSeverityAlerts, "</span>"] | join('') | safe %}
-                {% set hasAlerts = repo.lowSeverityAlerts and repo.lowSeverityAlerts > 0 %}
-                <div class="inline-block text-sm {% if hasAlerts %}text-white bg-amber-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Low severity alerts")}}</div>
+              <div class="mt-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-3">
+                <details class="group/alerts">
+                  <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
+                    <div class="flex flex-wrap gap-0 text-[0px]">
+                      {% set hasAlerts = repo.criticalSeverityAlerts and repo.criticalSeverityAlerts > 0 %}
+                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-red-600{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.criticalSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.criticalSeverityAlerts }}</span></div>
+                      {% set hasAlerts = repo.highSeverityAlerts and repo.highSeverityAlerts > 0 %}
+                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-red-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.highSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.highSeverityAlerts }}</span></div>
+                      {% set hasAlerts = repo.mediumSeverityAlerts and repo.mediumSeverityAlerts > 0 %}
+                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-orange-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.mediumSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.mediumSeverityAlerts }}</span></div>
+                      {% set hasAlerts = repo.lowSeverityAlerts and repo.lowSeverityAlerts > 0 %}
+                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-amber-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.lowSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.lowSeverityAlerts }}</span></div>
+                    </div>
+                    {% if repo.hasOpenAlertOlderThan14Days %}
+                    <p class="mt-2 text-sm font-medium text-red-700 dark:text-red-400">
+                      Security alert older than 14 days.
+                    </p>
+                    {% endif %}
+                    <div class="flex items-center gap-2 mt-2">
+                      <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 hidden group-open/alerts:inline">Hide security alert details</span>
+                      <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 group-open/alerts:hidden">Show security alert details</span>
+                    </div>
+                  </summary>
+                  <div class="mt-2 text-xs text-slate-600 dark:text-slate-300">
+                    {% if repo.oldestOpenAlertCreatedAt %}
+                    Oldest vulnerability age:
+                    <span class="js-alert-age font-semibold" data-created-at="{{ repo.oldestOpenAlertCreatedAt }}"></span>
+
+                    {% if repo.otherOpenAlertsCreatedAt and repo.otherOpenAlertsCreatedAt.length %}
+                    <p class="mt-2">Other vulnerabilities (oldest first):</p>
+                    <ul class="mt-1 list-disc pl-5 space-y-1">
+                      {% for createdAt in repo.otherOpenAlertsCreatedAt %}
+                      <li><span class="js-alert-age font-semibold" data-created-at="{{ createdAt }}"></span></li>
+                      {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% else %}
+                    No open vulnerabilities.
+                    {% endif %}
+                  </div>
+                </details>
               </div>
-              {% if repo.hasOpenAlertOlderThan14Days %}
-              <p class="mt-2 text-sm font-medium text-red-700 dark:text-red-400">
-                Security alert older than 14 days.
-              </p>
-              {% endif %}
               {% else %}
               <p class="mt-1 text-slate-400 text-xs font-light italic">Dependabot alerts disabled</p>
               {% endif %}
@@ -273,6 +292,22 @@
         document.documentElement.classList.toggle('dark');
         localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
         applyTheme();
+      });
+
+      document.querySelectorAll('.js-alert-age').forEach((element) => {
+        const createdAt = element.dataset.createdAt;
+        if (!createdAt) return;
+
+        const createdAtDate = new Date(createdAt);
+        const now = new Date();
+        const ageInDays = Math.floor((now.getTime() - createdAtDate.getTime()) / (24 * 60 * 60 * 1000));
+
+        if (ageInDays === 1) {
+          element.textContent = '1 day';
+          return;
+        }
+
+        element.textContent = `${ageInDays} days`;
       });
     </script>
   </body>
