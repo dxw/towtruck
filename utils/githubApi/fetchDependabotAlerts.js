@@ -23,40 +23,49 @@ export const getDependabotAlertsForRepo = async ({ octokit, repository }) => {
  * @returns
  */
 export const handleDependabotAlertsApiResponse = ({ data }) => {
-  const totalOpenAlerts = data.reduce((acc, alert) => {
-    if (alert.state === "open") {
+  const openAlerts = data.filter((alert) => alert.state === "open");
+  const totalOpenAlerts = openAlerts.length;
+
+  const lowSeverityAlerts = openAlerts.reduce((acc, alert) => {
+    if (alert.security_vulnerability.severity === "low") {
       return acc + 1;
     }
     return acc;
   }, 0);
 
-  const lowSeverityAlerts = data.reduce((acc, alert) => {
-    if (alert.state === "open" && alert.security_vulnerability.severity === "low") {
+  const mediumSeverityAlerts = openAlerts.reduce((acc, alert) => {
+    if (alert.security_vulnerability.severity === "medium") {
       return acc + 1;
     }
     return acc;
   }, 0);
 
-  const mediumSeverityAlerts = data.reduce((acc, alert) => {
-    if (alert.state === "open" && alert.security_vulnerability.severity === "medium") {
+  const highSeverityAlerts = openAlerts.reduce((acc, alert) => {
+    if (alert.security_vulnerability.severity === "high") {
       return acc + 1;
     }
     return acc;
   }, 0);
 
-  const highSeverityAlerts = data.reduce((acc, alert) => {
-    if (alert.state === "open" && alert.security_vulnerability.severity === "high") {
+  const criticalSeverityAlerts = openAlerts.reduce((acc, alert) => {
+    if (alert.security_vulnerability.severity === "critical") {
       return acc + 1;
     }
     return acc;
   }, 0);
 
-  const criticalSeverityAlerts = data.reduce((acc, alert) => {
-    if (alert.state === "open" && alert.security_vulnerability.severity === "critical") {
-      return acc + 1;
-    }
-    return acc;
-  }, 0);
+  const oldestOpenAlertCreatedAt = openAlerts.reduce((oldest, alert) => {
+    if (!alert.created_at) return oldest;
+
+    if (!oldest) return alert.created_at;
+
+    return new Date(alert.created_at) < new Date(oldest) ? alert.created_at : oldest;
+  }, null);
+
+  const fourteenDaysInMs = 14 * 24 * 60 * 60 * 1000;
+  const hasOpenAlertOlderThan14Days = oldestOpenAlertCreatedAt
+    ? Date.now() - new Date(oldestOpenAlertCreatedAt).getTime() > fourteenDaysInMs
+    : false;
 
   return {
     totalOpenAlerts,
@@ -64,5 +73,7 @@ export const handleDependabotAlertsApiResponse = ({ data }) => {
     mediumSeverityAlerts,
     highSeverityAlerts,
     criticalSeverityAlerts,
+    oldestOpenAlertCreatedAt,
+    hasOpenAlertOlderThan14Days,
   };
 };

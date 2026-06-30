@@ -96,4 +96,63 @@ describe("handleDependabotAlertsApiResponse", () => {
       expect.strictEqual(actual.criticalSeverityAlerts, 0);
     });
   });
+
+  describe("hasOpenAlertOlderThan14Days", () => {
+    it("returns true when there is an open alert older than 14 days", (t) => {
+      const now = new Date("2026-07-01T00:00:00Z");
+      const fifteenDaysAgo = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000)).toISOString();
+      const oneDayAgo = new Date(now.getTime() - (1 * 24 * 60 * 60 * 1000)).toISOString();
+
+      const alert1 = {
+        state: "open",
+        created_at: fifteenDaysAgo,
+        security_vulnerability: { severity: "critical" },
+      };
+      const alert2 = {
+        state: "open",
+        created_at: oneDayAgo,
+        security_vulnerability: { severity: "high" },
+      };
+
+      const dateNowSpy = t.mock.method(Date, "now", () => now.getTime());
+      const actual = handleDependabotAlertsApiResponse({ data: [alert1, alert2] });
+
+      expect.strictEqual(actual.hasOpenAlertOlderThan14Days, true);
+      expect.strictEqual(actual.oldestOpenAlertCreatedAt, fifteenDaysAgo);
+
+      dateNowSpy.mock.restore();
+    });
+
+    it("returns false when all open alerts are 14 days old or newer", (t) => {
+      const now = new Date("2026-07-01T00:00:00Z");
+      const fourteenDaysAgo = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000)).toISOString();
+
+      const alert = {
+        state: "open",
+        created_at: fourteenDaysAgo,
+        security_vulnerability: { severity: "medium" },
+      };
+
+      const dateNowSpy = t.mock.method(Date, "now", () => now.getTime());
+      const actual = handleDependabotAlertsApiResponse({ data: [alert] });
+
+      expect.strictEqual(actual.hasOpenAlertOlderThan14Days, false);
+      expect.strictEqual(actual.oldestOpenAlertCreatedAt, fourteenDaysAgo);
+
+      dateNowSpy.mock.restore();
+    });
+
+    it("returns false when there are no open alerts", () => {
+      const alert = {
+        state: "fixed",
+        created_at: "2026-01-01T00:00:00Z",
+        security_vulnerability: { severity: "critical" },
+      };
+
+      const actual = handleDependabotAlertsApiResponse({ data: [alert] });
+
+      expect.strictEqual(actual.hasOpenAlertOlderThan14Days, false);
+      expect.strictEqual(actual.oldestOpenAlertCreatedAt, null);
+    });
+  });
 });

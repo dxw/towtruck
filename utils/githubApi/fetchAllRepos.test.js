@@ -268,6 +268,8 @@ describe("fetchForRepo", () => {
       mediumSeverityAlerts: 1,
       lowSeverityAlerts: 1,
       totalOpenAlerts: 4,
+      oldestOpenAlertCreatedAt: null,
+      hasOpenAlertOlderThan14Days: false,
     };
 
     const actual = await fetchForRepo(repository, octokit);

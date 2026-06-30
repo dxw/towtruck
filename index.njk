@@ -97,7 +97,7 @@
         <!-- Card grid -->
         <div class="mx-4 mb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {% for repo in repos %}
-          <div class="bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 flex flex-col shadow-sm">
+          <div class="rounded-lg border flex flex-col shadow-sm {% if repo.hasOpenAlertOlderThan14Days %}bg-red-50 dark:bg-red-950/20 border-red-500 dark:border-red-500 border-2{% else %}bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700{% endif %}">
 
             <!-- Card header -->
             <div class="p-4 border-b border-slate-100 dark:border-slate-700">
@@ -127,6 +127,11 @@
                 {% set hasAlerts = repo.lowSeverityAlerts and repo.lowSeverityAlerts > 0 %}
                 <div class="inline-block text-sm {% if hasAlerts %}text-white bg-amber-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Low severity alerts")}}</div>
               </div>
+              {% if repo.hasOpenAlertOlderThan14Days %}
+              <p class="mt-2 text-sm font-medium text-red-700 dark:text-red-400">
+                Security alert older than 14 days.
+              </p>
+              {% endif %}
               {% else %}
               <p class="mt-1 text-slate-400 text-xs font-light italic">Dependabot alerts disabled</p>
               {% endif %}
