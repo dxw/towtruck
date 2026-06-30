@@ -257,7 +257,7 @@
 
         <!-- Pagination -->
         {% if totalPages > 1 %}
-        {{macros.pagination(currentPage, pageNumbers, totalPages, "/" + org, sortBy, sortDirection, tag)}}
+        {{macros.pagination(currentPage, pageNumbers, totalPages, "/" + org, sortBy, sortDirection, tag, alertFilter)}}
         {% endif %}
       </div>
     </div>

@@ -110,7 +110,7 @@
 </div>
 {% endmacro %}
 
-{% macro pagination(currentPage, pageNumbers, totalPages, basePath, sortBy, sortDirection, tag) %}
+{% macro pagination(currentPage, pageNumbers, totalPages, basePath, sortBy, sortDirection, tag, alertFilter) %}
 {% set basePath = basePath if basePath else "/" %}
 <nav class="flex justify-center items-center gap-2 my-6" aria-label="Pagination">
   <!-- Previous button -->
@@ -119,6 +119,7 @@
     {% if sortBy %}{% set prevParams = prevParams + "&sortBy=" + sortBy %}{% endif %}
     {% if sortDirection %}{% set prevParams = prevParams + "&sortDirection=" + sortDirection %}{% endif %}
     {% if tag %}{% set prevParams = prevParams + "&tag=" + tag %}{% endif %}
+    {% if alertFilter %}{% set prevParams = prevParams + "&alertFilter=" + alertFilter %}{% endif %}
     <a href="{{ prevParams }}" class="px-4 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors" aria-label="Previous page">
       <i class="bx bx-chevron-left"></i>
     </a>
@@ -140,6 +141,7 @@
         {% if sortBy %}{% set pageParams = pageParams + "&sortBy=" + sortBy %}{% endif %}
         {% if sortDirection %}{% set pageParams = pageParams + "&sortDirection=" + sortDirection %}{% endif %}
         {% if tag %}{% set pageParams = pageParams + "&tag=" + tag %}{% endif %}
+        {% if alertFilter %}{% set pageParams = pageParams + "&alertFilter=" + alertFilter %}{% endif %}
         <a href="{{ pageParams }}" class="px-3 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors">
           {{ pageNum }}
         </a>
@@ -153,6 +155,7 @@
     {% if sortBy %}{% set nextParams = nextParams + "&sortBy=" + sortBy %}{% endif %}
     {% if sortDirection %}{% set nextParams = nextParams + "&sortDirection=" + sortDirection %}{% endif %}
     {% if tag %}{% set nextParams = nextParams + "&tag=" + tag %}{% endif %}
+    {% if alertFilter %}{% set nextParams = nextParams + "&alertFilter=" + alertFilter %}{% endif %}
     <a href="{{ nextParams }}" class="px-4 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors" aria-label="Next page">
       <i class="bx bx-chevron-right"></i>
     </a>
