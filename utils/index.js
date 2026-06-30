@@ -170,8 +170,9 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
   });
 
   const totalRepos = mappedRepos.length;
+  const org = Object.entries(persistedData)[0]?.[1]?.owner ?? "";
 
-  return { org: Object.entries(persistedData)[0][1].owner, repos: mappedRepos, totalRepos };
+  return { org, repos: mappedRepos, totalRepos };
 };
 
 /**
@@ -227,3 +228,17 @@ export const mapRepoFromApiForStorage = (repo) => ({
   topics: repo.topics,
   openIssues: repo.open_issues,
 });
+
+/**
+ * Returns the list of distinct org names found in the persisted repository data.
+ * @param {Object} persistedData - The object returned by db.getAllRepositories()
+ * @returns {string[]}
+ */
+export const getOrgs = (persistedData) => {
+  const orgs = new Set();
+  for (const repo of Object.values(persistedData)) {
+    if (repo.owner) orgs.add(repo.owner);
+  }
+  return [...orgs].sort();
+};
+

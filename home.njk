@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Towtruck</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script>
+      // Apply saved theme before first paint to avoid flash
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
+  </head>
+  <body class="bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    <header class="bg-slate-600 dark:bg-slate-900 text-white">
+      <nav class="w-full flex items-center p-6 border-b-4 border-slate-700 dark:border-slate-950">
+        <h1 class="text-3xl font-bold flex-1">Towtruck</h1>
+        <button id="theme-toggle" aria-label="Toggle dark mode"
+          class="text-slate-200 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-500 dark:hover:bg-slate-700">
+          <i id="theme-icon" class="bx text-2xl"></i>
+        </button>
+      </nav>
+    </header>
+
+    <div class="container mx-auto flex flex-col mt-6 space-y-6">
+      <div class="bg-slate-100 dark:bg-slate-900 rounded-lg border-b-4 border-slate-300 dark:border-slate-950 space-y-4 pb-6">
+        <h2 class="bg-slate-50 dark:bg-slate-800 rounded-t-lg border-b-2 border-slate-200 dark:border-slate-900 text-xl font-bold p-4">Organisations</h2>
+
+        {% if orgs.length %}
+        <div class="mx-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          {% for org in orgs %}
+          <a href="/{{ org }}" class="block bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 p-6 hover:border-slate-400 dark:hover:border-slate-400 hover:shadow-md transition-shadow group">
+            <div class="flex items-center gap-3">
+              <i class="bx bxl-github text-3xl text-slate-400 dark:text-slate-400 group-hover:text-slate-600 transition-colors"></i>
+              <span class="text-lg font-semibold text-slate-800 dark:text-slate-100 group-hover:text-slate-600 dark:group-hover:text-slate-300 transition-colors">{{ org }}</span>
+            </div>
+          </a>
+          {% endfor %}
+        </div>
+        {% else %}
+        <p class="mx-4 text-slate-400 font-light italic">No organisations found. Run <code class="font-mono bg-slate-200 dark:bg-slate-800 rounded px-1">script/seed</code> to populate data.</p>
+        {% endif %}
+      </div>
+    </div>
+    <script>
+      const toggle = document.getElementById('theme-toggle');
+      const icon = document.getElementById('theme-icon');
+      function applyTheme() {
+        const isDark = document.documentElement.classList.contains('dark');
+        icon.className = 'bx text-2xl ' + (isDark ? 'bx-sun' : 'bx-moon');
+      }
+      applyTheme();
+      toggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        applyTheme();
+      });
+    </script>
+  </body>
+</html>
+
+
+

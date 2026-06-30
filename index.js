@@ -1,6 +1,6 @@
 import express from "express";
 import nunjucks from "nunjucks";
-import { mapRepoFromStorageToUi } from "./utils/index.js";
+import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
 import { sortByType } from "./utils/sorting.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
@@ -16,6 +16,17 @@ httpServer.use(handleWebhooks);
 httpServer.get("/", (request, response) => {
   const db = new TowtruckDatabase();
   const persistedRepoData = db.getAllRepositories();
+  const orgs = getOrgs(persistedRepoData);
+
+  const template = nunjucks.render("home.njk", { orgs });
+
+  return response.end(template);
+});
+
+httpServer.get("/:org", (request, response) => {
+  const { org } = request.params;
+  const db = new TowtruckDatabase();
+  const persistedRepoData = db.getAllRepositoriesForOrg(org);
   const persistedLifetimeData = db.getAllDependencies();
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData);
@@ -26,6 +37,7 @@ httpServer.get("/", (request, response) => {
     sortBy,
     sortDirection,
     ...reposForUi,
+    org,
     repos: sortByType(reposForUi.repos, sortDirection, sortBy),
   });
 

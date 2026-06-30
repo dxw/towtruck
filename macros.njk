@@ -1,3 +1,34 @@
+{% macro sortableCardHeader(name, id, sortDirection, sortBy, basePath) %}
+
+{% set basePath = basePath if basePath else "/" %}
+{% set sortingOnThisParam = id === sortBy %}
+{% set linkParams = basePath + "?sortBy=" + id + "&sortDirection=asc" %}
+{% set ariaSort = "none" %}
+
+{% if sortingOnThisParam and sortDirection === "asc" %}
+    {% set linkParams = basePath + "?sortBy=" + id + "&sortDirection=desc" %}
+    {% set ariaSort = "ascending" %}
+{% endif %}
+
+{% if sortingOnThisParam and sortDirection === "desc" %}
+    {% set linkParams = basePath + "?sortBy=" + id + "&sortDirection=asc" %}
+    {% set ariaSort = "descending" %}
+{% endif %}
+
+<a href="{{linkParams}}" aria-sort="{{ariaSort}}"
+   class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors
+          {% if sortingOnThisParam %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200
+          {% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
+  {{name}}
+  <span class="text-xs">
+    {% if sortingOnThisParam and sortDirection === "asc" %}↓
+    {% elif sortingOnThisParam and sortDirection === "desc" %}↑
+    {% else %}<span class="opacity-40">↕</span>
+    {% endif %}
+  </span>
+</a>
+{% endmacro %}
+
 {% macro sortableTableHeader(name, id, sortDirection, sortBy) %}
 
 {% set upArrow %}
@@ -54,7 +85,7 @@
 {% macro tooltip(id, mainText, tooltipText) %}
 <div aria-describedby="{{ id }}" class="group relative inline-block">
   <span class="border-dotted border-b">{{ mainText }}</span>
-  <div role="tooltip" id="{{ id }}" class="invisible group-focus:visible group-hover:visible absolute -top-8 left-2/4 -translate-x-2/4 text-center z-30 py-0.5 px-2 bg-stone-800 text-white rounded-full after:content-[' '] after:absolute after:top-full after:left-2/4 after:-ml-[4px] after:border-4 after:border-transparent after:border-t-stone-800">
+  <div role="tooltip" id="{{ id }}" class="invisible group-focus:visible group-hover:visible absolute -top-8 left-2/4 -translate-x-2/4 text-center z-30 py-0.5 px-2 bg-slate-900 text-white rounded-full after:content-[' '] after:absolute after:top-full after:left-2/4 after:-ml-[4px] after:border-4 after:border-transparent after:border-t-slate-900">
     {{ tooltipText }}
   </div>
 </div>
