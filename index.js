@@ -2,6 +2,7 @@ import express from "express";
 import nunjucks from "nunjucks";
 import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
 import { sortByType } from "./utils/sorting.js";
+import { filterByAlerts } from "./utils/alertFiltering.js";
 import { calculatePagination } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
@@ -32,23 +33,26 @@ httpServer.get("/:org", (request, response) => {
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData);
 
-  const { sortDirection, sortBy, tag, page: pageParam } = request.query;
+  const { sortDirection, sortBy, tag, page: pageParam, alertFilter } = request.query;
 
-  const filteredRepos = tag
+  const filteredByTag = tag
     ? reposForUi.repos.filter((repo) => repo.topics && repo.topics.includes(tag))
     : reposForUi.repos;
 
-  const sortedRepos = sortByType(filteredRepos, sortDirection, sortBy);
+  const filteredByAlerts = filterByAlerts(filteredByTag, alertFilter);
+  const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
   const paginationData = calculatePagination(sortedRepos, pageParam);
 
   const template = nunjucks.render("index.njk", {
     sortBy,
     sortDirection,
     tag,
+    alertFilter,
     ...reposForUi,
     org,
     repos: paginationData.items,
-    totalRepos: filteredRepos.length,
+    totalRepos: reposForUi.totalRepos,
+    displayedRepos: filteredByAlerts.length,
     currentPage: paginationData.currentPage,
     totalPages: paginationData.totalPages,
     pageNumbers: paginationData.pageNumbers,

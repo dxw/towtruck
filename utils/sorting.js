@@ -83,6 +83,12 @@ export const sortByType = (repos, sortDirection, sortBy) => {
     case "oldestOpenIssueOpenedAt":
       return sortByISO8601Timestamp(repos, sortDirection, "oldestOpenIssueOpenedAtISO8601");
 
+    case "criticalSeverityAlerts":
+      return sortByNumericValue(repos, sortDirection, "criticalSeverityAlerts");
+
+    case "totalOpenAlerts":
+      return sortByNumericValue(repos, sortDirection, "totalOpenAlerts");
+
     default:
       return repos;
   }
