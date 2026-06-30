@@ -1,0 +1,12 @@
+Script started on Tue Jun 30 22:29:35 2026
+[1m[7m%[27m[1m[0m                                                                                                                                                [0m[27m[24m[Jmichael.huldt@MXQG4WVNFQ towtruck % [K[?2004hsscript/server[?2004l
+
+> towtruck@0.0.1 start:watch
+> node --env-file=.env --watch index.js
+
+Server is running on port 3000
+c[32mRestarting 'index.js'[39m
+Server is running on port 3000
+c[32mRestarting 'index.js'[39m
+Server is running on port 3000
+c

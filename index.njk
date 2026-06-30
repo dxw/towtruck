@@ -208,6 +208,11 @@
           <p class="col-span-full py-4 text-center text-slate-400 font-light italic">No repositories found.</p>
           {% endfor %}
         </div>
+
+        <!-- Pagination -->
+        {% if totalPages > 1 %}
+        {{macros.pagination(currentPage, pageNumbers, totalPages, "/" + org, sortBy, sortDirection, tag)}}
+        {% endif %}
       </div>
     </div>
     <script>

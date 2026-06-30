@@ -2,6 +2,7 @@ import express from "express";
 import nunjucks from "nunjucks";
 import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
 import { sortByType } from "./utils/sorting.js";
+import { calculatePagination } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
 
@@ -31,14 +32,28 @@ httpServer.get("/:org", (request, response) => {
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData);
 
-  const { sortDirection, sortBy } = request.query;
+  const { sortDirection, sortBy, tag, page: pageParam } = request.query;
+
+  const filteredRepos = tag
+    ? reposForUi.repos.filter((repo) => repo.topics && repo.topics.includes(tag))
+    : reposForUi.repos;
+
+  const sortedRepos = sortByType(filteredRepos, sortDirection, sortBy);
+  const paginationData = calculatePagination(sortedRepos, pageParam);
 
   const template = nunjucks.render("index.njk", {
     sortBy,
     sortDirection,
+    tag,
     ...reposForUi,
     org,
-    repos: sortByType(reposForUi.repos, sortDirection, sortBy),
+    repos: paginationData.items,
+    totalRepos: filteredRepos.length,
+    currentPage: paginationData.currentPage,
+    totalPages: paginationData.totalPages,
+    pageNumbers: paginationData.pageNumbers,
+    hasPreviousPage: paginationData.hasPreviousPage,
+    hasNextPage: paginationData.hasNextPage,
   });
 
   return response.end(template);

@@ -1,0 +1,2 @@
+- run all tests before making any commits
+- run the linter before making any commits

@@ -90,3 +90,58 @@
   </div>
 </div>
 {% endmacro %}
+
+{% macro pagination(currentPage, pageNumbers, totalPages, basePath, sortBy, sortDirection, tag) %}
+{% set basePath = basePath if basePath else "/" %}
+<nav class="flex justify-center items-center gap-2 my-6" aria-label="Pagination">
+  <!-- Previous button -->
+  {% if currentPage > 1 %}
+    {% set prevParams = basePath + "?page=" + (currentPage - 1) %}
+    {% if sortBy %}{% set prevParams = prevParams + "&sortBy=" + sortBy %}{% endif %}
+    {% if sortDirection %}{% set prevParams = prevParams + "&sortDirection=" + sortDirection %}{% endif %}
+    {% if tag %}{% set prevParams = prevParams + "&tag=" + tag %}{% endif %}
+    <a href="{{ prevParams }}" class="px-4 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors" aria-label="Previous page">
+      <i class="bx bx-chevron-left"></i>
+    </a>
+  {% else %}
+    <button disabled class="px-4 py-2 rounded-lg border border-slate-300 bg-slate-100 text-slate-400 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-700 cursor-not-allowed" aria-label="Previous page">
+      <i class="bx bx-chevron-left"></i>
+    </button>
+  {% endif %}
+
+  <!-- Page numbers -->
+  <div class="flex gap-1">
+    {% for pageNum in pageNumbers %}
+      {% if pageNum === currentPage %}
+        <span class="px-3 py-2 rounded-lg border-2 border-slate-700 bg-slate-700 text-white dark:border-slate-200 dark:bg-slate-200 dark:text-slate-900 font-semibold" aria-current="page">
+          {{ pageNum }}
+        </span>
+      {% else %}
+        {% set pageParams = basePath + "?page=" + pageNum %}
+        {% if sortBy %}{% set pageParams = pageParams + "&sortBy=" + sortBy %}{% endif %}
+        {% if sortDirection %}{% set pageParams = pageParams + "&sortDirection=" + sortDirection %}{% endif %}
+        {% if tag %}{% set pageParams = pageParams + "&tag=" + tag %}{% endif %}
+        <a href="{{ pageParams }}" class="px-3 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors">
+          {{ pageNum }}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Next button -->
+  {% if currentPage < totalPages %}
+    {% set nextParams = basePath + "?page=" + (currentPage + 1) %}
+    {% if sortBy %}{% set nextParams = nextParams + "&sortBy=" + sortBy %}{% endif %}
+    {% if sortDirection %}{% set nextParams = nextParams + "&sortDirection=" + sortDirection %}{% endif %}
+    {% if tag %}{% set nextParams = nextParams + "&tag=" + tag %}{% endif %}
+    <a href="{{ nextParams }}" class="px-4 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors" aria-label="Next page">
+      <i class="bx bx-chevron-right"></i>
+    </a>
+  {% else %}
+    <button disabled class="px-4 py-2 rounded-lg border border-slate-300 bg-slate-100 text-slate-400 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-700 cursor-not-allowed" aria-label="Next page">
+      <i class="bx bx-chevron-right"></i>
+    </button>
+  {% endif %}
+</nav>
+{% endmacro %}
+
