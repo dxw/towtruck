@@ -17,6 +17,9 @@
   },
   "author": "dxw",
   "license": "MIT",
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@octokit/app": "^15.1.0",
     "better-sqlite3": "^11.3.0",
