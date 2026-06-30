@@ -1,4 +1,4 @@
-import { describe, it, mock } from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert/strict";
 import { isAllowedEmail, requireAuth, registerAuthRoutes } from "./index.js";
 
@@ -137,38 +137,10 @@ describe("registerAuthRoutes", () => {
     });
 
     it("returns 403 when the email domain is not dxw.com", async () => {
-      const app = makeApp();
-
-      const oidcConfig = makeOidcConfig();
-      const originalEnv = process.env.BASE_URL;
-      process.env.BASE_URL = "https://example.com";
-
-      // Dynamically mock authorizationCodeGrant at the module level via dependency injection
-      const fakeTokens = {
-        claims: () => ({ email: "attacker@evil.com" }),
-      };
-
-      registerAuthRoutes(app, oidcConfig, async () => fakeTokens);
-
-      const req = {
-        session: {
-          oidc: { state: "s", nonce: "n", codeVerifier: "v" },
-        },
-        originalUrl: "/auth/callback?code=abc&state=s",
-      };
-      const res = {
-        statusCode: null,
-        body: null,
-        status(code) { this.statusCode = code; return this; },
-        send(body) { this.body = body; },
-      };
-
-      // We can't easily mock the imported authorizationCodeGrant without a DI seam,
-      // so we test the 403 path by confirming isAllowedEmail rejects the address
+      // isAllowedEmail is the guard used inside the callback handler.
+      // Confirm it rejects non-dxw.com addresses, which causes the 403.
       const { isAllowedEmail: check } = await import("./index.js");
       assert.equal(check("attacker@evil.com"), false);
-
-      process.env.BASE_URL = originalEnv;
     });
   });
 });

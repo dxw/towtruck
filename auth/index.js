@@ -79,7 +79,6 @@ export const registerAuthRoutes = (app, oidcConfig) => {
         return res.status(400).send("Invalid session state. Please try logging in again.");
       }
 
-      const redirectUri = `${process.env.BASE_URL}/auth/callback`;
 
       const tokens = await openidClient.authorizationCodeGrant(
         oidcConfig,
