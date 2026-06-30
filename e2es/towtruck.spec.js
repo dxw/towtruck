@@ -32,7 +32,7 @@ test("has dependency info", async ({ page, baseURL }) => {
   await testSortingForColumn(
     {
       name: "Open bot PR count",
-      topAscending: "optionparse",
+      topAscending: "optionparser",
       topDescending: "govuk-blogs",
     },
     page
@@ -51,7 +51,7 @@ test("has dependency info", async ({ page, baseURL }) => {
     {
       name: "Updated at",
       topAscending: "optionparser",
-      topDescending: "govuk-blogs ",
+      topDescending: "govuk-blogs",
     },
     page
   );

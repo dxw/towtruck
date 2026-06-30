@@ -1,0 +1,13 @@
+#!/bin/bash
+
+set -e
+
+cd "$(dirname "$0")/.."
+
+# Clear any stale server on port 3000
+lsof -ti:3000 | xargs kill -9 2>/dev/null || true
+
+echo "==> Running Playwright tests..."
+
+npx playwright test --reporter=list
+

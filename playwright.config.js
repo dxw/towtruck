@@ -33,20 +33,23 @@ export default defineConfig({
 
   projects: [
     {
-      name: "setup data",
-      testMatch: /seed\.test\.data\.js/,
+      name: "setup auth",
+      testMatch: /auth\.setup\.js/,
     },
     {
       name: "chromium",
-      use: { ...devices["Desktop Chrome"] },
-      dependencies: ["setup data"],
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "./e2es/.auth/session.json",
+      },
+      dependencies: ["setup auth"],
     },
   ],
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "node ./e2es/seedTestData.js && script/server",
-    url: "http://127.0.0.1:3000",
+    command: "node ./e2es/seedTestData.js && node --env-file=.env.test index.js",
+    url: "http://127.0.0.1:3000/health",
     reuseExistingServer: !process.env.CI,
   },
 });

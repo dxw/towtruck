@@ -6,5 +6,8 @@ set -e
 
 cd "$(dirname "$0")/.."
 
+export NVM_DIR="${NVM_DIR:-$HOME/.nvm}"
+[ -s "$NVM_DIR/nvm.sh" ] && source "$NVM_DIR/nvm.sh" && nvm use
+
 echo "==> Seeding data..."
-npm run seed
+node --env-file=.env ./seed/repos.js && node --env-file=.env ./seed/lifetimes.js
