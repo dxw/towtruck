@@ -15,9 +15,13 @@ export const isAllowedEmail = (email) => {
 
 /**
  * Discovers the Google OpenID Connect configuration and builds the client config.
- * @returns {Promise<openidClient.Configuration>}
+ * Returns null if GOOGLE_CLIENT_ID is not set (e.g. in test environments).
+ * @returns {Promise<openidClient.Configuration|null>}
  */
 export const buildOidcConfig = async () => {
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    return null;
+  }
   const config = await openidClient.discovery(
     new URL(GOOGLE_ISSUER),
     process.env.GOOGLE_CLIENT_ID,

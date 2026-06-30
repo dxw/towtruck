@@ -30,7 +30,24 @@ httpServer.use(
 httpServer.use(handleWebhooks);
 
 const oidcConfig = await buildOidcConfig();
-registerAuthRoutes(httpServer, oidcConfig);
+if (oidcConfig) {
+  registerAuthRoutes(httpServer, oidcConfig);
+}
+
+// Test-only endpoint: creates an authenticated session without going through Google SSO.
+// Only available outside of production.
+if (process.env.NODE_ENV !== "production") {
+  httpServer.get("/health", (req, res) => res.status(200).send("ok"));
+
+  httpServer.post("/test/session", express.json(), (req, res) => {
+    const { email } = req.body ?? {};
+    if (!email || !email.endsWith("@dxw.com")) {
+      return res.status(400).json({ error: "A valid @dxw.com email is required." });
+    }
+    req.session.user = { email };
+    return res.status(201).json({ email });
+  });
+}
 
 httpServer.get("/", requireAuth, (request, response) => {
   const db = new TowtruckDatabase();
