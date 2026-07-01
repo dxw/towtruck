@@ -1,4 +1,5 @@
 import express from "express";
+import session from "express-session";
 import nunjucks from "nunjucks";
 import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
 import { sortByType } from "./utils/sorting.js";
@@ -7,6 +8,7 @@ import { normalizeSelectedTags, filterByTags } from "./utils/tagFiltering.js";
 import { calculatePagination } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
+import { buildOidcConfig, registerAuthRoutes, requireAuth } from "./auth/index.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -14,10 +16,45 @@ nunjucks.configure({
 });
 
 const httpServer = express();
+
+httpServer.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+    },
+  }),
+);
+
 httpServer.use(handleWebhooks);
+
+const oidcConfig = await buildOidcConfig();
+if (oidcConfig) {
+  registerAuthRoutes(httpServer, oidcConfig);
+}
+
+// Test-only endpoint: creates an authenticated session without going through Google SSO.
+// Only available outside of production.
+if (process.env.NODE_ENV !== "production") {
+  httpServer.get("/health", (req, res) => res.status(200).send("ok"));
+
+  httpServer.post("/test/session", express.json(), (req, res) => {
+    const { email } = req.body ?? {};
+    if (!email || !email.endsWith("@dxw.com")) {
+      return res.status(400).json({ error: "A valid @dxw.com email is required." });
+    }
+    req.session.user = { email };
+    return res.status(201).json({ email });
+  });
+}
+
 httpServer.use(express.urlencoded({ extended: false }));
 
-httpServer.get("/", (request, response) => {
+httpServer.get("/", requireAuth, (request, response) => {
   const db = new TowtruckDatabase();
   const persistedRepoData = db.getAllRepositories();
   const orgs = getOrgs(persistedRepoData);
@@ -27,7 +64,7 @@ httpServer.get("/", (request, response) => {
   return response.end(template);
 });
 
-httpServer.get("/:org", (request, response) => {
+httpServer.get("/:org", requireAuth, (request, response) => {
   const { org } = request.params;
   const db = new TowtruckDatabase();
   const persistedRepoData = db.getAllRepositoriesForOrg(org);
@@ -105,7 +142,7 @@ httpServer.get("/:org", (request, response) => {
   return response.end(template);
 });
 
-httpServer.post("/:org/saved-configurations", (request, response) => {
+httpServer.post("/:org/saved-configurations", requireAuth, (request, response) => {
   const { org } = request.params;
   const { name, sortBy, sortDirection, tag, alertFilter } = request.body;
 
@@ -121,7 +158,7 @@ httpServer.post("/:org/saved-configurations", (request, response) => {
   return response.redirect(`/${org}?${new URLSearchParams(query).toString()}`);
 });
 
-httpServer.post("/:org/saved-configurations/:id/delete", (request, response) => {
+httpServer.post("/:org/saved-configurations/:id/delete", requireAuth, (request, response) => {
   const { org, id } = request.params;
   const { sortBy, sortDirection, tag, alertFilter } = request.body;
 
