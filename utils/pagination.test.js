@@ -45,7 +45,7 @@ describe("calculatePagination", () => {
     assert.strictEqual(result.hasPreviousPage, false);
   });
 
-  it("correctly calculates page numbers to display (current page ± 2)", () => {
+  it("correctly calculates page numbers to display (current page  2)", () => {
     const items = Array.from({ length: 30 }, (_, i) => i + 1);
 
     // Page 1: should show [1, 2, 3]

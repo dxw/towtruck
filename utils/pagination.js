@@ -17,7 +17,7 @@ export function calculatePagination(items, page = 1) {
   const startIndex = (validPageNumber - 1) * PAGE_SIZE;
   const paginatedItems = items.slice(startIndex, startIndex + PAGE_SIZE);
 
-  // Calculate page numbers to display (current ± 2)
+  // Calculate page numbers to display (current  2)
   const pageNumbers = [];
   for (let i = Math.max(1, validPageNumber - 2); i <= Math.min(totalPages, validPageNumber + 2); i++) {
     pageNumbers.push(i);
@@ -35,5 +35,4 @@ export function calculatePagination(items, page = 1) {
 }
 
 export { PAGE_SIZE };
-
 
