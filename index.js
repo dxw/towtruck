@@ -15,6 +15,7 @@ nunjucks.configure({
 
 const httpServer = express();
 httpServer.use(handleWebhooks);
+httpServer.use(express.urlencoded({ extended: false }));
 
 httpServer.get("/", (request, response) => {
   const db = new TowtruckDatabase();
@@ -42,6 +43,28 @@ httpServer.get("/:org", (request, response) => {
   const filteredByAlerts = filterByAlerts(filteredByTag, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
   const paginationData = calculatePagination(sortedRepos, pageParam);
+
+  const savedConfigurations = db.getAllSavedConfigurationsForOrg(org).map((config) => {
+    const params = new URLSearchParams(config.query || {});
+    const qs = params.toString();
+    return { ...config, applyUrl: qs ? `/${org}?${qs}` : `/${org}` };
+  });
+
+  const normalizeQuery = (query) => {
+    const params = new URLSearchParams(query || {});
+    return [...params.entries()].sort(([a], [b]) => a.localeCompare(b)).map(([k, v]) => `${k}=${v}`).join("&");
+  };
+
+  const currentQs = normalizeQuery({
+    ...(sortBy ? { sortBy } : {}),
+    ...(sortDirection ? { sortDirection } : {}),
+    ...(alertFilter ? { alertFilter } : {}),
+    ...(selectedTags.length ? { tag: selectedTags.join(",") } : {}),
+  });
+
+  const activeConfigId = savedConfigurations.find(
+    (config) => normalizeQuery(config.query) === currentQs
+  )?.id ?? null;
 
   const buildTopicFilterUrl = (topic) => {
     const toggledTags = selectedTags.includes(topic)
@@ -75,9 +98,44 @@ httpServer.get("/:org", (request, response) => {
     pageNumbers: paginationData.pageNumbers,
     hasPreviousPage: paginationData.hasPreviousPage,
     hasNextPage: paginationData.hasNextPage,
+    savedConfigurations,
+    activeConfigId,
   });
 
   return response.end(template);
+});
+
+httpServer.post("/:org/saved-configurations", (request, response) => {
+  const { org } = request.params;
+  const { name, sortBy, sortDirection, tag, alertFilter } = request.body;
+
+  const query = {};
+  if (sortBy) query.sortBy = sortBy;
+  if (sortDirection) query.sortDirection = sortDirection;
+  if (tag) query.tag = tag;
+  if (alertFilter) query.alertFilter = alertFilter;
+
+  const db = new TowtruckDatabase();
+  db.saveConfiguration(org, name || `Config ${new Date().toLocaleString()}`, query);
+
+  return response.redirect(`/${org}?${new URLSearchParams(query).toString()}`);
+});
+
+httpServer.post("/:org/saved-configurations/:id/delete", (request, response) => {
+  const { org, id } = request.params;
+  const { sortBy, sortDirection, tag, alertFilter } = request.body;
+
+  const db = new TowtruckDatabase();
+  db.deleteSavedConfiguration(org, id);
+
+  const params = new URLSearchParams();
+  if (sortBy) params.set("sortBy", sortBy);
+  if (sortDirection) params.set("sortDirection", sortDirection);
+  if (tag) params.set("tag", tag);
+  if (alertFilter) params.set("alertFilter", alertFilter);
+
+  const qs = params.toString();
+  return response.redirect(qs ? `/${org}?${qs}` : `/${org}`);
 });
 
 const PORT = process.env.PORT || 3000;
