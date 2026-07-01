@@ -43,6 +43,18 @@
           that Towtruck is tracking for <span class="font-bold">{{ org }}</span>.
         </p>
 
+        <!-- Vulnerability summary counters -->
+        <div class="mx-4 flex flex-wrap justify-end gap-3">
+          <div class="rounded-lg px-4 py-3 min-w-[8rem] {% if totalCriticalVulnerabilities > 0 %}bg-red-100 dark:bg-red-950/60{% else %}bg-slate-200/60 dark:bg-slate-800/60{% endif %}">
+            <p class="text-xs uppercase tracking-wide font-medium {% if totalCriticalVulnerabilities > 0 %}text-red-600 dark:text-red-400{% else %}text-slate-400 dark:text-slate-500{% endif %}">Critical vulnerabilities</p>
+            <p class="text-3xl font-bold mt-0.5 {% if totalCriticalVulnerabilities > 0 %}text-red-700 dark:text-red-300{% else %}text-slate-400 dark:text-slate-500{% endif %}">{{ totalCriticalVulnerabilities }}</p>
+          </div>
+          <div class="rounded-lg px-4 py-3 min-w-[8rem] {% if totalVulnerabilities > 0 %}bg-yellow-100 dark:bg-yellow-950/60{% else %}bg-slate-200/60 dark:bg-slate-800/60{% endif %}">
+            <p class="text-xs uppercase tracking-wide font-medium {% if totalVulnerabilities > 0 %}text-yellow-700 dark:text-yellow-400{% else %}text-slate-400 dark:text-slate-500{% endif %}">Total vulnerabilities</p>
+            <p class="text-3xl font-bold mt-0.5 {% if totalVulnerabilities > 0 %}text-yellow-900 dark:text-yellow-200{% else %}text-slate-400 dark:text-slate-500{% endif %}">{{ totalVulnerabilities }}</p>
+          </div>
+        </div>
+
         <!-- Controls box: filters, sorts, save, saved configurations -->
         <div class="mx-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-200 dark:divide-slate-700">
 

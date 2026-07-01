@@ -309,6 +309,110 @@ describe("mapRepoFromStorageToUi", () => {
     expect.deepEqual(mapRepoFromStorageToUi(persistedData).totalRepos, 3);
   });
 
+  it("returns total vulnerabilities summed across all repos", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        dependabotAlerts: {
+          totalOpenAlerts: 5,
+          criticalSeverityAlerts: 2,
+          highSeverityAlerts: 1,
+          mediumSeverityAlerts: 1,
+          lowSeverityAlerts: 1,
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+      repo2: {
+        owner: "dxw",
+        main: {
+          name: "repo2",
+          description: "description2",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo2",
+          apiUrl: "http://api.com/repo2",
+          pullsUrl: "http://api.com/repo2/pulls",
+          issuesUrl: "http://api.com/repo2/issues",
+          language: null,
+          topics: [],
+        },
+        dependabotAlerts: {
+          totalOpenAlerts: 3,
+          criticalSeverityAlerts: 1,
+          highSeverityAlerts: 2,
+          mediumSeverityAlerts: 0,
+          lowSeverityAlerts: 0,
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const result = mapRepoFromStorageToUi(persistedData);
+    expect.strictEqual(result.totalVulnerabilities, 8);
+    expect.strictEqual(result.totalCriticalVulnerabilities, 3);
+  });
+
+  it("returns zero total vulnerabilities when no repos have alerts", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const result = mapRepoFromStorageToUi(persistedData);
+    expect.strictEqual(result.totalVulnerabilities, 0);
+    expect.strictEqual(result.totalCriticalVulnerabilities, 0);
+  });
+
   describe("mapRepo", () => {
     it("maps the repo from the data returned from the api", async () => {
       const apiRepo = {

@@ -174,7 +174,10 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
   const totalRepos = mappedRepos.length;
   const org = Object.entries(persistedData)[0]?.[1]?.owner ?? "";
 
-  return { org, repos: mappedRepos, totalRepos };
+  const totalVulnerabilities = mappedRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
+  const totalCriticalVulnerabilities = mappedRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+
+  return { org, repos: mappedRepos, totalRepos, totalVulnerabilities, totalCriticalVulnerabilities };
 };
 
 /**
