@@ -54,12 +54,19 @@ export const handleDependabotAlertsApiResponse = ({ data }) => {
     return acc;
   }, 0);
 
-  const openAlertCreatedAtOldestFirst = openAlerts
-    .map((alert) => alert.created_at)
-    .filter(Boolean)
-    .sort((first, second) => new Date(first) - new Date(second));
+  const openAlertsOldestFirst = openAlerts
+    .filter((alert) => Boolean(alert.created_at))
+    .sort((first, second) => new Date(first.created_at) - new Date(second.created_at));
 
-  const [oldestOpenAlertCreatedAt = null, ...otherOpenAlertsCreatedAt] = openAlertCreatedAtOldestFirst;
+  const oldestOpenAlertCreatedAt = openAlertsOldestFirst[0]?.created_at ?? null;
+
+  const otherOpenAlerts = openAlertsOldestFirst.slice(1).map((alert) => ({
+    createdAt: alert.created_at,
+    severity: alert.security_vulnerability.severity,
+  }));
+
+  // Keep this legacy shape for compatibility with existing mappings/tests.
+  const otherOpenAlertsCreatedAt = otherOpenAlerts.map((alert) => alert.createdAt);
 
   const fourteenDaysInMs = 14 * 24 * 60 * 60 * 1000;
   const hasOpenAlertOlderThan14Days = oldestOpenAlertCreatedAt
@@ -73,6 +80,7 @@ export const handleDependabotAlertsApiResponse = ({ data }) => {
     highSeverityAlerts,
     criticalSeverityAlerts,
     oldestOpenAlertCreatedAt,
+    otherOpenAlerts,
     otherOpenAlertsCreatedAt,
     hasOpenAlertOlderThan14Days,
   };

@@ -71,6 +71,7 @@ describe("handleEvent", () => {
       lowSeverityAlerts: 1,
       totalOpenAlerts: 4,
       oldestOpenAlertCreatedAt: null,
+      otherOpenAlerts: [],
       otherOpenAlertsCreatedAt: [],
       hasOpenAlertOlderThan14Days: false,
     };

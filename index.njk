@@ -137,8 +137,17 @@
                     Oldest vulnerability age:
                     <span class="js-alert-age font-semibold" data-created-at="{{ repo.oldestOpenAlertCreatedAt }}"></span>
 
-                    {% if repo.otherOpenAlertsCreatedAt and repo.otherOpenAlertsCreatedAt.length %}
-                    <p class="mt-2">Other vulnerabilities (oldest first):</p>
+                    {% if repo.otherOpenAlerts and repo.otherOpenAlerts.length %}
+                    <p class="mt-2">Other vulnerabilities:</p>
+                    <ul class="mt-1 list-disc pl-5 space-y-1">
+                      {% for alert in repo.otherOpenAlerts %}
+                      <li>
+                        <span class="js-alert-age font-semibold {% if alert.severity === 'critical' %}text-red-700 dark:text-red-400{% endif %}" data-created-at="{{ alert.createdAt }}"></span>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                    {% elif repo.otherOpenAlertsCreatedAt and repo.otherOpenAlertsCreatedAt.length %}
+                    <p class="mt-2">Other vulnerabilities:</p>
                     <ul class="mt-1 list-disc pl-5 space-y-1">
                       {% for createdAt in repo.otherOpenAlertsCreatedAt %}
                       <li><span class="js-alert-age font-semibold" data-created-at="{{ createdAt }}"></span></li>
