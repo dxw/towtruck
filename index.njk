@@ -97,7 +97,7 @@
         <!-- Card grid -->
         <div class="mx-4 mb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
           {% for repo in repos %}
-          <div class="rounded-lg border flex flex-col shadow-sm {% if repo.hasOpenAlertOlderThan14Days %}bg-red-50 dark:bg-red-950/20 border-red-500 dark:border-red-500 border-2{% else %}bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700{% endif %}">
+          <div class="rounded-lg border flex flex-col shadow-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
 
             <!-- Card header -->
             <div class="p-4 border-b border-slate-100 dark:border-slate-700">
@@ -109,7 +109,7 @@
               </div>
 
               {% if repo.totalOpenAlerts !== undefined %}
-              <div class="mt-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-3">
+              <div class="mt-3 rounded-lg border p-3 {% if repo.hasOpenAlertOlderThan14Days %}bg-red-50 dark:bg-red-950/20 border-red-500 dark:border-red-500 border-2{% else %}border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50{% endif %}">
                 <details class="group/alerts">
                   <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
                     <div class="flex flex-wrap gap-0 text-[0px]">
