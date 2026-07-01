@@ -43,11 +43,11 @@
           that Towtruck is tracking for <span class="font-bold">{{ org }}</span>.
         </p>
 
-        <!-- Alert filter and sort toolbar -->
-        <div class="mx-4 pb-2">
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="text-sm font-medium text-slate-500 dark:text-slate-400 mr-1">Filter alerts:</span>
+        <!-- Controls box: filters, sorts, save, saved configurations -->
+        <div class="mx-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-200 dark:divide-slate-700">
 
+          <!-- Alert filters + sort row -->
+          <div class="p-3 flex flex-wrap items-center gap-2">
             <!-- Critical alerts filter and sort -->
             <div class="flex gap-2">
               {% set criticalParams = "/" + org + "?alertFilter=criticalOnly" %}
@@ -82,12 +82,9 @@
               Reset
             </a>
           </div>
-        </div>
 
-        <!-- Sort toolbar -->
-        <div class="mx-4 pb-2">
-          <div class="flex flex-wrap items-center gap-2">
-            <span class="text-sm font-medium text-slate-500 dark:text-slate-400 mr-1">Sort by:</span>
+          <!-- Sort row -->
+          <div class="p-3 flex flex-wrap items-center gap-2">
             {{macros.sortableCardHeader("Open issues", "openIssues", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
             {{macros.sortableCardHeader("Open bot PRs", "openBotPrCount", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
             {{macros.sortableCardHeader("Open PRs", "openPrCount", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
@@ -97,38 +94,36 @@
             {{macros.sortableCardHeader("Most recent issue", "mostRecentIssueOpenedAt", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
             {{macros.sortableCardHeader("Oldest open issue", "oldestOpenIssueOpenedAt", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
           </div>
-        </div>
 
-        <!-- Save current configuration -->
-        <div class="mx-4 pb-4">
-          <details class="group/save">
-            <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
-              <i class="bx bx-bookmark-plus"></i>
-              Save current configuration
-            </summary>
-            <form method="POST" action="/{{ org }}/saved-configurations" class="mt-3 flex items-center gap-2">
-              <input type="hidden" name="sortBy" value="{{ sortBy }}" />
-              <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
-              <input type="hidden" name="tag" value="{{ tag }}" />
-              <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
-              <input
-                type="text"
-                name="name"
-                placeholder="Configuration name (optional)"
-                class="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 w-64"
-              />
-              <button type="submit" class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-700 text-white border-slate-700 hover:bg-slate-600 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200 dark:hover:bg-slate-300">
-                <i class="bx bx-save"></i>
-                Save
-              </button>
-            </form>
-          </details>
-        </div>
+          <!-- Save current configuration -->
+          <div class="p-3">
+            <details class="group/save">
+              <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+                <i class="bx bx-bookmark-plus"></i>
+                Save current configuration
+              </summary>
+              <form method="POST" action="/{{ org }}/saved-configurations" class="mt-3 flex items-center gap-2">
+                <input type="hidden" name="sortBy" value="{{ sortBy }}" />
+                <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
+                <input type="hidden" name="tag" value="{{ tag }}" />
+                <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Configuration name (optional)"
+                  class="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 w-64"
+                />
+                <button type="submit" class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-700 text-white border-slate-700 hover:bg-slate-600 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200 dark:hover:bg-slate-300">
+                  <i class="bx bx-save"></i>
+                  Save
+                </button>
+              </form>
+            </details>
+          </div>
 
-        <!-- Saved configurations panel -->
-        {% if savedConfigurations and savedConfigurations.length %}
-        <div class="mx-4 pb-4">
-          <div class="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 p-4">
+          <!-- Saved configurations panel -->
+          {% if savedConfigurations and savedConfigurations.length %}
+          <div class="p-3">
             <div class="flex items-center justify-between mb-3">
               <h3 class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                 <i class="bx bx-bookmark"></i>
@@ -160,8 +155,9 @@
               {% endfor %}
             </ul>
           </div>
+          {% endif %}
+
         </div>
-        {% endif %}
 
         <!-- Card grid -->
         <div class="mx-4 mb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
