@@ -2,14 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bb72ed1c-514a-4f31-b193-ab54cb436b4a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/utils/alertFiltering.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/alertFiltering.test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/copilotDiffState.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/copilotDiffState.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/dateFormatting.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/utils/dateFormatting.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.github/copilot-instructions.md" beforeDir="false" afterPath="$PROJECT_DIR$/.github/copilot-instructions.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.njk" beforeDir="false" afterPath="$PROJECT_DIR$/index.njk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/macros.njk" beforeDir="false" afterPath="$PROJECT_DIR$/macros.njk" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/githubApi/fetchAllRepos.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/githubApi/fetchAllRepos.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/githubApi/fetchDependabotAlerts.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/githubApi/fetchDependabotAlerts.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/githubApi/fetchDependabotAlerts.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/githubApi/fetchDependabotAlerts.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/index.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/index.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/index.test.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/sorting.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/sorting.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/webhooks/alerts.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/webhooks/alerts.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -19,7 +26,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="c5fbe023-59bc-40ec-81f0-5e60eb0f8678" />
+        <option name="activeSessionId" value="d5804423-d4c5-482d-a5f7-5dd8457eed45" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -156,7 +163,7 @@
             <option name="modeId" value="Agent" />
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="auto" />
-            <option name="status" value="Stopped" />
+            <option name="status" value="Completed" />
             <option name="targetType" value="LOCAL" />
           </session>
           <session>
@@ -165,6 +172,42 @@
             <option name="modeId" value="Agent" />
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="claude-sonnet-4.6" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="fb9c67a9-b7a0-43d6-baf0-0d1c52b6e782" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="auto" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="2df397cd-ae66-44d2-b770-4bf3b812ba77" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="claude-sonnet-4.6" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="9bfb718c-9986-4b8f-995e-1175514bb2de" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="claude-sonnet-4.6" />
+            <option name="status" value="Completed" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="d5804423-d4c5-482d-a5f7-5dd8457eed45" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="claude-sonnet-4.6" />
+            <option name="status" value="Processing" />
             <option name="targetType" value="LOCAL" />
           </session>
         </option>
@@ -249,7 +292,7 @@
       <workItem from="1781534045937" duration="440000" />
       <workItem from="1781536065264" duration="39839000" />
       <workItem from="1782825456092" duration="31488000" />
-      <workItem from="1782860312104" duration="1206000" />
+      <workItem from="1782860312104" duration="19158000" />
     </task>
     <servers />
   </component>

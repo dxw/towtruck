@@ -1,2 +1,3 @@
 - run all tests before making any commits
 - run the linter before making any commits
+- add tests for new features or bug fixes

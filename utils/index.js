@@ -1,5 +1,6 @@
 import { differenceInYears, formatDistance, formatDistanceToNow, startOfToday } from "date-fns";
 import { getDependencyEndOfLifeDate, getDependencyState } from "./endOfLifeDateApi/index.js";
+import { formatDate } from "./dateFormatting.js";
 
 /**
  * @typedef {Object} PersistedData
@@ -135,11 +136,12 @@ export const hashToTailwindColor = (str) => {
  * Maps the persisted repo data from storage to a format suitable for the UI
  * @param {PersistedData} persistedData
  * @param {import("./endOfLifeDateApi/fetchAllDependencyEolInfo").DependencyLifetimes[]} persistedLifetimes
+ * @param {import("./dateFormatting").DateStyle} [dateStyle="DD/MM/YYYY"]
  * @returns {RepoData}
  */
-export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
+export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateStyle = "DD/MM/YYYY") => {
   const mappedRepos = Object.entries(persistedData).map(([, repo]) => {
-    const newDate = new Date(repo.main.updatedAt).toLocaleDateString();
+    const newDate = formatDate(repo.main.updatedAt, dateStyle);
     const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
 
     const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDistanceToNow(repo.pullRequests.mostRecentPrOpenedAt, { addSuffix: true });

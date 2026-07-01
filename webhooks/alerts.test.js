@@ -70,10 +70,6 @@ describe("handleEvent", () => {
       mediumSeverityAlerts: 1,
       lowSeverityAlerts: 1,
       totalOpenAlerts: 4,
-      oldestOpenAlertCreatedAt: null,
-      otherOpenAlerts: [],
-      otherOpenAlertsCreatedAt: [],
-      hasOpenAlertOlderThan14Days: false,
     };
 
     await handleEvent(event, db);

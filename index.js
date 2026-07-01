@@ -1,7 +1,9 @@
 import express from "express";
+import cookieParser from "cookie-parser";
 import session from "express-session";
 import nunjucks from "nunjucks";
 import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
+import { normalizeDateStyle } from "./utils/dateFormatting.js";
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
 import { normalizeSelectedTags, filterByTags } from "./utils/tagFiltering.js";
@@ -16,6 +18,8 @@ nunjucks.configure({
 });
 
 const httpServer = express();
+
+httpServer.use(cookieParser());
 
 httpServer.use(
   session({
@@ -70,7 +74,14 @@ httpServer.get("/:org", requireAuth, (request, response) => {
   const persistedRepoData = db.getAllRepositoriesForOrg(org);
   const persistedLifetimeData = db.getAllDependencies();
 
-  const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData);
+  // Resolve date format: query param takes precedence over cookie; persist choice in cookie
+  const rawDateFormat = request.query.dateFormat ?? request.cookies?.dateFormat;
+  const dateFormat = normalizeDateStyle(rawDateFormat);
+  if (request.query.dateFormat && request.query.dateFormat !== request.cookies?.dateFormat) {
+    response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
+  }
+
+  const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData, dateFormat);
 
   const { sortDirection, sortBy, tag, page: pageParam, alertFilter } = request.query;
   const selectedTags = normalizeSelectedTags(tag);
@@ -125,6 +136,7 @@ httpServer.get("/:org", requireAuth, (request, response) => {
     selectedTags,
     buildTopicFilterUrl,
     alertFilter,
+    dateFormat,
     ...reposForUi,
     org,
     repos: paginationData.items,
