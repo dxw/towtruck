@@ -14,7 +14,7 @@ import { buildOidcConfig, registerAuthRoutes, requireAuth } from "./auth/index.j
 
 nunjucks.configure({
   autoescape: true,
-  watch: true,
+  watch: process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test",
 });
 
 const httpServer = express();

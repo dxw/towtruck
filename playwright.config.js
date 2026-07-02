@@ -52,6 +52,8 @@ export default defineConfig({
     command: "node ./e2es/seedTestData.js && node index.js",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: !process.env.CI,
+    stdout: "inherit",
+    stderr: "inherit",
     env: {
       NODE_ENV: "test",
     },
