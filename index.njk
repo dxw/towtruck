@@ -42,6 +42,13 @@
       </nav>
     </header>
 
+    {% if dPlusMode %}
+    <div class="bg-blue-600 dark:bg-blue-700 border-b-4 border-blue-800 dark:border-blue-900 px-6 py-4 text-white font-semibold text-base flex items-center gap-2">
+      <i class="bx bx-info-circle text-xl"></i>
+      This dashboard shows only repos not marked GovPress.
+    </div>
+    {% endif %}
+
     <div class="container mx-auto flex flex-col mt-6 space-y-6">
       <div class="bg-slate-100 dark:bg-slate-900 rounded-lg border-b-4 border-slate-300 dark:border-slate-950 space-y-4">
         <h2 class="bg-slate-50 dark:bg-slate-800 rounded-t-lg border-b-2 border-slate-200 dark:border-slate-900 text-xl font-bold p-4">{{ org }}</h2>
