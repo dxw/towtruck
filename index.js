@@ -41,6 +41,10 @@ httpServer.use(handleWebhooks);
 const oidcConfig = await buildOidcConfig();
 if (oidcConfig) {
   registerAuthRoutes(httpServer, oidcConfig);
+} else if (process.env.NODE_ENV !== "production") {
+  // When OIDC is not configured (e.g. in test environments), provide a stub
+  // /auth/login so that requireAuth redirects land somewhere valid (not 404).
+  httpServer.get("/auth/login", (req, res) => res.status(200).send("Auth not configured"));
 }
 
 // Test-only endpoint: creates an authenticated session without going through Google SSO.
