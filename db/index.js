@@ -35,6 +35,7 @@ export class TowtruckDatabase {
   #getAllForScopeStatement;
   #deleteAllForScopeStatement;
   #getAllConfigurationsForOrgStatement;
+  #getAllConfigurationsForUserStatement;
 
   constructor(filename = "./data/towtruck.db", options) {
     this.#db = initialiseDatabase(filename, options);
@@ -46,6 +47,7 @@ export class TowtruckDatabase {
     this.#getAllForScopeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ?;");
     this.#deleteAllForScopeStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ?;");
     this.#getAllConfigurationsForOrgStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? ORDER BY id ASC;");
+    this.#getAllConfigurationsForUserStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? AND json_extract(value, '$.userEmail') = ? ORDER BY id ASC;");
   }
 
   #save(scope, name, key, data) {
@@ -145,9 +147,9 @@ export class TowtruckDatabase {
     return this.#deleteAllForScope("dependency");
   }
 
-  saveConfiguration(org, name, query) {
+  saveConfiguration(org, name, query, userEmail) {
     const id = randomUUID();
-    return this.#save("saved-configuration", `${org}/${id}`, "config", { id, name, org, query, createdAt: new Date().toISOString() });
+    return this.#save("saved-configuration", `${org}/${id}`, "config", { id, name, org, query, userEmail, createdAt: new Date().toISOString() });
   }
 
   getAllSavedConfigurationsForOrg(org) {
@@ -155,10 +157,15 @@ export class TowtruckDatabase {
     return rows.map((row) => JSON.parse(row.value)).filter(Boolean);
   }
 
-  deleteSavedConfiguration(org, id) {
+  getAllSavedConfigurationsForUser(org, userEmail) {
+    const rows = this.#getAllConfigurationsForUserStatement.all(`${org}/%`, userEmail);
+    return rows.map((row) => JSON.parse(row.value)).filter(Boolean);
+  }
+
+  deleteSavedConfiguration(org, id, userEmail) {
     const rawDb = this.#db;
-    const stmt = rawDb.prepare("DELETE FROM towtruck_data WHERE scope = 'saved-configuration' AND name = ?;");
-    return stmt.run(`${org}/${id}`);
+    const stmt = rawDb.prepare("DELETE FROM towtruck_data WHERE scope = 'saved-configuration' AND name = ? AND json_extract(value, '$.userEmail') = ?;");
+    return stmt.run(`${org}/${id}`, userEmail);
   }
 
   transaction(fn) {

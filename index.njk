@@ -42,6 +42,13 @@
       </nav>
     </header>
 
+    {% if dPlusMode %}
+    <div class="bg-blue-600 dark:bg-blue-700 border-b-4 border-blue-800 dark:border-blue-900 px-6 py-4 text-white font-semibold text-base flex items-center gap-2">
+      <i class="bx bx-info-circle text-xl"></i>
+      This dashboard shows only repos not marked GovPress.
+    </div>
+    {% endif %}
+
     <div class="container mx-auto flex flex-col mt-6 space-y-6">
       <div class="bg-slate-100 dark:bg-slate-900 rounded-lg border-b-4 border-slate-300 dark:border-slate-950 space-y-4">
         <h2 class="bg-slate-50 dark:bg-slate-800 rounded-t-lg border-b-2 border-slate-200 dark:border-slate-900 text-xl font-bold p-4">{{ org }}</h2>
@@ -181,28 +188,6 @@
           </div>
           {% endif %}
 
-          <!-- Date format toggle -->
-          <div class="p-3 flex flex-wrap items-center gap-2">
-            <span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-medium">Date format:</span>
-            {% set ddmmParams = baseUrl + "?dateFormat=DD%2FMM%2FYYYY" %}
-            {% if sortBy %}{% set ddmmParams = ddmmParams + "&sortBy=" + sortBy %}{% endif %}
-            {% if sortDirection %}{% set ddmmParams = ddmmParams + "&sortDirection=" + sortDirection %}{% endif %}
-            {% if tag %}{% set ddmmParams = ddmmParams + "&tag=" + tag %}{% endif %}
-            {% if alertFilter %}{% set ddmmParams = ddmmParams + "&alertFilter=" + alertFilter %}{% endif %}
-            <a href="{{ ddmmParams }}" aria-pressed="{{ 'true' if dateFormat !== 'MM/DD/YYYY' else 'false' }}"
-               class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if dateFormat !== 'MM/DD/YYYY' %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              DD/MM/YYYY
-            </a>
-            {% set mmddParams = baseUrl + "?dateFormat=MM%2FDD%2FYYYY" %}
-            {% if sortBy %}{% set mmddParams = mmddParams + "&sortBy=" + sortBy %}{% endif %}
-            {% if sortDirection %}{% set mmddParams = mmddParams + "&sortDirection=" + sortDirection %}{% endif %}
-            {% if tag %}{% set mmddParams = mmddParams + "&tag=" + tag %}{% endif %}
-            {% if alertFilter %}{% set mmddParams = mmddParams + "&alertFilter=" + alertFilter %}{% endif %}
-            <a href="{{ mmddParams }}" aria-pressed="{{ 'true' if dateFormat === 'MM/DD/YYYY' else 'false' }}"
-               class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if dateFormat === 'MM/DD/YYYY' %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              MM/DD/YYYY
-            </a>
-          </div>
 
         </div>
 
