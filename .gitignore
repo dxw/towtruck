@@ -140,6 +140,9 @@ towtruck.private-key.pem
 /blob-report/
 /playwright/.cache/
 
+# Playwright auth state
+/e2es/.auth/
+
 # SQLite
 *.db-wal
 *.db-shm

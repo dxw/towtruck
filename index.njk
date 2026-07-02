@@ -18,12 +18,23 @@
     </script>
   </head>
   <body class="bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    {% set baseUrl = dPlusBaseUrl if dPlusMode else "/" + org %}
     <header class="bg-slate-600 dark:bg-slate-900 text-white">
       <nav class="w-full flex items-center gap-4 p-6 border-b-4 border-slate-700 dark:border-slate-950">
         <a href="/" class="text-slate-300 hover:text-white transition-colors" aria-label="Back to home">
           <i class="bx bx-arrow-back text-2xl"></i>
         </a>
         <h1 class="text-3xl font-bold flex-1">Towtruck</h1>
+        {% if dPlusMode %}
+        <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
+          Exit D+ mode
+        </a>
+        {% else %}
+        <a href="/{{ org }}/d-plus" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-blue-600 text-white border-blue-500 hover:bg-blue-500">
+          <i class="bx bx-rocket"></i>
+          D+ mode
+        </a>
+        {% endif %}
         <button id="theme-toggle" aria-label="Toggle dark mode"
           class="text-slate-200 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-500 dark:hover:bg-slate-700">
           <i id="theme-icon" class="bx text-2xl"></i>
@@ -62,30 +73,30 @@
           <div class="p-3 flex flex-wrap items-center gap-2">
             <!-- Critical alerts filter and sort -->
             <div class="flex gap-2">
-              {% set criticalParams = "/" + org + "?alertFilter=criticalOnly" %}
+              {% set criticalParams = baseUrl + "?alertFilter=criticalOnly" %}
               {% if sortBy %}{% set criticalParams = criticalParams + "&sortBy=" + sortBy %}{% endif %}
               {% if sortDirection %}{% set criticalParams = criticalParams + "&sortDirection=" + sortDirection %}{% endif %}
               {% if tag %}{% set criticalParams = criticalParams + "&tag=" + tag %}{% endif %}
               <a href="{{ criticalParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'criticalOnly' %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600{% else %}bg-red-200 text-red-700 border-red-400 hover:bg-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900{% endif %}">
                 Critical only
               </a>
-              {{macros.sortableCardHeader("Critical alerts", "criticalSeverityAlerts", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
+              {{macros.sortableCardHeader("Critical alerts", "criticalSeverityAlerts", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
             </div>
 
             <!-- Any alerts filter and sort -->
             <div class="flex gap-2">
-              {% set anyAlertsParams = "/" + org + "?alertFilter=anyAlerts" %}
+              {% set anyAlertsParams = baseUrl + "?alertFilter=anyAlerts" %}
               {% if sortBy %}{% set anyAlertsParams = anyAlertsParams + "&sortBy=" + sortBy %}{% endif %}
               {% if sortDirection %}{% set anyAlertsParams = anyAlertsParams + "&sortDirection=" + sortDirection %}{% endif %}
               {% if tag %}{% set anyAlertsParams = anyAlertsParams + "&tag=" + tag %}{% endif %}
               <a href="{{ anyAlertsParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'anyAlerts' %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500{% else %}bg-yellow-200 text-yellow-700 border-yellow-400 hover:bg-yellow-300 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800 dark:hover:bg-yellow-900{% endif %}">
                 Any alerts
               </a>
-              {{macros.sortableCardHeader("Total alerts", "totalOpenAlerts", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
+              {{macros.sortableCardHeader("Total alerts", "totalOpenAlerts", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
             </div>
 
             <!-- Reset button -->
-            {% set resetParams = "/" + org %}
+            {% set resetParams = baseUrl %}
             {% set resetParamSep = "?" %}
             {% if tag %}{% set resetParams = resetParams + resetParamSep + "tag=" + tag %}{% set resetParamSep = "&" %}{% endif %}
             {% if sortBy %}{% set resetParams = resetParams + resetParamSep + "sortBy=" + sortBy %}{% set resetParamSep = "&" %}{% endif %}
@@ -97,14 +108,14 @@
 
           <!-- Sort row -->
           <div class="p-3 flex flex-wrap items-center gap-2">
-            {{macros.sortableCardHeader("Open issues", "openIssues", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Open bot PRs", "openBotPrCount", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Open PRs", "openPrCount", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Updated at", "updatedAt", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Most recent PR", "mostRecentPrOpenedAt", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Oldest open PR", "oldestOpenPrOpenedAt", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Most recent issue", "mostRecentIssueOpenedAt", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Oldest open issue", "oldestOpenIssueOpenedAt", sortDirection, sortBy, "/" + org, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Open issues", "openIssues", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Open bot PRs", "openBotPrCount", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Open PRs", "openPrCount", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Updated at", "updatedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Most recent PR", "mostRecentPrOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Oldest open PR", "oldestOpenPrOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Most recent issue", "mostRecentIssueOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Oldest open issue", "oldestOpenIssueOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
           </div>
 
 
@@ -142,7 +153,7 @@
                 <i class="bx bx-bookmark"></i>
                 Saved configurations
               </h3>
-              <a href="/{{ org }}" class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+              <a href="{{ baseUrl }}" class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
                 <i class="bx bx-reset"></i>
                 Reset to default
               </a>
@@ -173,7 +184,7 @@
           <!-- Date format toggle -->
           <div class="p-3 flex flex-wrap items-center gap-2">
             <span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-medium">Date format:</span>
-            {% set ddmmParams = "/" + org + "?dateFormat=DD%2FMM%2FYYYY" %}
+            {% set ddmmParams = baseUrl + "?dateFormat=DD%2FMM%2FYYYY" %}
             {% if sortBy %}{% set ddmmParams = ddmmParams + "&sortBy=" + sortBy %}{% endif %}
             {% if sortDirection %}{% set ddmmParams = ddmmParams + "&sortDirection=" + sortDirection %}{% endif %}
             {% if tag %}{% set ddmmParams = ddmmParams + "&tag=" + tag %}{% endif %}
@@ -182,7 +193,7 @@
                class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if dateFormat !== 'MM/DD/YYYY' %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
               DD/MM/YYYY
             </a>
-            {% set mmddParams = "/" + org + "?dateFormat=MM%2FDD%2FYYYY" %}
+            {% set mmddParams = baseUrl + "?dateFormat=MM%2FDD%2FYYYY" %}
             {% if sortBy %}{% set mmddParams = mmddParams + "&sortBy=" + sortBy %}{% endif %}
             {% if sortDirection %}{% set mmddParams = mmddParams + "&sortDirection=" + sortDirection %}{% endif %}
             {% if tag %}{% set mmddParams = mmddParams + "&tag=" + tag %}{% endif %}
@@ -387,7 +398,7 @@
 
         <!-- Pagination -->
         {% if totalPages > 1 %}
-        {{macros.pagination(currentPage, pageNumbers, totalPages, "/" + org, sortBy, sortDirection, tag, alertFilter)}}
+        {{macros.pagination(currentPage, pageNumbers, totalPages, baseUrl, sortBy, sortDirection, tag, alertFilter)}}
         {% endif %}
       </div>
     </div>

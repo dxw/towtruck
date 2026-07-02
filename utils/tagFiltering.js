@@ -16,3 +16,7 @@ export const filterByTags = (repos, selectedTags) => {
   return repos.filter((repo) => Array.isArray(repo.topics) && selectedTags.some((tag) => repo.topics.includes(tag)));
 };
 
+export const excludeByTag = (repos, tag) => {
+  return repos.filter((repo) => !Array.isArray(repo.topics) || !repo.topics.includes(tag));
+};
+

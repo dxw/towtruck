@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { normalizeSelectedTags, filterByTags } from "./tagFiltering.js";
+import { normalizeSelectedTags, filterByTags, excludeByTag } from "./tagFiltering.js";
 
 describe("normalizeSelectedTags", () => {
   it("returns an empty array when no tags are provided", () => {
@@ -44,6 +44,31 @@ describe("filterByTags", () => {
   it("ignores repos with no topics", () => {
 	const result = filterByTags(repos, ["govpress"]);
 	assert.deepStrictEqual(result.map((repo) => repo.name), ["repo-1"]);
+  });
+});
+
+describe("excludeByTag", () => {
+  const repos = [
+	{ name: "repo-1", topics: ["govpress", "alpha"] },
+	{ name: "repo-2", topics: ["delivery-plus"] },
+	{ name: "repo-3", topics: ["alpha"] },
+	{ name: "repo-4", topics: [] },
+	{ name: "repo-5", topics: null },
+  ];
+
+  it("excludes repos that have the specified tag", () => {
+	const result = excludeByTag(repos, "govpress");
+	assert.deepStrictEqual(result.map((repo) => repo.name), ["repo-2", "repo-3", "repo-4", "repo-5"]);
+  });
+
+  it("returns all repos when none have the specified tag", () => {
+	const result = excludeByTag(repos, "nonexistent-tag");
+	assert.deepStrictEqual(result.map((repo) => repo.name), ["repo-1", "repo-2", "repo-3", "repo-4", "repo-5"]);
+  });
+
+  it("handles repos with null topics gracefully", () => {
+	const result = excludeByTag(repos, "govpress");
+	assert.ok(result.some((repo) => repo.name === "repo-5"));
   });
 });
 
