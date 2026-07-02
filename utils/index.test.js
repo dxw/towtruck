@@ -2,6 +2,7 @@ import { describe, it } from "node:test";
 import expect from "node:assert";
 import { mapRepoFromStorageToUi, mapRepoFromApiForStorage, hashToTailwindColor } from "./index.js";
 import { formatDistanceToNow } from "date-fns";
+import { formatDate } from "./dateFormatting.js";
 
 describe("mapRepoFromStorageToUi", () => {
   it("converts ISO8601 timestamps to human-readable forms", () => {
@@ -36,7 +37,7 @@ describe("mapRepoFromStorageToUi", () => {
       {
         name: "repo1",
         description: "description1",
-        updatedAt: new Date("2021-01-01T00:00:00Z").toLocaleDateString(),
+        updatedAt: formatDate("2021-01-01T00:00:00Z"),
         updatedAtISO8601: "2021-01-01T00:00:00Z",
         htmlUrl: "http://url.com/repo1",
         apiUrl: "http://api.com/repo1",
@@ -117,7 +118,7 @@ describe("mapRepoFromStorageToUi", () => {
       {
         name: "repo1",
         description: "description1",
-        updatedAt: new Date("2021-01-01T00:00:00Z").toLocaleDateString(),
+        updatedAt: formatDate("2021-01-01T00:00:00Z"),
         updatedAtISO8601: "2021-01-01T00:00:00Z",
         htmlUrl: "http://url.com/repo1",
         apiUrl: "http://api.com/repo1",
@@ -140,7 +141,7 @@ describe("mapRepoFromStorageToUi", () => {
       {
         name: "repo2",
         description: "description2",
-        updatedAt: new Date("2021-01-01T00:00:00Z").toLocaleDateString(),
+        updatedAt: formatDate("2021-01-01T00:00:00Z"),
         updatedAtISO8601: "2021-01-01T00:00:00Z",
         htmlUrl: "http://url.com/repo2",
         apiUrl: "http://api.com/repo2",
@@ -163,6 +164,70 @@ describe("mapRepoFromStorageToUi", () => {
     ];
 
     expect.deepEqual(mapRepoFromStorageToUi(persistedData).repos, expected);
+  });
+
+  it("formats updatedAt as MM/DD/YYYY when dateStyle is MM/DD/YYYY", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-15T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const [repo] = mapRepoFromStorageToUi(persistedData, {}, "MM/DD/YYYY").repos;
+    expect.strictEqual(repo.updatedAt, "01/15/2021");
+  });
+
+  it("formats updatedAt as DD/MM/YYYY when dateStyle is DD/MM/YYYY", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-15T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const [repo] = mapRepoFromStorageToUi(persistedData, {}, "DD/MM/YYYY").repos;
+    expect.strictEqual(repo.updatedAt, "15/01/2021");
   });
 
   it("returns a count of the number of repos", () => {
@@ -242,6 +307,110 @@ describe("mapRepoFromStorageToUi", () => {
     };
 
     expect.deepEqual(mapRepoFromStorageToUi(persistedData).totalRepos, 3);
+  });
+
+  it("returns total vulnerabilities summed across all repos", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        dependabotAlerts: {
+          totalOpenAlerts: 5,
+          criticalSeverityAlerts: 2,
+          highSeverityAlerts: 1,
+          mediumSeverityAlerts: 1,
+          lowSeverityAlerts: 1,
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+      repo2: {
+        owner: "dxw",
+        main: {
+          name: "repo2",
+          description: "description2",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo2",
+          apiUrl: "http://api.com/repo2",
+          pullsUrl: "http://api.com/repo2/pulls",
+          issuesUrl: "http://api.com/repo2/issues",
+          language: null,
+          topics: [],
+        },
+        dependabotAlerts: {
+          totalOpenAlerts: 3,
+          criticalSeverityAlerts: 1,
+          highSeverityAlerts: 2,
+          mediumSeverityAlerts: 0,
+          lowSeverityAlerts: 0,
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const result = mapRepoFromStorageToUi(persistedData);
+    expect.strictEqual(result.totalVulnerabilities, 8);
+    expect.strictEqual(result.totalCriticalVulnerabilities, 3);
+  });
+
+  it("returns zero total vulnerabilities when no repos have alerts", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const result = mapRepoFromStorageToUi(persistedData);
+    expect.strictEqual(result.totalVulnerabilities, 0);
+    expect.strictEqual(result.totalCriticalVulnerabilities, 0);
   });
 
   describe("mapRepo", () => {

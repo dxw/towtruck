@@ -544,4 +544,90 @@ describe("TowtruckDatabase", () => {
       expect.deepStrictEqual(actual, { "COUNT(*)": 0 });
     });
   });
+
+  describe("saveConfiguration", () => {
+    it("persists a configuration and returns it via getAllSavedConfigurationsForOrg", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const query = { sortBy: "openIssues", sortDirection: "desc", alertFilter: "criticalOnly" };
+      db.saveConfiguration("my-org", "My Config", query);
+
+      const configs = db.getAllSavedConfigurationsForOrg("my-org");
+
+      expect.strictEqual(configs.length, 1);
+      expect.strictEqual(configs[0].name, "My Config");
+      expect.strictEqual(configs[0].org, "my-org");
+      expect.deepStrictEqual(configs[0].query, query);
+      expect.ok(configs[0].id, "should have an id");
+      expect.ok(configs[0].createdAt, "should have a createdAt");
+    });
+
+    it("saves multiple configurations and returns them in order", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" });
+      db.saveConfiguration("my-org", "Config B", { sortBy: "openPrCount" });
+
+      const configs = db.getAllSavedConfigurationsForOrg("my-org");
+
+      expect.strictEqual(configs.length, 2);
+      expect.strictEqual(configs[0].name, "Config A");
+      expect.strictEqual(configs[1].name, "Config B");
+    });
+  });
+
+  describe("getAllSavedConfigurationsForOrg", () => {
+    it("returns an empty array when no configurations exist", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const actual = db.getAllSavedConfigurationsForOrg("my-org");
+
+      expect.deepStrictEqual(actual, []);
+    });
+
+    it("only returns configurations for the given org", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveConfiguration("org-a", "Config for A", { sortBy: "openIssues" });
+      db.saveConfiguration("org-b", "Config for B", { sortBy: "openPrCount" });
+
+      const forA = db.getAllSavedConfigurationsForOrg("org-a");
+      const forB = db.getAllSavedConfigurationsForOrg("org-b");
+
+      expect.strictEqual(forA.length, 1);
+      expect.strictEqual(forA[0].name, "Config for A");
+      expect.strictEqual(forB.length, 1);
+      expect.strictEqual(forB[0].name, "Config for B");
+    });
+  });
+
+  describe("deleteSavedConfiguration", () => {
+    it("removes the expected configuration", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" });
+      db.saveConfiguration("my-org", "Config B", { sortBy: "openPrCount" });
+
+      const before = db.getAllSavedConfigurationsForOrg("my-org");
+      expect.strictEqual(before.length, 2);
+
+      db.deleteSavedConfiguration("my-org", before[0].id);
+
+      const after = db.getAllSavedConfigurationsForOrg("my-org");
+      expect.strictEqual(after.length, 1);
+      expect.strictEqual(after[0].name, "Config B");
+    });
+
+    it("leaves other configs intact when deleting one", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" });
+      const before = db.getAllSavedConfigurationsForOrg("my-org");
+
+      db.deleteSavedConfiguration("my-org", before[0].id);
+
+      const after = db.getAllSavedConfigurationsForOrg("my-org");
+      expect.deepStrictEqual(after, []);
+    });
+  });
 });

@@ -17,17 +17,24 @@
   },
   "author": "dxw",
   "license": "MIT",
+  "engines": {
+    "node": "22.x"
+  },
   "dependencies": {
     "@octokit/app": "^15.1.0",
     "better-sqlite3": "^11.3.0",
+    "cookie-parser": "^1.4.7",
     "date-fns": "^4.1.0",
     "express": "^5.0.0",
+    "express-session": "^1.19.0",
     "nunjucks": "^3.2.4",
+    "openid-client": "^6.8.4",
     "undici": "^6.19.8"
   },
   "devDependencies": {
     "@eslint/js": "9.23.0",
     "@playwright/test": "1.51.1",
+    "@types/cookie-parser": "^1.4.10",
     "@types/node": "22.13.14",
     "chokidar": "3.6.0",
     "eslint": "9.23.0",

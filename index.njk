@@ -10,17 +10,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>tailwind.config = { darkMode: 'class' }</script>
+    <script>
+      if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      }
+    </script>
   </head>
-  <body class="bg-stone-100 text-stone-800 dark:bg-stone-800 dark:text-stone-200">
-    <header class="bg-white dark:bg-stone-600">
-      <nav class="w-full flex p-6 border-b-4 border-stone-200 dark:border-stone-900">
-        <h1 class="text-3xl">Towtruck</h1>
+  <body class="bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+    {% set baseUrl = dPlusBaseUrl if dPlusMode else "/" + org %}
+    <header class="bg-slate-600 dark:bg-slate-900 text-white">
+      <nav class="w-full flex items-center gap-4 p-6 border-b-4 border-slate-700 dark:border-slate-950">
+        <a href="/" class="text-slate-300 hover:text-white transition-colors" aria-label="Back to home">
+          <i class="bx bx-arrow-back text-2xl"></i>
+        </a>
+        <h1 class="text-3xl font-bold flex-1">Towtruck</h1>
+        {% if dPlusMode %}
+        <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
+          Exit D+ mode
+        </a>
+        {% else %}
+        <a href="/{{ org }}/d-plus" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-blue-600 text-white border-blue-500 hover:bg-blue-500">
+          <i class="bx bx-rocket"></i>
+          D+ mode
+        </a>
+        {% endif %}
+        <button id="theme-toggle" aria-label="Toggle dark mode"
+          class="text-slate-200 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-500 dark:hover:bg-slate-700">
+          <i id="theme-icon" class="bx text-2xl"></i>
+        </button>
       </nav>
     </header>
 
     <div class="container mx-auto flex flex-col mt-6 space-y-6">
-      <div class="bg-stone-50 dark:bg-stone-700 rounded-lg border-b-4 border-stone-200 dark:border-stone-900 space-y-4">
-        <h2 class="bg-white dark:bg-stone-600 rounded-t-lg border-b-2 border-stone-100 dark:border-stone-800 text-xl font-bold p-4">{{ org }}</h2>
+      <div class="bg-slate-100 dark:bg-slate-900 rounded-lg border-b-4 border-slate-300 dark:border-slate-950 space-y-4">
+        <h2 class="bg-slate-50 dark:bg-slate-800 rounded-t-lg border-b-2 border-slate-200 dark:border-slate-900 text-xl font-bold p-4">{{ org }}</h2>
         <p class="mx-4">
           {% if totalRepos === 1 %}
           There is <span class="font-bold">1</span> repository
@@ -29,192 +53,384 @@
           {% endif %}
           that Towtruck is tracking for <span class="font-bold">{{ org }}</span>.
         </p>
-        <div class="mx-4">
-          <table class="table-fixed w-full mb-4 border-y border-stone-200 dark:border-stone-900">
-            <thead class="sticky top-0 z-20 bg-white dark:bg-stone-600 border-b border-stone-200 dark:border-stone-900 text-left">
-              <tr class="space-x-2">
-                <th class="py-2 pl-2 w-5/12" scope="col">Repository</th>
-                {{macros.sortableTableHeader("Open issues count", "openIssues", sortDirection, sortBy)}}
-                {{macros.sortableTableHeader("Open bot PR count", "openBotPrCount", sortDirection, sortBy)}}
-                {{macros.sortableTableHeader("Open PR count", "openPrCount", sortDirection, sortBy)}}
-                {{macros.sortableTableHeader("Updated at", "updatedAt", sortDirection, sortBy)}}
-                {{macros.sortableTableHeader("Most recent PR opened", "mostRecentPrOpenedAt", sortDirection, sortBy)}}
-                {{macros.sortableTableHeader("Oldest open PR opened", "oldestOpenPrOpenedAt", sortDirection, sortBy)}}
-                {{macros.sortableTableHeader("Most recent issue opened", "mostRecentIssueOpenedAt", sortDirection, sortBy)}}
-                {{macros.sortableTableHeader("Oldest open issue opened", "oldestOpenIssueOpenedAt", sortDirection, sortBy)}}
-              </tr>
-            </thead>
-            <tbody>
-              {% for repo in repos %}
-              <tr class="even:bg-white dark:even:bg-stone-600">
-                <td class="py-2 pl-2 align-text-top" scope="row">
-                  <div class="text-[0px]">
-                    <a target="_blank" class="inline-block text-base text-sky-600 dark:text-sky-500 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a>
-                    {% if repo.language %}
-                    <span class="inline-block text-xs text-{{ repo.languageColor }}-600 dark:text-{{ repo.languageColor }}-400 border-{{ repo.languageColor }}-600 dark:border-{{ repo.languageColor }}-400 border rounded-lg ml-2 py-1 px-2">{{ repo.language }}</span>
-                    {% endif %}
-                    {% if repo.totalOpenAlerts !== undefined %}
-                    <div class="inline-block whitespace-nowrap text-[0px] ml-2 align-[-1px]">
-                      {% set id = [repo.name, "alerts", "critical"] | join("-") %}
-                      {% set mainText = ["<span", " class='font-bold'" if repo.criticalSeverityAlerts, ">", repo.criticalSeverityAlerts, "</span>"] | join('') | safe %}
-                      <div class="inline-block text-sm text-white bg-red-600 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Critical severity alerts")}}</div>
-                      {% set id = [repo.name, "alerts", "high"] | join("-") %}
-                      {% set mainText = ["<span", " class='font-bold'" if repo.highSeverityAlerts, ">", repo.highSeverityAlerts, "</span>"] | join('') | safe %}
-                      <div class="inline-block text-sm text-white bg-red-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "High severity alerts")}}</div>
-                      {% set id = [repo.name, "alerts", "medium"] | join("-") %}
-                      {% set mainText = ["<span", " class='font-bold'" if repo.mediumSeverityAlerts, ">", repo.mediumSeverityAlerts, "</span>"] | join('') | safe %}
-                      <div class="inline-block text-sm text-white bg-orange-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Medium severity alerts")}}</div>
-                      {% set id = [repo.name, "alerts", "low"] | join("-") %}
-                      {% set mainText = ["<span", " class='font-bold'" if repo.lowSeverityAlerts, ">", repo.lowSeverityAlerts, "</span>"] | join('') | safe %}
-                      <div class="inline-block text-sm text-white bg-amber-500 first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2">{{macros.tooltip(id, mainText, "Low severity alerts")}}</div>
-                    </div>
-                    {% else %}
-                      <span class="text-stone-400 font-light italic">Dependabot alerts have been disabled for this repository.</span>
-                    {% endif %}
-                  </div>
-                  <p class="mt-2">{{ repo.description }}</p>
 
-                  {% if repo.topics.length %}
-                  <div class="mt-4">
-                    {% for topic in repo.topics %}
-                    <span class="text-xs text-stone-600 dark:text-stone-400 bg-stone-200 dark:bg-stone-800 rounded-full py-1 px-2">{{ topic }}</span>
-                    {% endfor %}
-                  </div>
-                  {% endif %}
-
-                  <hr class="mt-4 w-96 border-stone-200 dark:border-stone-400" />
-
-                  <div class="mt-4 mb-2">
-                    {% if repo.dependencies.length %}
-                    <div class="group space-y-2">
-                      <p>
-                        {% if repo.dependencies.length === 1 %}
-                        There is <span class="font-bold">1</span> dependency:
-                        {% else %}
-                        There are <span class="font-bold">{{ repo.dependencies.length }}</span> dependencies:
-                        {% endif %}
-                        <label>
-                          <input class="hidden" type="checkbox" />
-                          <span class="text-sm bg-stone-500 text-white rounded-lg py-1 px-2 hidden group-has-[:checked]:inline">Hide</span>
-                          <span class="text-sm bg-stone-500 text-white rounded-lg py-1 px-2 group-has-[:checked]:hidden">Show</span>
-                        </label>
-                      </p>
-                      <ul class="space-y-2 hidden group-has-[:checked]:block">
-                        {% for dependency in repo.dependencies %}
-                          <li>
-                            <div class="inline-block whitespace-nowrap text-[0px]">
-                              <span>
-                                <span class="font-mono text-sm bg-{{ dependency.color }}-200 dark:bg-{{ dependency.color }}-800 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
-                                {% if dependency.version %}
-                                <span class="font-mono text-sm bg-{{ dependency.color }}-300 dark:bg-{{ dependency.color }}-900 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
-                                {% endif %}
-                                {% if dependency.tag %}
-                                <span class="font-mono text-sm bg-{{ dependency.color }}-400 dark:bg-{{ dependency.color }}-950 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
-                                {% endif %}
-                              </span>
-                              <span class="inline-block w-1"></span>
-                              <span>
-                                {% if dependency.isOutdated %}
-                                <span class="font-mono text-sm bg-{{ dependency.color }}-500 dark:bg-{{ dependency.color }}-600 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">  
-                                  <i class="align-[-1px] bx {{dependency.icon}}"></i>
-                                  {{ dependency.changelog }}
-                                  v{{ dependency.latestVersion }}
-                                </span>
-                                {% endif %}
-                                {% if dependency.isEndOfLifeSoon %}
-                                <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-700 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
-                                  <i class="align-[-1px] bx bxs-hourglass"></i>
-                                  <span class="font-sans">Support ends {{ dependency.endOfLifeRelative }}</span>
-                                </span>
-                                {% elif dependency.isOutOfSupport %}
-                                <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-700 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
-                                  <i class="align-[-1px] bx bxs-hourglass-bottom"></i>
-                                  <span class="font-sans">Support ended {{ dependency.endOfLifeRelative }}</span>
-                                </span>
-                                {% endif %}
-                              </span>
-                            </div>
-                          </li>
-                        {% endfor %}
-                      </ul>
-                    </div>
-                    {% else %}
-                      <span class="text-stone-400 font-light italic">
-                        No dependencies have been discovered.
-                        <br/>
-                        Please make sure that Renovate has been configured on the repository to produce a dependency dashboard.
-                      </span>
-                    {% endif %}
-                  </div>
-                </td>
-
-                <td class="py-2 pl-2 align-text-top last:pr-2">
-                  <span class="relative">
-                    <span class="sticky top-28">
-                      {{ repo.openIssues }}
-                    </span>
-                  </span>
-                </td>
-                <td class="py-2 pl-2 align-text-top last:pr-2">
-                  <span class="relative">
-                    <span class="sticky top-28">
-                      {{ repo.openBotPrCount }}
-                    </span>
-                  </span>
-                </td>
-                <td class="py-2 pl-2 align-text-top last:pr-2">
-                  <span class="relative">
-                    <span class="sticky top-28">
-                      {{ repo.openPrCount }}
-                    </span>
-                  </span>
-                </td>
-                <td class="py-2 pl-2 align-text-top last:pr-2">
-                  <span class="relative">
-                    <span class="sticky top-28">
-                      {{ repo.updatedAt }}
-                    </span>
-                  </span>
-                </td>
-                <td class="py-2 pl-2 align-text-top last:pr-2">
-                  <span class="relative">
-                    <span class="sticky top-28">
-                      {{ repo.mostRecentPrOpenedAt }}
-                    </span>
-                  </span>
-                </td>
-                <td class="py-2 pl-2 align-text-top last:pr-2">
-                  <span class="relative">
-                    <span class="sticky top-28">
-                      {{ repo.oldestOpenPrOpenedAt }}
-                    </span>
-                  </span>
-                </td>
-                <td class="py-2 pl-2 align-text-top last:pr-2">
-                  <span class="relative">
-                    <span class="sticky top-28">
-                      {{ repo.mostRecentIssueOpenedAt }}
-                    </span>
-                  </span>
-                </td>
-                <td class="py-2 pl-2 align-text-top last:pr-2">
-                  <span class="relative">
-                    <span class="sticky top-28">
-                      {{ repo.oldestOpenIssueOpenedAt }}
-                    </span>
-                  </span>
-                </td>
-             
-              </tr>
-              {% else %}
-              <tr>
-                <td class="py-2 px-2 text-center text-stone-400 font-light italic">No repositories found.</td>
-              </tr>
-              {% endfor %}
-            </tbody>
-          </table>
+        <!-- Vulnerability summary counters -->
+        <div class="mx-4 flex flex-wrap justify-end gap-3">
+          <div class="rounded-lg px-4 py-3 min-w-[8rem] {% if totalCriticalVulnerabilities > 0 %}bg-red-100 dark:bg-red-950/60{% else %}bg-slate-200/60 dark:bg-slate-800/60{% endif %}">
+            <p class="text-xs uppercase tracking-wide font-medium {% if totalCriticalVulnerabilities > 0 %}text-red-600 dark:text-red-400{% else %}text-slate-400 dark:text-slate-500{% endif %}">Critical vulnerabilities</p>
+            <p class="text-3xl font-bold mt-0.5 {% if totalCriticalVulnerabilities > 0 %}text-red-700 dark:text-red-300{% else %}text-slate-400 dark:text-slate-500{% endif %}">{{ totalCriticalVulnerabilities }}</p>
+          </div>
+          <div class="rounded-lg px-4 py-3 min-w-[8rem] {% if totalVulnerabilities > 0 %}bg-yellow-100 dark:bg-yellow-950/60{% else %}bg-slate-200/60 dark:bg-slate-800/60{% endif %}">
+            <p class="text-xs uppercase tracking-wide font-medium {% if totalVulnerabilities > 0 %}text-yellow-700 dark:text-yellow-400{% else %}text-slate-400 dark:text-slate-500{% endif %}">Total vulnerabilities</p>
+            <p class="text-3xl font-bold mt-0.5 {% if totalVulnerabilities > 0 %}text-yellow-900 dark:text-yellow-200{% else %}text-slate-400 dark:text-slate-500{% endif %}">{{ totalVulnerabilities }}</p>
+          </div>
         </div>
+
+        <!-- Controls box: filters, sorts, save, saved configurations -->
+        <div class="mx-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-200 dark:divide-slate-700">
+
+          <!-- Alert filters + sort row -->
+          <div class="p-3 flex flex-wrap items-center gap-2">
+            <!-- Critical alerts filter and sort -->
+            <div class="flex gap-2">
+              {% set criticalParams = baseUrl + "?alertFilter=criticalOnly" %}
+              {% if sortBy %}{% set criticalParams = criticalParams + "&sortBy=" + sortBy %}{% endif %}
+              {% if sortDirection %}{% set criticalParams = criticalParams + "&sortDirection=" + sortDirection %}{% endif %}
+              {% if tag %}{% set criticalParams = criticalParams + "&tag=" + tag %}{% endif %}
+              <a href="{{ criticalParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'criticalOnly' %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600{% else %}bg-red-200 text-red-700 border-red-400 hover:bg-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900{% endif %}">
+                Critical only
+              </a>
+              {{macros.sortableCardHeader("Critical alerts", "criticalSeverityAlerts", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            </div>
+
+            <!-- Any alerts filter and sort -->
+            <div class="flex gap-2">
+              {% set anyAlertsParams = baseUrl + "?alertFilter=anyAlerts" %}
+              {% if sortBy %}{% set anyAlertsParams = anyAlertsParams + "&sortBy=" + sortBy %}{% endif %}
+              {% if sortDirection %}{% set anyAlertsParams = anyAlertsParams + "&sortDirection=" + sortDirection %}{% endif %}
+              {% if tag %}{% set anyAlertsParams = anyAlertsParams + "&tag=" + tag %}{% endif %}
+              <a href="{{ anyAlertsParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'anyAlerts' %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500{% else %}bg-yellow-200 text-yellow-700 border-yellow-400 hover:bg-yellow-300 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800 dark:hover:bg-yellow-900{% endif %}">
+                Any alerts
+              </a>
+              {{macros.sortableCardHeader("Total alerts", "totalOpenAlerts", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            </div>
+
+            <!-- Reset button -->
+            {% set resetParams = baseUrl %}
+            {% set resetParamSep = "?" %}
+            {% if tag %}{% set resetParams = resetParams + resetParamSep + "tag=" + tag %}{% set resetParamSep = "&" %}{% endif %}
+            {% if sortBy %}{% set resetParams = resetParams + resetParamSep + "sortBy=" + sortBy %}{% set resetParamSep = "&" %}{% endif %}
+            {% if sortDirection %}{% set resetParams = resetParams + resetParamSep + "sortDirection=" + sortDirection %}{% set resetParamSep = "&" %}{% endif %}
+            <a href="{{ resetParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+              Reset
+            </a>
+          </div>
+
+          <!-- Sort row -->
+          <div class="p-3 flex flex-wrap items-center gap-2" data-testid="sort-controls">
+            {{macros.sortableCardHeader("Open issues", "openIssues", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Open bot PRs", "openBotPrCount", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Open PRs", "openPrCount", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Updated at", "updatedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Most recent PR", "mostRecentPrOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Oldest open PR", "oldestOpenPrOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Most recent issue", "mostRecentIssueOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Oldest open issue", "oldestOpenIssueOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+          </div>
+
+
+          <!-- Save current configuration -->
+          <div class="p-3">
+            <details class="group/save">
+              <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+                <i class="bx bx-bookmark-plus"></i>
+                Save current configuration
+              </summary>
+              <form method="POST" action="/{{ org }}/saved-configurations" class="mt-3 flex items-center gap-2">
+                <input type="hidden" name="sortBy" value="{{ sortBy }}" />
+                <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
+                <input type="hidden" name="tag" value="{{ tag }}" />
+                <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Configuration name (optional)"
+                  class="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 w-64"
+                />
+                <button type="submit" class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-700 text-white border-slate-700 hover:bg-slate-600 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200 dark:hover:bg-slate-300">
+                  <i class="bx bx-save"></i>
+                  Save
+                </button>
+              </form>
+            </details>
+          </div>
+
+          <!-- Saved configurations panel -->
+          {% if savedConfigurations and savedConfigurations.length %}
+          <div class="p-3">
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                <i class="bx bx-bookmark"></i>
+                Saved configurations
+              </h3>
+              <a href="{{ baseUrl }}" class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+                <i class="bx bx-reset"></i>
+                Reset to default
+              </a>
+            </div>
+            <ul class="flex flex-wrap gap-2">
+              {% for config in savedConfigurations %}
+              <li class="flex items-center gap-1">
+                <a href="{{ config.applyUrl | safe }}" class="inline-flex items-center gap-1 rounded-l-full border px-3 py-1 text-sm font-medium transition-colors {% if config.id === activeConfigId %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-600{% endif %}">
+                  <i class="bx bx-play-circle text-base"></i>
+                  {{ config.name }}
+                </a>
+                <form method="POST" action="/{{ org }}/saved-configurations/{{ config.id }}/delete" class="inline">
+                  <input type="hidden" name="sortBy" value="{{ sortBy }}" />
+                  <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
+                  <input type="hidden" name="tag" value="{{ tag }}" />
+                  <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
+                  <button type="submit" title="Delete this configuration" class="inline-flex items-center gap-1 rounded-r-full border-t border-r border-b px-2.5 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-500 border-slate-400 hover:bg-red-100 hover:text-red-700 hover:border-red-400 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-600 dark:hover:bg-red-950 dark:hover:text-red-400 dark:hover:border-red-800">
+                    <i class="bx bx-trash text-sm"></i>
+                    <span class="text-xs">Delete</span>
+                  </button>
+                </form>
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- Date format toggle -->
+          <div class="p-3 flex flex-wrap items-center gap-2">
+            <span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-medium">Date format:</span>
+            {% set ddmmParams = baseUrl + "?dateFormat=DD%2FMM%2FYYYY" %}
+            {% if sortBy %}{% set ddmmParams = ddmmParams + "&sortBy=" + sortBy %}{% endif %}
+            {% if sortDirection %}{% set ddmmParams = ddmmParams + "&sortDirection=" + sortDirection %}{% endif %}
+            {% if tag %}{% set ddmmParams = ddmmParams + "&tag=" + tag %}{% endif %}
+            {% if alertFilter %}{% set ddmmParams = ddmmParams + "&alertFilter=" + alertFilter %}{% endif %}
+            <a href="{{ ddmmParams }}" aria-pressed="{{ 'true' if dateFormat !== 'MM/DD/YYYY' else 'false' }}"
+               class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if dateFormat !== 'MM/DD/YYYY' %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
+              DD/MM/YYYY
+            </a>
+            {% set mmddParams = baseUrl + "?dateFormat=MM%2FDD%2FYYYY" %}
+            {% if sortBy %}{% set mmddParams = mmddParams + "&sortBy=" + sortBy %}{% endif %}
+            {% if sortDirection %}{% set mmddParams = mmddParams + "&sortDirection=" + sortDirection %}{% endif %}
+            {% if tag %}{% set mmddParams = mmddParams + "&tag=" + tag %}{% endif %}
+            {% if alertFilter %}{% set mmddParams = mmddParams + "&alertFilter=" + alertFilter %}{% endif %}
+            <a href="{{ mmddParams }}" aria-pressed="{{ 'true' if dateFormat === 'MM/DD/YYYY' else 'false' }}"
+               class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if dateFormat === 'MM/DD/YYYY' %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
+              MM/DD/YYYY
+            </a>
+          </div>
+
+        </div>
+
+        <!-- Card grid -->
+        <div class="mx-4 mb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+          {% for repo in repos %}
+          <div class="rounded-lg border flex flex-col shadow-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+
+            <!-- Card header -->
+            <div class="p-4 border-b border-slate-100 dark:border-slate-700">
+              <div class="flex flex-wrap items-center gap-2">
+                <a target="_blank" class="text-lg font-semibold text-slate-600 dark:text-slate-300 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a>
+                {% if repo.language %}
+                <span class="text-xs text-{{ repo.languageColor }}-600 dark:text-{{ repo.languageColor }}-400 border-{{ repo.languageColor }}-600 dark:border-{{ repo.languageColor }}-400 border rounded-lg py-0.5 px-2">{{ repo.language }}</span>
+                {% endif %}
+              </div>
+
+              {% if repo.totalOpenAlerts !== undefined %}
+              <div class="mt-3 rounded-lg border p-3 {% if repo.hasOpenAlertOlderThan14Days %}bg-red-50 dark:bg-red-950/20 border-red-500 dark:border-red-500 border-2{% else %}border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50{% endif %}">
+                <details class="group/alerts">
+                  <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
+                    <div class="flex flex-wrap gap-0 text-[0px]">
+                      {% set hasAlerts = repo.criticalSeverityAlerts and repo.criticalSeverityAlerts > 0 %}
+                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-red-600{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.criticalSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.criticalSeverityAlerts }}</span></div>
+                      {% set hasAlerts = repo.highSeverityAlerts and repo.highSeverityAlerts > 0 %}
+                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-red-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.highSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.highSeverityAlerts }}</span></div>
+                      {% set hasAlerts = repo.mediumSeverityAlerts and repo.mediumSeverityAlerts > 0 %}
+                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-orange-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.mediumSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.mediumSeverityAlerts }}</span></div>
+                      {% set hasAlerts = repo.lowSeverityAlerts and repo.lowSeverityAlerts > 0 %}
+                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-amber-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.lowSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.lowSeverityAlerts }}</span></div>
+                    </div>
+                    {% if repo.hasOpenAlertOlderThan14Days %}
+                    <p class="mt-2 text-sm font-medium text-red-700 dark:text-red-400">
+                      Security alert older than 14 days.
+                    </p>
+                    {% endif %}
+                    <div class="flex items-center gap-2 mt-2">
+                      <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 hidden group-open/alerts:inline">Hide security alert details</span>
+                      <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 group-open/alerts:hidden">Show security alert details</span>
+                    </div>
+                  </summary>
+                  <div class="mt-2 text-xs text-slate-600 dark:text-slate-300">
+                    {% if repo.oldestOpenAlertCreatedAt %}
+                    Oldest vulnerability age:
+                    <span class="js-alert-age font-semibold" data-created-at="{{ repo.oldestOpenAlertCreatedAt }}"></span>
+
+                    {% if repo.otherOpenAlerts and repo.otherOpenAlerts.length %}
+                    <p class="mt-2">Other vulnerabilities:</p>
+                    <ul class="mt-1 list-disc pl-5 space-y-1">
+                      {% for alert in repo.otherOpenAlerts %}
+                      <li>
+                        <span class="js-alert-age font-semibold {% if alert.severity === 'critical' %}text-red-700 dark:text-red-400{% endif %}" data-created-at="{{ alert.createdAt }}"></span>
+                      </li>
+                      {% endfor %}
+                    </ul>
+                    {% elif repo.otherOpenAlertsCreatedAt and repo.otherOpenAlertsCreatedAt.length %}
+                    <p class="mt-2">Other vulnerabilities:</p>
+                    <ul class="mt-1 list-disc pl-5 space-y-1">
+                      {% for createdAt in repo.otherOpenAlertsCreatedAt %}
+                      <li><span class="js-alert-age font-semibold" data-created-at="{{ createdAt }}"></span></li>
+                      {% endfor %}
+                    </ul>
+                    {% endif %}
+                    {% else %}
+                    No open vulnerabilities.
+                    {% endif %}
+                  </div>
+                </details>
+              </div>
+              {% else %}
+              <p class="mt-1 text-slate-400 text-xs font-light italic">Dependabot alerts disabled</p>
+              {% endif %}
+
+              {% if repo.description %}
+              <p class="mt-2 text-sm text-slate-700 dark:text-slate-200">{{ repo.description }}</p>
+              {% endif %}
+
+              {% if repo.topics.length %}
+              <div class="mt-2 flex flex-wrap gap-1">
+                {% for topic in repo.topics %}
+                {% set topicSelected = topic in selectedTags %}
+                <a href="{{ buildTopicFilterUrl(topic) }}" class="text-xs rounded-full py-0.5 px-2 transition-colors {% if topicSelected %}text-white bg-slate-700 dark:text-slate-900 dark:bg-slate-200{% else %}text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800{% endif %}">{{ topic }}</a>
+                {% endfor %}
+              </div>
+              {% endif %}
+            </div>
+
+            <!-- Stats grid -->
+            <div class="grid grid-cols-2 gap-x-4 gap-y-2 p-4 text-sm border-b border-slate-100 dark:border-slate-700">
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Open issues</span>
+                <p class="font-semibold">{{ repo.openIssues }}</p>
+              </div>
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Open PRs</span>
+                <p class="font-semibold">{{ repo.openPrCount }}</p>
+              </div>
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Bot PRs</span>
+                <p class="font-semibold">{{ repo.openBotPrCount }}</p>
+              </div>
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Updated at</span>
+                <p class="font-semibold">{{ repo.updatedAt }}</p>
+              </div>
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Most recent PR</span>
+                <p class="font-semibold">{{ repo.mostRecentPrOpenedAt }}</p>
+              </div>
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Oldest open PR</span>
+                <p class="font-semibold">{{ repo.oldestOpenPrOpenedAt }}</p>
+              </div>
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Most recent issue</span>
+                <p class="font-semibold">{{ repo.mostRecentIssueOpenedAt }}</p>
+              </div>
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Oldest open issue</span>
+                <p class="font-semibold">{{ repo.oldestOpenIssueOpenedAt }}</p>
+              </div>
+            </div>
+
+            <!-- Dependencies -->
+            <div class="p-4 flex-1">
+              {% if repo.dependencies.length %}
+              <div class="group space-y-2">
+                <p class="text-sm">
+                  {% if repo.dependencies.length === 1 %}
+                  <span class="font-bold">1</span> dependency:
+                  {% else %}
+                  <span class="font-bold">{{ repo.dependencies.length }}</span> dependencies:
+                  {% endif %}
+                  <label>
+                    <input class="hidden" type="checkbox" />
+                    <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 hidden group-has-[:checked]:inline">Hide</span>
+                    <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 group-has-[:checked]:hidden">Show</span>
+                  </label>
+                </p>
+                <ul class="space-y-1.5 hidden group-has-[:checked]:block">
+                  {% for dependency in repo.dependencies %}
+                  <li>
+                    <div class="inline-block whitespace-nowrap text-[0px]">
+                      <span>
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-200 dark:bg-{{ dependency.color }}-800 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
+                        {% if dependency.version %}
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-300 dark:bg-{{ dependency.color }}-900 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
+                        {% endif %}
+                        {% if dependency.tag %}
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-400 dark:bg-{{ dependency.color }}-950 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
+                        {% endif %}
+                      </span>
+                      <span class="inline-block w-1"></span>
+                      <span>
+                        {% if dependency.isOutdated %}
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-500 dark:bg-{{ dependency.color }}-600 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
+                          <i class="align-[-1px] bx {{dependency.icon}}"></i>
+                          {{ dependency.changelog }}
+                          v{{ dependency.latestVersion }}
+                        </span>
+                        {% endif %}
+                        {% if dependency.isEndOfLifeSoon %}
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-700 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
+                          <i class="align-[-1px] bx bxs-hourglass"></i>
+                          <span class="font-sans">Support ends {{ dependency.endOfLifeRelative }}</span>
+                        </span>
+                        {% elif dependency.isOutOfSupport %}
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-700 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
+                          <i class="align-[-1px] bx bxs-hourglass-bottom"></i>
+                          <span class="font-sans">Support ended {{ dependency.endOfLifeRelative }}</span>
+                        </span>
+                        {% endif %}
+                      </span>
+                    </div>
+                  </li>
+                  {% endfor %}
+                </ul>
+              </div>
+              {% else %}
+              <p class="text-slate-400 font-light italic text-sm">
+                No dependencies have been discovered.
+                <br/>
+                Please make sure that Renovate has been configured on the repository to produce a dependency dashboard.
+              </p>
+              {% endif %}
+            </div>
+
+          </div>
+          {% else %}
+          <p class="col-span-full py-4 text-center text-slate-400 font-light italic">No repositories found.</p>
+          {% endfor %}
+        </div>
+
+        <!-- Pagination -->
+        {% if totalPages > 1 %}
+        {{macros.pagination(currentPage, pageNumbers, totalPages, baseUrl, sortBy, sortDirection, tag, alertFilter)}}
+        {% endif %}
       </div>
     </div>
+    <script>
+      const toggle = document.getElementById('theme-toggle');
+      const icon = document.getElementById('theme-icon');
+      function applyTheme() {
+        const isDark = document.documentElement.classList.contains('dark');
+        icon.className = 'bx text-2xl ' + (isDark ? 'bx-sun' : 'bx-moon');
+      }
+      applyTheme();
+      toggle.addEventListener('click', () => {
+        document.documentElement.classList.toggle('dark');
+        localStorage.theme = document.documentElement.classList.contains('dark') ? 'dark' : 'light';
+        applyTheme();
+      });
+
+      document.querySelectorAll('.js-alert-age').forEach((element) => {
+        const createdAt = element.dataset.createdAt;
+        if (!createdAt) return;
+
+        const createdAtDate = new Date(createdAt);
+        const now = new Date();
+        const ageInDays = Math.floor((now.getTime() - createdAtDate.getTime()) / (24 * 60 * 60 * 1000));
+
+        if (ageInDays === 1) {
+          element.textContent = '1 day';
+          return;
+        }
+
+        element.textContent = `${ageInDays} days`;
+      });
+    </script>
   </body>
 </html>

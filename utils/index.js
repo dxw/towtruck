@@ -1,5 +1,6 @@
 import { differenceInYears, formatDistance, formatDistanceToNow, startOfToday } from "date-fns";
 import { getDependencyEndOfLifeDate, getDependencyState } from "./endOfLifeDateApi/index.js";
+import { formatDate } from "./dateFormatting.js";
 
 /**
  * @typedef {Object} PersistedData
@@ -135,11 +136,12 @@ export const hashToTailwindColor = (str) => {
  * Maps the persisted repo data from storage to a format suitable for the UI
  * @param {PersistedData} persistedData
  * @param {import("./endOfLifeDateApi/fetchAllDependencyEolInfo").DependencyLifetimes[]} persistedLifetimes
+ * @param {import("./dateFormatting").DateStyle} [dateStyle="DD/MM/YYYY"]
  * @returns {RepoData}
  */
-export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
+export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateStyle = "DD/MM/YYYY") => {
   const mappedRepos = Object.entries(persistedData).map(([, repo]) => {
-    const newDate = new Date(repo.main.updatedAt).toLocaleDateString();
+    const newDate = formatDate(repo.main.updatedAt, dateStyle);
     const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
 
     const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDistanceToNow(repo.pullRequests.mostRecentPrOpenedAt, { addSuffix: true });
@@ -170,8 +172,12 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes) => {
   });
 
   const totalRepos = mappedRepos.length;
+  const org = Object.entries(persistedData)[0]?.[1]?.owner ?? "";
 
-  return { org: Object.entries(persistedData)[0][1].owner, repos: mappedRepos, totalRepos };
+  const totalVulnerabilities = mappedRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
+  const totalCriticalVulnerabilities = mappedRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+
+  return { org, repos: mappedRepos, totalRepos, totalVulnerabilities, totalCriticalVulnerabilities };
 };
 
 /**
@@ -227,3 +233,17 @@ export const mapRepoFromApiForStorage = (repo) => ({
   topics: repo.topics,
   openIssues: repo.open_issues,
 });
+
+/**
+ * Returns the list of distinct org names found in the persisted repository data.
+ * @param {Object} persistedData - The object returned by db.getAllRepositories()
+ * @returns {string[]}
+ */
+export const getOrgs = (persistedData) => {
+  const orgs = new Set();
+  for (const repo of Object.values(persistedData)) {
+    if (repo.owner) orgs.add(repo.owner);
+  }
+  return [...orgs].sort();
+};
+

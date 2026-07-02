@@ -1,3 +1,53 @@
+{% macro sortableCardHeader(name, id, sortDirection, sortBy, basePath, alertFilter, tag) %}
+
+{% set basePath = basePath if basePath else "/" %}
+{% set sortingOnThisParam = id === sortBy %}
+{% set linkParams = basePath + "?sortBy=" + id + "&sortDirection=asc" %}
+{% if alertFilter %}{% set linkParams = linkParams + "&alertFilter=" + alertFilter %}{% endif %}
+{% if tag %}{% set linkParams = linkParams + "&tag=" + tag %}{% endif %}
+{% set ariaSort = "none" %}
+
+{% if sortingOnThisParam and sortDirection === "asc" %}
+    {% set linkParams = basePath + "?sortBy=" + id + "&sortDirection=desc" %}
+    {% if alertFilter %}{% set linkParams = linkParams + "&alertFilter=" + alertFilter %}{% endif %}
+    {% if tag %}{% set linkParams = linkParams + "&tag=" + tag %}{% endif %}
+    {% set ariaSort = "ascending" %}
+{% endif %}
+
+{% if sortingOnThisParam and sortDirection === "desc" %}
+    {% set linkParams = basePath + "?sortBy=" + id + "&sortDirection=asc" %}
+    {% if alertFilter %}{% set linkParams = linkParams + "&alertFilter=" + alertFilter %}{% endif %}
+    {% if tag %}{% set linkParams = linkParams + "&tag=" + tag %}{% endif %}
+    {% set ariaSort = "descending" %}
+{% endif %}
+
+{# Determine color scheme based on button type #}
+{% set isCriticalAlerts = id === "criticalSeverityAlerts" %}
+{% set isTotalAlerts = id === "totalOpenAlerts" %}
+
+<a href="{{linkParams}}" aria-sort="{{ariaSort}}"
+   class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors
+          {% if isCriticalAlerts %}
+            {% if sortingOnThisParam %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600
+            {% else %}bg-red-200 text-red-700 border-red-400 hover:bg-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900{% endif %}
+          {% elif isTotalAlerts %}
+            {% if sortingOnThisParam %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500
+            {% else %}bg-yellow-200 text-yellow-700 border-yellow-400 hover:bg-yellow-300 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800 dark:hover:bg-yellow-900{% endif %}
+          {% else %}
+            {% if sortingOnThisParam %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200
+            {% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}
+          {% endif %}">
+  {{name}}
+  <span class="text-xs">
+    {% if sortingOnThisParam and sortDirection === "asc" %}↓
+    {% elif sortingOnThisParam and sortDirection === "desc" %}↑
+    {% else %}<span class="opacity-40">↕</span>
+    {% endif %}
+  </span>
+</a>
+
+{% endmacro %}
+
 {% macro sortableTableHeader(name, id, sortDirection, sortBy) %}
 
 {% set upArrow %}
@@ -54,8 +104,66 @@
 {% macro tooltip(id, mainText, tooltipText) %}
 <div aria-describedby="{{ id }}" class="group relative inline-block">
   <span class="border-dotted border-b">{{ mainText }}</span>
-  <div role="tooltip" id="{{ id }}" class="invisible group-focus:visible group-hover:visible absolute -top-8 left-2/4 -translate-x-2/4 text-center z-30 py-0.5 px-2 bg-stone-800 text-white rounded-full after:content-[' '] after:absolute after:top-full after:left-2/4 after:-ml-[4px] after:border-4 after:border-transparent after:border-t-stone-800">
+  <div role="tooltip" id="{{ id }}" class="invisible group-focus:visible group-hover:visible absolute -top-8 left-2/4 -translate-x-2/4 text-center z-30 py-0.5 px-2 bg-slate-900 text-white rounded-full after:content-[' '] after:absolute after:top-full after:left-2/4 after:-ml-[4px] after:border-4 after:border-transparent after:border-t-slate-900">
     {{ tooltipText }}
   </div>
 </div>
 {% endmacro %}
+
+{% macro pagination(currentPage, pageNumbers, totalPages, basePath, sortBy, sortDirection, tag, alertFilter) %}
+{% set basePath = basePath if basePath else "/" %}
+<nav class="flex justify-center items-center gap-2 my-6" aria-label="Pagination">
+  <!-- Previous button -->
+  {% if currentPage > 1 %}
+    {% set prevParams = basePath + "?page=" + (currentPage - 1) %}
+    {% if sortBy %}{% set prevParams = prevParams + "&sortBy=" + sortBy %}{% endif %}
+    {% if sortDirection %}{% set prevParams = prevParams + "&sortDirection=" + sortDirection %}{% endif %}
+    {% if tag %}{% set prevParams = prevParams + "&tag=" + tag %}{% endif %}
+    {% if alertFilter %}{% set prevParams = prevParams + "&alertFilter=" + alertFilter %}{% endif %}
+    <a href="{{ prevParams }}" class="px-4 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors" aria-label="Previous page">
+      <i class="bx bx-chevron-left"></i>
+    </a>
+  {% else %}
+    <button disabled class="px-4 py-2 rounded-lg border border-slate-300 bg-slate-100 text-slate-400 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-700 cursor-not-allowed" aria-label="Previous page">
+      <i class="bx bx-chevron-left"></i>
+    </button>
+  {% endif %}
+
+  <!-- Page numbers -->
+  <div class="flex gap-1">
+    {% for pageNum in pageNumbers %}
+      {% if pageNum === currentPage %}
+        <span class="px-3 py-2 rounded-lg border-2 border-slate-700 bg-slate-700 text-white dark:border-slate-200 dark:bg-slate-200 dark:text-slate-900 font-semibold" aria-current="page">
+          {{ pageNum }}
+        </span>
+      {% else %}
+        {% set pageParams = basePath + "?page=" + pageNum %}
+        {% if sortBy %}{% set pageParams = pageParams + "&sortBy=" + sortBy %}{% endif %}
+        {% if sortDirection %}{% set pageParams = pageParams + "&sortDirection=" + sortDirection %}{% endif %}
+        {% if tag %}{% set pageParams = pageParams + "&tag=" + tag %}{% endif %}
+        {% if alertFilter %}{% set pageParams = pageParams + "&alertFilter=" + alertFilter %}{% endif %}
+        <a href="{{ pageParams }}" class="px-3 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors">
+          {{ pageNum }}
+        </a>
+      {% endif %}
+    {% endfor %}
+  </div>
+
+  <!-- Next button -->
+  {% if currentPage < totalPages %}
+    {% set nextParams = basePath + "?page=" + (currentPage + 1) %}
+    {% if sortBy %}{% set nextParams = nextParams + "&sortBy=" + sortBy %}{% endif %}
+    {% if sortDirection %}{% set nextParams = nextParams + "&sortDirection=" + sortDirection %}{% endif %}
+    {% if tag %}{% set nextParams = nextParams + "&tag=" + tag %}{% endif %}
+    {% if alertFilter %}{% set nextParams = nextParams + "&alertFilter=" + alertFilter %}{% endif %}
+    <a href="{{ nextParams }}" class="px-4 py-2 rounded-lg border border-slate-400 bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700 transition-colors" aria-label="Next page">
+      <i class="bx bx-chevron-right"></i>
+    </a>
+  {% else %}
+    <button disabled class="px-4 py-2 rounded-lg border border-slate-300 bg-slate-100 text-slate-400 dark:bg-slate-900 dark:text-slate-600 dark:border-slate-700 cursor-not-allowed" aria-label="Next page">
+      <i class="bx bx-chevron-right"></i>
+    </button>
+  {% endif %}
+</nav>
+{% endmacro %}
+

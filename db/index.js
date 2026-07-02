@@ -1,4 +1,5 @@
 import Database from "better-sqlite3";
+import { randomUUID } from "node:crypto";
 
 const dbSchemaSql = [
   `CREATE TABLE IF NOT EXISTS towtruck_data (
@@ -33,6 +34,7 @@ export class TowtruckDatabase {
   #getAllForNameLikeStatement;
   #getAllForScopeStatement;
   #deleteAllForScopeStatement;
+  #getAllConfigurationsForOrgStatement;
 
   constructor(filename = "./data/towtruck.db", options) {
     this.#db = initialiseDatabase(filename, options);
@@ -43,6 +45,7 @@ export class TowtruckDatabase {
     this.#getAllForNameLikeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ? AND name LIKE ?;")
     this.#getAllForScopeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ?;");
     this.#deleteAllForScopeStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ?;");
+    this.#getAllConfigurationsForOrgStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? ORDER BY id ASC;");
   }
 
   #save(scope, name, key, data) {
@@ -140,6 +143,22 @@ export class TowtruckDatabase {
 
   deleteAllDependencies() {
     return this.#deleteAllForScope("dependency");
+  }
+
+  saveConfiguration(org, name, query) {
+    const id = randomUUID();
+    return this.#save("saved-configuration", `${org}/${id}`, "config", { id, name, org, query, createdAt: new Date().toISOString() });
+  }
+
+  getAllSavedConfigurationsForOrg(org) {
+    const rows = this.#getAllConfigurationsForOrgStatement.all(`${org}/%`);
+    return rows.map((row) => JSON.parse(row.value)).filter(Boolean);
+  }
+
+  deleteSavedConfiguration(org, id) {
+    const rawDb = this.#db;
+    const stmt = rawDb.prepare("DELETE FROM towtruck_data WHERE scope = 'saved-configuration' AND name = ?;");
+    return stmt.run(`${org}/${id}`);
   }
 
   transaction(fn) {

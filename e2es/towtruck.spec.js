@@ -1,28 +1,19 @@
 import { test, expect } from "@playwright/test";
 
 test("has dependency info", async ({ page, baseURL }) => {
+  // Home page lists orgs
   await page.goto(baseURL);
-
   await expect(page).toHaveTitle(/Towtruck/);
 
-  page.getByText("There are 3 repositories that Towtruck is tracking for dxw.");
+  // Navigate to the dxw org page
+  await page.getByRole("link", { name: "dxw" }).click();
+  await expect(page).toHaveTitle(/Towtruck/);
 
-  const tableHeadings = [
-    "Name",
-    "Description",
-    "Language",
-    "Last Updated",
-    "Open issues count",
-    "Open PR count",
-    "Dependencies",
-  ];
-  tableHeadings.forEach((heading) => {
-    expect(page.getByRole("columnheader", { name: heading })).toBeTruthy();
-  });
+  await expect(page.getByText("Towtruck is tracking for dxw")).toBeVisible();
 
   await testSortingForColumn(
     {
-      name: "Open issues count",
+      name: "Open issues",
       topAscending: "govuk-blogs",
       topDescending: "optionparser",
     },
@@ -31,8 +22,8 @@ test("has dependency info", async ({ page, baseURL }) => {
 
   await testSortingForColumn(
     {
-      name: "Open bot PR count",
-      topAscending: "optionparse",
+      name: "Open bot PRs",
+      topAscending: "optionparser",
       topDescending: "govuk-blogs",
     },
     page
@@ -40,7 +31,7 @@ test("has dependency info", async ({ page, baseURL }) => {
 
   await testSortingForColumn(
     {
-      name: "Open PR count",
+      name: "Open PRs",
       topAscending: "optionparser",
       topDescending: "php-missing",
     },
@@ -51,7 +42,7 @@ test("has dependency info", async ({ page, baseURL }) => {
     {
       name: "Updated at",
       topAscending: "optionparser",
-      topDescending: "govuk-blogs ",
+      topDescending: "govuk-blogs",
     },
     page
   );
@@ -61,14 +52,15 @@ const testSortingForColumn = async (
   { name, topAscending, topDescending },
   page
 ) => {
-  await page.getByRole("link", { name, exact: true }).click();
-  await assertFirstDependencyRow(topAscending, page);
+  const sortControls = page.getByTestId("sort-controls");
+  await sortControls.getByRole("link", { name }).click();
+  await assertFirstCard(topAscending, page);
 
-  await page.getByRole("link", { name, exact: true }).click();
-  await assertFirstDependencyRow(topDescending, page);
+  await sortControls.getByRole("link", { name }).click();
+  await assertFirstCard(topDescending, page);
 };
 
-const assertFirstDependencyRow = async (expectedFirstDependency, page) => {
-  const firstDependencyRow = page.getByRole("row").nth(1);
-  await expect(firstDependencyRow).toContainText(expectedFirstDependency);
+const assertFirstCard = async (expectedRepoName, page) => {
+  const firstCard = page.locator(".grid > div").first();
+  await expect(firstCard).toContainText(expectedRepoName);
 };

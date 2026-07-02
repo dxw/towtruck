@@ -20,19 +20,28 @@ import { onRepository } from "./repository.js";
  * @template {string} T
  */
 
-const registerWebhook = OctokitApp.app.webhooks.on;
+let handleWebhooks;
 
-registerWebhook("pull_request.opened", onPullRequestOpened);
-registerWebhook("pull_request.closed", onPullRequestClosed);
+if (!OctokitApp.app) {
+  console.info("Webhook handling disabled: GitHub App credentials not configured.");
+  handleWebhooks = (_req, _res, next) => next();
+} else {
+  const registerWebhook = OctokitApp.app.webhooks.on;
 
-registerWebhook("issues.opened", onIssueOpened);
-registerWebhook("issues.closed", onIssueClosed);
+  registerWebhook("pull_request.opened", onPullRequestOpened);
+  registerWebhook("pull_request.closed", onPullRequestClosed);
 
-registerWebhook("push", onPush);
-registerWebhook("issues.edited", onIssueEdited);
+  registerWebhook("issues.opened", onIssueOpened);
+  registerWebhook("issues.closed", onIssueClosed);
 
-registerWebhook("dependabot_alert", onDependabotAlert);
+  registerWebhook("push", onPush);
+  registerWebhook("issues.edited", onIssueEdited);
 
-registerWebhook("repository", onRepository);
+  registerWebhook("dependabot_alert", onDependabotAlert);
 
-export const handleWebhooks = createNodeMiddleware(OctokitApp.app);
+  registerWebhook("repository", onRepository);
+
+  handleWebhooks = createNodeMiddleware(OctokitApp.app);
+}
+
+export { handleWebhooks };
