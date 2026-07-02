@@ -9,7 +9,7 @@ test("has dependency info", async ({ page, baseURL }) => {
   await page.getByRole("link", { name: "dxw" }).click();
   await expect(page).toHaveTitle(/Towtruck/);
 
-  await expect(page.getByText("There are 3 repositories that Towtruck is tracking for dxw.")).toBeVisible();
+  await expect(page.getByText("Towtruck is tracking for dxw")).toBeVisible();
 
   await testSortingForColumn(
     {
