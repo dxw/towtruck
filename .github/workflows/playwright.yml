@@ -21,6 +21,21 @@ jobs:
         run: script/setup --ci
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
+      - name: Test server startup
+        run: |
+          node ./e2es/seedTestData.js
+          NODE_ENV=test timeout 15 node index.js &
+          SERVER_PID=$!
+          sleep 5
+          curl -v http://127.0.0.1:3000/health || echo "HEALTH CHECK FAILED"
+          kill $SERVER_PID 2>/dev/null || true
+        env:
+          APP_ID: ${{ secrets.APP_ID }}
+          PRIVATE_KEY: ${{ secrets.PRIVATE_KEY }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+          REDIRECT_URL_BASE: ${{ secrets.REDIRECT_URL_BASE }}
       - name: Run Playwright tests
         run: npx playwright test
         env:
