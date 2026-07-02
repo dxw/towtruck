@@ -30,7 +30,6 @@ jobs:
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
           REDIRECT_URL_BASE: ${{ secrets.REDIRECT_URL_BASE }}
-          DEBUG: pw:webserver
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         if: always()
         with:
