@@ -3,11 +3,10 @@ import path from "path";
 
 export const authFile = path.join(import.meta.dirname, ".auth", "user.json");
 
-setup("authenticate", async ({ request, context }) => {
-  await request.post("/test/session", {
+setup("authenticate", async ({ page }) => {
+  await page.request.post("/test/session", {
     data: { email: "test@dxw.com" },
   });
 
-  await context.storageState({ path: authFile });
+  await page.context().storageState({ path: authFile });
 });
-
