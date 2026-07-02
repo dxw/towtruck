@@ -52,10 +52,11 @@ const testSortingForColumn = async (
   { name, topAscending, topDescending },
   page
 ) => {
-  await page.getByRole("link", { name, exact: true }).first().click();
+  const sortControls = page.getByTestId("sort-controls");
+  await sortControls.getByRole("link", { name }).click();
   await assertFirstCard(topAscending, page);
 
-  await page.getByRole("link", { name, exact: true }).first().click();
+  await sortControls.getByRole("link", { name }).click();
   await assertFirstCard(topDescending, page);
 };
 

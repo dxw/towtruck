@@ -107,7 +107,7 @@
           </div>
 
           <!-- Sort row -->
-          <div class="p-3 flex flex-wrap items-center gap-2">
+          <div class="p-3 flex flex-wrap items-center gap-2" data-testid="sort-controls">
             {{macros.sortableCardHeader("Open issues", "openIssues", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
             {{macros.sortableCardHeader("Open bot PRs", "openBotPrCount", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
             {{macros.sortableCardHeader("Open PRs", "openPrCount", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
