@@ -550,13 +550,14 @@ describe("TowtruckDatabase", () => {
       const db = new TowtruckDatabase(testDbPath);
 
       const query = { sortBy: "openIssues", sortDirection: "desc", alertFilter: "criticalOnly" };
-      db.saveConfiguration("my-org", "My Config", query);
+      db.saveConfiguration("my-org", "My Config", query, "alice@dxw.com");
 
       const configs = db.getAllSavedConfigurationsForOrg("my-org");
 
       expect.strictEqual(configs.length, 1);
       expect.strictEqual(configs[0].name, "My Config");
       expect.strictEqual(configs[0].org, "my-org");
+      expect.strictEqual(configs[0].userEmail, "alice@dxw.com");
       expect.deepStrictEqual(configs[0].query, query);
       expect.ok(configs[0].id, "should have an id");
       expect.ok(configs[0].createdAt, "should have a createdAt");
@@ -565,8 +566,8 @@ describe("TowtruckDatabase", () => {
     it("saves multiple configurations and returns them in order", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" });
-      db.saveConfiguration("my-org", "Config B", { sortBy: "openPrCount" });
+      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" }, "alice@dxw.com");
+      db.saveConfiguration("my-org", "Config B", { sortBy: "openPrCount" }, "alice@dxw.com");
 
       const configs = db.getAllSavedConfigurationsForOrg("my-org");
 
@@ -588,8 +589,8 @@ describe("TowtruckDatabase", () => {
     it("only returns configurations for the given org", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      db.saveConfiguration("org-a", "Config for A", { sortBy: "openIssues" });
-      db.saveConfiguration("org-b", "Config for B", { sortBy: "openPrCount" });
+      db.saveConfiguration("org-a", "Config for A", { sortBy: "openIssues" }, "alice@dxw.com");
+      db.saveConfiguration("org-b", "Config for B", { sortBy: "openPrCount" }, "alice@dxw.com");
 
       const forA = db.getAllSavedConfigurationsForOrg("org-a");
       const forB = db.getAllSavedConfigurationsForOrg("org-b");
@@ -601,17 +602,44 @@ describe("TowtruckDatabase", () => {
     });
   });
 
+  describe("getAllSavedConfigurationsForUser", () => {
+    it("returns only configurations belonging to the given user", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveConfiguration("my-org", "Alice Config", { sortBy: "openIssues" }, "alice@dxw.com");
+      db.saveConfiguration("my-org", "Bob Config", { sortBy: "openPrCount" }, "bob@dxw.com");
+
+      const forAlice = db.getAllSavedConfigurationsForUser("my-org", "alice@dxw.com");
+      const forBob = db.getAllSavedConfigurationsForUser("my-org", "bob@dxw.com");
+
+      expect.strictEqual(forAlice.length, 1);
+      expect.strictEqual(forAlice[0].name, "Alice Config");
+      expect.strictEqual(forBob.length, 1);
+      expect.strictEqual(forBob[0].name, "Bob Config");
+    });
+
+    it("returns an empty array when the user has no configurations", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveConfiguration("my-org", "Alice Config", { sortBy: "openIssues" }, "alice@dxw.com");
+
+      const forBob = db.getAllSavedConfigurationsForUser("my-org", "bob@dxw.com");
+
+      expect.deepStrictEqual(forBob, []);
+    });
+  });
+
   describe("deleteSavedConfiguration", () => {
     it("removes the expected configuration", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" });
-      db.saveConfiguration("my-org", "Config B", { sortBy: "openPrCount" });
+      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" }, "alice@dxw.com");
+      db.saveConfiguration("my-org", "Config B", { sortBy: "openPrCount" }, "alice@dxw.com");
 
       const before = db.getAllSavedConfigurationsForOrg("my-org");
       expect.strictEqual(before.length, 2);
 
-      db.deleteSavedConfiguration("my-org", before[0].id);
+      db.deleteSavedConfiguration("my-org", before[0].id, "alice@dxw.com");
 
       const after = db.getAllSavedConfigurationsForOrg("my-org");
       expect.strictEqual(after.length, 1);
@@ -621,13 +649,25 @@ describe("TowtruckDatabase", () => {
     it("leaves other configs intact when deleting one", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" });
+      db.saveConfiguration("my-org", "Config A", { sortBy: "openIssues" }, "alice@dxw.com");
       const before = db.getAllSavedConfigurationsForOrg("my-org");
 
-      db.deleteSavedConfiguration("my-org", before[0].id);
+      db.deleteSavedConfiguration("my-org", before[0].id, "alice@dxw.com");
 
       const after = db.getAllSavedConfigurationsForOrg("my-org");
       expect.deepStrictEqual(after, []);
+    });
+
+    it("does not delete a configuration belonging to a different user", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveConfiguration("my-org", "Alice Config", { sortBy: "openIssues" }, "alice@dxw.com");
+      const before = db.getAllSavedConfigurationsForOrg("my-org");
+
+      db.deleteSavedConfiguration("my-org", before[0].id, "bob@dxw.com");
+
+      const after = db.getAllSavedConfigurationsForOrg("my-org");
+      expect.strictEqual(after.length, 1);
     });
   });
 });

@@ -162,7 +162,7 @@ httpServer.get("/:org", requireAuth, (request, response) => {
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
   const paginationData = calculatePagination(sortedRepos, pageParam);
 
-  const savedConfigurations = db.getAllSavedConfigurationsForOrg(org).map((config) => {
+  const savedConfigurations = db.getAllSavedConfigurationsForUser(org, request.session.user.email).map((config) => {
     const params = new URLSearchParams(config.query || {});
     const qs = params.toString();
     return { ...config, applyUrl: qs ? `/${org}?${qs}` : `/${org}` };
@@ -237,7 +237,7 @@ httpServer.post("/:org/saved-configurations", requireAuth, (request, response) =
   if (alertFilter) query.alertFilter = alertFilter;
 
   const db = new TowtruckDatabase();
-  db.saveConfiguration(org, name || `Config ${new Date().toLocaleString()}`, query);
+  db.saveConfiguration(org, name || `Config ${new Date().toLocaleString()}`, query, request.session.user.email);
 
   return response.redirect(`/${org}?${new URLSearchParams(query).toString()}`);
 });
@@ -247,7 +247,7 @@ httpServer.post("/:org/saved-configurations/:id/delete", requireAuth, (request, 
   const { sortBy, sortDirection, tag, alertFilter } = request.body;
 
   const db = new TowtruckDatabase();
-  db.deleteSavedConfiguration(org, id);
+  db.deleteSavedConfiguration(org, id, request.session.user.email);
 
   const params = new URLSearchParams();
   if (sortBy) params.set("sortBy", sortBy);
