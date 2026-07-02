@@ -49,8 +49,11 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: "node ./e2es/seedTestData.js && script/server",
+    command: "node ./e2es/seedTestData.js && node index.js",
     url: "http://127.0.0.1:3000",
     reuseExistingServer: !process.env.CI,
+    env: {
+      NODE_ENV: "test",
+    },
   },
 });
