@@ -1,4 +1,4 @@
-import { differenceInYears, formatDistance, formatDistanceToNow, startOfToday } from "date-fns";
+import { differenceInYears, formatDistance, startOfToday } from "date-fns";
 import { getDependencyEndOfLifeDate, getDependencyState } from "./endOfLifeDateApi/index.js";
 import { formatDate } from "./dateFormatting.js";
 
@@ -139,15 +139,15 @@ export const hashToTailwindColor = (str) => {
  * @param {import("./dateFormatting").DateStyle} [dateStyle="DD/MM/YYYY"]
  * @returns {RepoData}
  */
-export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateStyle = "DD/MM/YYYY") => {
+export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateStyle = "DD/MM/YY") => {
   const mappedRepos = Object.entries(persistedData).map(([, repo]) => {
     const newDate = formatDate(repo.main.updatedAt, dateStyle);
     const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
 
-    const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDistanceToNow(repo.pullRequests.mostRecentPrOpenedAt, { addSuffix: true });
-    const oldestOpenPrOpenedAt = repo.pullRequests.oldestOpenPrOpenedAt && formatDistanceToNow(repo.pullRequests.oldestOpenPrOpenedAt, { addSuffix: true });
-    const mostRecentIssueOpenedAt = repo.issues.mostRecentIssueOpenedAt && formatDistanceToNow(repo.issues.mostRecentIssueOpenedAt, { addSuffix: true });
-    const oldestOpenIssueOpenedAt = repo.issues.oldestOpenIssueOpenedAt && formatDistanceToNow(repo.issues.oldestOpenIssueOpenedAt, { addSuffix: true });
+    const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDate(repo.pullRequests.mostRecentPrOpenedAt, dateStyle);
+    const oldestOpenPrOpenedAt = repo.pullRequests.oldestOpenPrOpenedAt && formatDate(repo.pullRequests.oldestOpenPrOpenedAt, dateStyle);
+    const mostRecentIssueOpenedAt = repo.issues.mostRecentIssueOpenedAt && formatDate(repo.issues.mostRecentIssueOpenedAt, dateStyle);
+    const oldestOpenIssueOpenedAt = repo.issues.oldestOpenIssueOpenedAt && formatDate(repo.issues.oldestOpenIssueOpenedAt, dateStyle);
 
     const languageColor = hashToTailwindColor(repo.main.language);
 

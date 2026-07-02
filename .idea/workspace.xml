@@ -2,21 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="bb72ed1c-514a-4f31-b193-ab54cb436b4a" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/utils/dateFormatting.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/utils/dateFormatting.test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.github/copilot-instructions.md" beforeDir="false" afterPath="$PROJECT_DIR$/.github/copilot-instructions.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/index.njk" beforeDir="false" afterPath="$PROJECT_DIR$/index.njk" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/githubApi/fetchAllRepos.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/githubApi/fetchAllRepos.test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/githubApi/fetchDependabotAlerts.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/githubApi/fetchDependabotAlerts.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/githubApi/fetchDependabotAlerts.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/githubApi/fetchDependabotAlerts.test.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/dateFormatting.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/dateFormatting.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/utils/dateFormatting.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/dateFormatting.test.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/index.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/utils/index.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/index.test.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/utils/sorting.js" beforeDir="false" afterPath="$PROJECT_DIR$/utils/sorting.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/webhooks/alerts.test.js" beforeDir="false" afterPath="$PROJECT_DIR$/webhooks/alerts.test.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -26,7 +18,7 @@
   <component name="CopilotChats">
     <option name="panelChat">
       <chat>
-        <option name="activeSessionId" value="d5804423-d4c5-482d-a5f7-5dd8457eed45" />
+        <option name="activeSessionId" value="8e369d77-f072-4199-97b0-9734353490ba" />
         <option name="sessions">
           <session>
             <option name="chatType" value="PANEL" />
@@ -207,7 +199,16 @@
             <option name="modeId" value="Agent" />
             <option name="modelType" value="builtin_family" />
             <option name="modelValue" value="claude-sonnet-4.6" />
-            <option name="status" value="Processing" />
+            <option name="status" value="Stopped" />
+            <option name="targetType" value="LOCAL" />
+          </session>
+          <session>
+            <option name="chatType" value="PANEL" />
+            <option name="id" value="8e369d77-f072-4199-97b0-9734353490ba" />
+            <option name="modeId" value="Agent" />
+            <option name="modelType" value="builtin_family" />
+            <option name="modelValue" value="claude-sonnet-4.6" />
+            <option name="status" value="Completed" />
             <option name="targetType" value="LOCAL" />
           </session>
         </option>
@@ -222,8 +223,8 @@
   </component>
   <component name="CopilotUserSelectedModel">
     <selectedModels>
-      <entry key="agent-panel" value="Auto" />
-      <entry key="chat-panel" value="Auto" />
+      <entry key="agent-panel" value="Claude Opus 4.6" />
+      <entry key="chat-panel" value="Claude Opus 4.6" />
     </selectedModels>
   </component>
   <component name="Git.Settings">
@@ -239,11 +240,11 @@
   <component name="ProjectSessionTemplates">
     <option name="panelTemplate">
       <template>
-        <option name="modeId" value="Ask" />
+        <option name="modeId" value="Agent" />
         <option name="model">
           <model>
             <option name="modelType" value="builtin_family" />
-            <option name="modelValue" value="auto" />
+            <option name="modelValue" value="claude-opus-4.6" />
           </model>
         </option>
         <option name="targetType" value="LOCAL" />
@@ -261,7 +262,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "RunOnceActivity.typescript.service.memoryLimit.init": "true",
-    "git-widget-placeholder": "layout-experiment",
+    "git-widget-placeholder": "layout-tweaks",
     "javascript.preferred.runtime.type.id": "node",
     "last_opened_file_path": "/Users/michael.huldt/code/towtruck",
     "node.js.detected.package.eslint": "true",

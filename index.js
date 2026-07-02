@@ -80,10 +80,10 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
   const persistedRepoData = db.getAllRepositoriesForOrg(org);
   const persistedLifetimeData = db.getAllDependencies();
 
-  // Resolve date format: query param takes precedence over cookie; persist choice in cookie
-  const rawDateFormat = request.query.dateFormat ?? request.cookies?.dateFormat;
-  const dateFormat = normalizeDateStyle(rawDateFormat);
-  if (request.query.dateFormat && request.query.dateFormat !== request.cookies?.dateFormat) {
+  // Resolve date format: query param takes precedence.
+  // Only persist DD/MM/YY in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
+  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === "DD/MM/YY" ? "DD/MM/YY" : undefined));
+  if (request.cookies?.dateFormat !== dateFormat) {
     response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
   }
 
@@ -144,10 +144,10 @@ httpServer.get("/:org", requireAuth, (request, response) => {
   const persistedRepoData = db.getAllRepositoriesForOrg(org);
   const persistedLifetimeData = db.getAllDependencies();
 
-  // Resolve date format: query param takes precedence over cookie; persist choice in cookie
-  const rawDateFormat = request.query.dateFormat ?? request.cookies?.dateFormat;
-  const dateFormat = normalizeDateStyle(rawDateFormat);
-  if (request.query.dateFormat && request.query.dateFormat !== request.cookies?.dateFormat) {
+  // Resolve date format: query param takes precedence.
+  // Only persist DD/MM/YY in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
+  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === "DD/MM/YY" ? "DD/MM/YY" : undefined));
+  if (request.cookies?.dateFormat !== dateFormat) {
     response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
   }
 
