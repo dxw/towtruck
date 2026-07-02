@@ -21,9 +21,11 @@ const httpServer = express();
 
 httpServer.use(cookieParser());
 
+const sessionSecret = process.env.SESSION_SECRET ?? (process.env.NODE_ENV !== "production" ? "dev-session-secret" : undefined);
+
 httpServer.use(
   session({
-    secret: process.env.SESSION_SECRET,
+    secret: sessionSecret,
     resave: false,
     saveUninitialized: false,
     cookie: {
