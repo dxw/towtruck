@@ -188,28 +188,6 @@
           </div>
           {% endif %}
 
-          <!-- Date format toggle -->
-          <div class="p-3 flex flex-wrap items-center gap-2">
-            <span class="text-xs text-slate-500 dark:text-slate-400 uppercase tracking-wide font-medium">Date format:</span>
-            {% set ddmmyyParams = baseUrl + "?dateFormat=DD%2FMM%2FYY" %}
-            {% if sortBy %}{% set ddmmyyParams = ddmmyyParams + "&sortBy=" + sortBy %}{% endif %}
-            {% if sortDirection %}{% set ddmmyyParams = ddmmyyParams + "&sortDirection=" + sortDirection %}{% endif %}
-            {% if tag %}{% set ddmmyyParams = ddmmyyParams + "&tag=" + tag %}{% endif %}
-            {% if alertFilter %}{% set ddmmyyParams = ddmmyyParams + "&alertFilter=" + alertFilter %}{% endif %}
-            <a href="{{ ddmmyyParams }}" aria-pressed="{{ 'true' if dateFormat !== 'MM/DD/YYYY' else 'false' }}"
-               class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if dateFormat !== 'MM/DD/YYYY' %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              DD/MM/YY
-            </a>
-            {% set mmddParams = baseUrl + "?dateFormat=MM%2FDD%2FYYYY" %}
-            {% if sortBy %}{% set mmddParams = mmddParams + "&sortBy=" + sortBy %}{% endif %}
-            {% if sortDirection %}{% set mmddParams = mmddParams + "&sortDirection=" + sortDirection %}{% endif %}
-            {% if tag %}{% set mmddParams = mmddParams + "&tag=" + tag %}{% endif %}
-            {% if alertFilter %}{% set mmddParams = mmddParams + "&alertFilter=" + alertFilter %}{% endif %}
-            <a href="{{ mmddParams }}" aria-pressed="{{ 'true' if dateFormat === 'MM/DD/YYYY' else 'false' }}"
-               class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if dateFormat === 'MM/DD/YYYY' %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              MM/DD/YYYY
-            </a>
-          </div>
 
         </div>
 
