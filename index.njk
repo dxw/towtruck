@@ -134,6 +134,7 @@
             {{macros.sortableCardHeader("Updated at", "updatedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
             {{macros.sortableCardHeader("Most recent PR", "mostRecentPrOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
             {{macros.sortableCardHeader("Oldest open PR", "oldestOpenPrOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            {{macros.sortableCardHeader("Last bot PR closed", "mostRecentBotPrClosedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
             {{macros.sortableCardHeader("Most recent issue", "mostRecentIssueOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
             {{macros.sortableCardHeader("Oldest open issue", "oldestOpenIssueOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
           </div>
@@ -301,6 +302,10 @@
               <div>
                 <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Bot PRs</span>
                 <p class="font-semibold">{{ repo.openBotPrCount }}</p>
+              </div>
+              <div>
+                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Last bot PR closed</span>
+                <p class="font-semibold">{{ repo.mostRecentBotPrClosedAt or "—" }}</p>
               </div>
               <div>
                 <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Updated at</span>
