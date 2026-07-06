@@ -18,7 +18,7 @@
     </script>
   </head>
   <body class="bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-    {% set baseUrl = dPlusBaseUrl if dPlusMode else "/" + org %}
+    {% set baseUrl = dPlusBaseUrl if dPlusMode else (govpressBaseUrl if govpressMode else "/" + org) %}
     <header class="bg-slate-600 dark:bg-slate-900 text-white">
       <nav class="w-full flex items-center gap-4 p-6 border-b-4 border-slate-700 dark:border-slate-950">
         <a href="/" class="text-slate-300 hover:text-white transition-colors" aria-label="Back to home">
@@ -29,10 +29,18 @@
         <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
           Exit D+ mode
         </a>
+        {% elif govpressMode %}
+        <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
+          Exit GovPress mode
+        </a>
         {% else %}
-        <a href="/{{ org }}/d-plus" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-blue-600 text-white border-blue-500 hover:bg-blue-500">
+        <a href="/{{ org }}/d-plus" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-purple-600 text-white border-purple-500 hover:bg-purple-500">
           <i class="bx bx-rocket"></i>
           D+ mode
+        </a>
+        <a href="/{{ org }}/govpress" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-orange-600 text-white border-orange-500 hover:bg-orange-500">
+          <i class="bx bx-globe"></i>
+          GovPress mode
         </a>
         {% endif %}
         <button id="theme-toggle" aria-label="Toggle dark mode"
@@ -43,9 +51,14 @@
     </header>
 
     {% if dPlusMode %}
-    <div class="bg-blue-600 dark:bg-blue-700 border-b-4 border-blue-800 dark:border-blue-900 px-6 py-4 text-white font-semibold text-base flex items-center gap-2">
+    <div class="bg-purple-600 dark:bg-purple-700 border-b-4 border-purple-800 dark:border-purple-900 px-6 py-4 text-white font-semibold text-base flex items-center gap-2">
       <i class="bx bx-info-circle text-xl"></i>
       This dashboard shows only repos not marked GovPress.
+    </div>
+    {% elif govpressMode %}
+    <div class="bg-orange-600 dark:bg-orange-700 border-b-4 border-orange-800 dark:border-orange-900 px-6 py-4 text-white font-semibold text-base flex items-center gap-2">
+      <i class="bx bx-info-circle text-xl"></i>
+      This dashboard shows only repos marked GovPress.
     </div>
     {% endif %}
 

@@ -132,7 +132,75 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
     savedConfigurations: [],
     activeConfigId: null,
     dPlusMode: true,
+    govpressMode: false,
     dPlusBaseUrl: `/${org}/d-plus`,
+    govpressBaseUrl: `/${org}/govpress`,
+  });
+
+  return response.end(template);
+});
+
+httpServer.get("/:org/govpress", requireAuth, (request, response) => {
+  const { org } = request.params;
+  const db = new TowtruckDatabase();
+  const persistedRepoData = db.getAllRepositoriesForOrg(org);
+  const persistedLifetimeData = db.getAllDependencies();
+
+  // Resolve date format: query param takes precedence.
+  // Only persist DD/MM/YY in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
+  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === "DD/MM/YY" ? "DD/MM/YY" : undefined));
+  if (request.cookies?.dateFormat !== dateFormat) {
+    response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
+  }
+
+  const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData, dateFormat);
+
+  const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
+
+  const govpressOnly = filterByTags(reposForUi.repos, ["govpress"]);
+  const filteredByAlerts = filterByAlerts(govpressOnly, alertFilter);
+  const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
+  const paginationData = calculatePagination(sortedRepos, pageParam);
+
+  const totalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
+  const totalCriticalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+
+  const buildTopicFilterUrl = () => {
+    const params = new URLSearchParams();
+    if (sortBy) params.set("sortBy", sortBy);
+    if (sortDirection) params.set("sortDirection", sortDirection);
+    if (alertFilter) params.set("alertFilter", alertFilter);
+
+    const queryString = params.toString();
+    return queryString ? `/${org}/govpress?${queryString}` : `/${org}/govpress`;
+  };
+
+  const template = nunjucks.render("index.njk", {
+    sortBy,
+    sortDirection,
+    tag: "",
+    selectedTags: [],
+    buildTopicFilterUrl,
+    alertFilter,
+    dateFormat,
+    ...reposForUi,
+    totalVulnerabilities,
+    totalCriticalVulnerabilities,
+    org,
+    repos: paginationData.items,
+    totalRepos: reposForUi.totalRepos,
+    displayedRepos: filteredByAlerts.length,
+    currentPage: paginationData.currentPage,
+    totalPages: paginationData.totalPages,
+    pageNumbers: paginationData.pageNumbers,
+    hasPreviousPage: paginationData.hasPreviousPage,
+    hasNextPage: paginationData.hasNextPage,
+    savedConfigurations: [],
+    activeConfigId: null,
+    dPlusMode: false,
+    govpressMode: true,
+    dPlusBaseUrl: `/${org}/d-plus`,
+    govpressBaseUrl: `/${org}/govpress`,
   });
 
   return response.end(template);
@@ -220,7 +288,9 @@ httpServer.get("/:org", requireAuth, (request, response) => {
     savedConfigurations,
     activeConfigId,
     dPlusMode: false,
+    govpressMode: false,
     dPlusBaseUrl: `/${org}/d-plus`,
+    govpressBaseUrl: `/${org}/govpress`,
   });
 
   return response.end(template);
