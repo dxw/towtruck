@@ -39,6 +39,6 @@
     "chokidar": "3.6.0",
     "eslint": "10.6.0",
     "eslint-config-prettier": "10.1.8",
-    "globals": "15.15.0"
+    "globals": "17.7.0"
   }
 }
