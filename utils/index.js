@@ -152,6 +152,12 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
 
     const languageColor = hashToTailwindColor(repo.main.language);
 
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+    const hasOpenBotPrs = (repo.pullRequests.openBotPrCount ?? 0) > 0;
+    const lastBotPrClosed = repo.pullRequests.mostRecentBotPrClosedAt ? new Date(repo.pullRequests.mostRecentBotPrClosedAt) : null;
+    const botPrStale = hasOpenBotPrs && (!lastBotPrClosed || lastBotPrClosed < sixMonthsAgo);
+
     return {
       ...repo.main,
       ...repo.dependabotAlerts,
@@ -166,6 +172,7 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
       oldestOpenPrOpenedAtISO8601: repo.pullRequests.oldestOpenPrOpenedAt,
       mostRecentBotPrClosedAt,
       mostRecentBotPrClosedAtISO8601: repo.pullRequests.mostRecentBotPrClosedAt,
+      botPrStale,
       mostRecentIssueOpenedAt,
       mostRecentIssueOpenedAtISO8601: repo.issues.mostRecentIssueOpenedAt,
       oldestOpenIssueOpenedAt,
