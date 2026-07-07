@@ -32,12 +32,12 @@
     "undici": "^6.19.8"
   },
   "devDependencies": {
-    "@eslint/js": "9.23.0",
+    "@eslint/js": "10.0.1",
     "@playwright/test": "1.51.1",
     "@types/cookie-parser": "^1.4.10",
     "@types/node": "22.13.14",
     "chokidar": "3.6.0",
-    "eslint": "9.23.0",
+    "eslint": "10.6.0",
     "eslint-config-prettier": "10.1.8",
     "globals": "15.15.0"
   }
