@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "10.0.1",
-    "@playwright/test": "1.51.1",
+    "@playwright/test": "1.61.1",
     "@types/cookie-parser": "1.4.10",
     "@types/node": "22.13.17",
     "chokidar": "3.6.0",
