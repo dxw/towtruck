@@ -91,6 +91,40 @@ describe("sortByISO8601Timestamp", () => {
 });
 
 describe("sortByType", () => {
+  it("sorts the repos by number of critical severity alerts", () => {
+    const reposToSort = [
+      { name: "Repo 1", criticalSeverityAlerts: 2 },
+      { name: "Repo 2", criticalSeverityAlerts: 0 },
+      { name: "Repo 3", criticalSeverityAlerts: 5 },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "asc", "criticalSeverityAlerts"),
+      [
+        { name: "Repo 2", criticalSeverityAlerts: 0 },
+        { name: "Repo 1", criticalSeverityAlerts: 2 },
+        { name: "Repo 3", criticalSeverityAlerts: 5 },
+      ]
+    );
+  });
+
+  it("sorts the repos by number of total open alerts", () => {
+    const reposToSort = [
+      { name: "Repo 1", totalOpenAlerts: 3 },
+      { name: "Repo 2", totalOpenAlerts: 1 },
+      { name: "Repo 3", totalOpenAlerts: 7 },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "desc", "totalOpenAlerts"),
+      [
+        { name: "Repo 3", totalOpenAlerts: 7 },
+        { name: "Repo 1", totalOpenAlerts: 3 },
+        { name: "Repo 2", totalOpenAlerts: 1 },
+      ]
+    );
+  });
+
   it("sorts the repos by number of open PRs", () => {
     const reposToSort = [
       { name: "Repo 1", openPrCount: 5 },
