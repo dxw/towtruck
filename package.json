@@ -13,9 +13,7 @@
     "format": "prettier --write .",
     "seed": "npm run seed:repos && npm run seed:lifetimes",
     "seed:repos": "node --env-file=.env ./seed/repos.js",
-    "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js",
-    "notify:slack": "node --env-file=.env ./script/notify-slack-stale-bot-prs.js",
-    "notify:email": "node --env-file=.env ./script/notify-email-subscriptions.js"
+    "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js"
   },
   "author": "dxw",
   "license": "MIT",
@@ -29,7 +27,6 @@
     "date-fns": "^4.1.0",
     "express": "^5.0.0",
     "express-session": "^1.19.0",
-    "nodemailer": "^9.0.3",
     "nunjucks": "^3.2.4",
     "openid-client": "^6.8.4",
     "undici": "^6.19.8"

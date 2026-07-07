@@ -168,32 +168,6 @@ export class TowtruckDatabase {
     return stmt.run(`${org}/${id}`, userEmail);
   }
 
-  saveEmailSubscription(org, userEmail, { tags, criticalAlerts }) {
-    const name = `${org}/${userEmail}`;
-    return this.#save("email-subscription", name, "preferences", {
-      org,
-      userEmail,
-      tags: tags || [],
-      criticalAlerts: !!criticalAlerts,
-      updatedAt: new Date().toISOString(),
-    });
-  }
-
-  getEmailSubscription(org, userEmail) {
-    const name = `${org}/${userEmail}`;
-    return this.#get("email-subscription", name, "preferences");
-  }
-
-  deleteEmailSubscription(org, userEmail) {
-    const rawDb = this.#db;
-    const stmt = rawDb.prepare("DELETE FROM towtruck_data WHERE scope = 'email-subscription' AND name = ?;");
-    return stmt.run(`${org}/${userEmail}`);
-  }
-
-  getAllEmailSubscriptions() {
-    return this.#getAllForScope("email-subscription");
-  }
-
   transaction(fn) {
     return this.#db.transaction(fn);
   }

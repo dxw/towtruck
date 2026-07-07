@@ -146,5 +146,3 @@ towtruck.private-key.pem
 # SQLite
 *.db-wal
 *.db-shm
-doc/gmail-smtp-setup.md
-doc/slack-integration-setup.md

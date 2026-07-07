@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import { handlePrsApiResponse, handleClosedBotPrsResponse } from "./fetchOpenPrs.js";
+import { handlePrsApiResponse } from "./fetchOpenPrs.js";
 
 describe("handlePrsApiResponse", () => {
   describe("openPrCount", () => {
@@ -105,43 +105,3 @@ describe("handlePrsApiResponse", () => {
     expect.deepStrictEqual(actual.oldestOpenPrOpenedAt, new Date(openPr1.created_at));
   });
 });
-
-describe("handleClosedBotPrsResponse", () => {
-  it("returns null if there are no closed PRs", () => {
-    const actual = handleClosedBotPrsResponse([]);
-
-    expect.strictEqual(actual.mostRecentBotPrClosedAt, null);
-  });
-
-  it("returns null if there are no bot PRs among closed PRs", () => {
-    const humanPr = { user: { login: "rich" }, closed_at: "2024-03-01T12:00:00Z" };
-    const actual = handleClosedBotPrsResponse([humanPr]);
-
-    expect.strictEqual(actual.mostRecentBotPrClosedAt, null);
-  });
-
-  it("returns the closed_at date of a renovate bot PR", () => {
-    const renovatePr = { user: { login: "renovate[bot]" }, closed_at: "2024-03-01T12:00:00Z" };
-    const actual = handleClosedBotPrsResponse([renovatePr]);
-
-    expect.deepStrictEqual(actual.mostRecentBotPrClosedAt, new Date("2024-03-01T12:00:00Z"));
-  });
-
-  it("returns the closed_at date of a dependabot PR", () => {
-    const dependabotPr = { user: { login: "dependabot[bot]" }, closed_at: "2024-04-15T10:00:00Z" };
-    const actual = handleClosedBotPrsResponse([dependabotPr]);
-
-    expect.deepStrictEqual(actual.mostRecentBotPrClosedAt, new Date("2024-04-15T10:00:00Z"));
-  });
-
-  it("returns the most recent closed_at among multiple bot PRs", () => {
-    const olderRenovatePr = { user: { login: "renovate[bot]" }, closed_at: "2024-01-01T12:00:00Z" };
-    const newerDependabotPr = { user: { login: "dependabot[bot]" }, closed_at: "2024-05-01T12:00:00Z" };
-    const humanPr = { user: { login: "rich" }, closed_at: "2024-06-01T12:00:00Z" };
-
-    const actual = handleClosedBotPrsResponse([olderRenovatePr, newerDependabotPr, humanPr]);
-
-    expect.deepStrictEqual(actual.mostRecentBotPrClosedAt, new Date("2024-05-01T12:00:00Z"));
-  });
-});
-

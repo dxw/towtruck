@@ -5,43 +5,14 @@
  * @returns {Promise<number>}
  */
 export const getOpenPRsForRepo = async ({ octokit, repository }) => {
-  const pullsUrl = repository.pulls_url.replace("{/number}", "");
-
-  return Promise.all([
-    octokit.request(repository.pulls_url).then(handlePrsApiResponse),
-    octokit.request(`${pullsUrl}?state=closed&sort=updated&direction=desc&per_page=100`)
-      .then(({ data }) => handleClosedBotPrsResponse(data)),
-  ]).then(([openPrInfo, closedBotPrInfo]) => ({
-    ...openPrInfo,
-    ...closedBotPrInfo,
-  })).catch((error) => {
-    console.error(error);
-    return {};
-  });
+  return octokit.request(repository.pulls_url).then(handlePrsApiResponse)
+    .catch((error) => {
+      console.error(error);
+      return {};
+    });;
 };
 
 const depdencyUpdateBots = ["renovate[bot]", "dependabot[bot]"];
-
-/**
- * Returns the most recent closed_at date among PRs authored by dependency update bots
- * @param {any[]} data
- * @returns {{ mostRecentBotPrClosedAt: Date | null }}
- */
-export const handleClosedBotPrsResponse = (data) => {
-  const mostRecentBotPrClosedAt = data.reduce((latestDate, pr) => {
-    if (!depdencyUpdateBots.includes(pr?.user?.login)) {
-      return latestDate;
-    }
-
-    const closedAt = new Date(pr.closed_at);
-    if (!latestDate || latestDate < closedAt) {
-      return closedAt;
-    }
-    return latestDate;
-  }, null);
-
-  return { mostRecentBotPrClosedAt };
-};
 
 /**
  * Returns the length of the PRs array or 0 if there are no PRs
