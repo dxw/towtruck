@@ -22,6 +22,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: "2021-06-15T00:00:00Z",
         },
         issues: {
           openIssues: 0,
@@ -50,6 +51,9 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
         oldestOpenPrOpenedAt: formatDate("2022-02-02T00:00:00Z"),
         oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentBotPrClosedAt: formatDate("2021-06-15T00:00:00Z"),
+        mostRecentBotPrClosedAtISO8601: "2021-06-15T00:00:00Z",
+        botPrStale: false,
         mostRecentIssueOpenedAt: formatDate("2023-03-03T00:00:00Z"),
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
@@ -79,6 +83,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,
@@ -103,6 +108,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,
@@ -131,6 +137,9 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
         oldestOpenPrOpenedAt: formatDate("2022-02-02T00:00:00Z"),
         oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentBotPrClosedAt: null,
+        mostRecentBotPrClosedAtISO8601: null,
+        botPrStale: false,
         mostRecentIssueOpenedAt: formatDate("2023-03-03T00:00:00Z"),
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
@@ -154,6 +163,9 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
         oldestOpenPrOpenedAt: formatDate("2022-02-02T00:00:00Z"),
         oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentBotPrClosedAt: null,
+        mostRecentBotPrClosedAtISO8601: null,
+        botPrStale: false,
         mostRecentIssueOpenedAt: formatDate("2023-03-03T00:00:00Z"),
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
@@ -163,6 +175,148 @@ describe("mapRepoFromStorageToUi", () => {
     ];
 
     expect.deepEqual(mapRepoFromStorageToUi(persistedData).repos, expected);
+  });
+
+  it("sets botPrStale to true when repo has open bot PRs and last closed bot PR is older than 6 months", () => {
+    const sevenMonthsAgo = new Date();
+    sevenMonthsAgo.setMonth(sevenMonthsAgo.getMonth() - 7);
+
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          openBotPrCount: 2,
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: sevenMonthsAgo.toISOString(),
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const [repo] = mapRepoFromStorageToUi(persistedData, {}).repos;
+    expect.strictEqual(repo.botPrStale, true);
+  });
+
+  it("sets botPrStale to false when repo has open bot PRs but last closed bot PR is recent", () => {
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          openBotPrCount: 1,
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: twoWeeksAgo.toISOString(),
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const [repo] = mapRepoFromStorageToUi(persistedData, {}).repos;
+    expect.strictEqual(repo.botPrStale, false);
+  });
+
+  it("sets botPrStale to false when repo has no open bot PRs", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          openBotPrCount: 0,
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const [repo] = mapRepoFromStorageToUi(persistedData, {}).repos;
+    expect.strictEqual(repo.botPrStale, false);
+  });
+
+  it("sets botPrStale to true when repo has open bot PRs and no bot PR has ever been closed", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-01T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          openBotPrCount: 3,
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const [repo] = mapRepoFromStorageToUi(persistedData, {}).repos;
+    expect.strictEqual(repo.botPrStale, true);
   });
 
   it("formats updatedAt as MM/DD/YYYY when dateStyle is MM/DD/YYYY", () => {
