@@ -1,4 +1,4 @@
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 12;
 
 /**
  * Calculates pagination data for a given page
