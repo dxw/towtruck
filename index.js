@@ -7,7 +7,7 @@ import { normalizeDateStyle } from "./utils/dateFormatting.js";
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
 import { normalizeSelectedTags, filterByTags } from "./utils/tagFiltering.js";
-import { calculatePagination } from "./utils/pagination.js";
+import { calculatePagination, ROW_PAGE_SIZE } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
 import { buildOidcConfig, registerAuthRoutes, requireAuth } from "./auth/index.js";
@@ -94,7 +94,8 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
   const dPlusRepos = filterByTags(reposForUi.repos, ["d-plus", "delivery-plus", "internal"]);
   const filteredByAlerts = filterByAlerts(dPlusRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const paginationData = calculatePagination(sortedRepos, pageParam);
+  const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
+  const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
 
   const totalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
@@ -162,7 +163,8 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
   const govpressOnly = filterByTags(reposForUi.repos, ["govpress"]);
   const filteredByAlerts = filterByAlerts(govpressOnly, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const paginationData = calculatePagination(sortedRepos, pageParam);
+  const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
+  const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
 
   const totalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
@@ -229,7 +231,8 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
   const opsRepos = filterByTags(reposForUi.repos, ["dalmatian", "tech-ops"]);
   const filteredByAlerts = filterByAlerts(opsRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const paginationData = calculatePagination(sortedRepos, pageParam);
+  const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
+  const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
 
   const totalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
@@ -299,7 +302,8 @@ httpServer.get("/:org", requireAuth, (request, response) => {
 
   const filteredByAlerts = filterByAlerts(filteredByTag, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const paginationData = calculatePagination(sortedRepos, pageParam);
+  const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
+  const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
 
   const savedConfigurations = db.getAllSavedConfigurationsForUser(org, request.session.user.email).map((config) => {
     const params = new URLSearchParams(config.query || {});
