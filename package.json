@@ -13,32 +13,33 @@
     "format": "prettier --write .",
     "seed": "npm run seed:repos && npm run seed:lifetimes",
     "seed:repos": "node --env-file=.env ./seed/repos.js",
-    "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js"
+    "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js",
+    "notify:slack": "node --env-file=.env ./script/notify-slack-stale-bot-prs.js"
   },
   "author": "dxw",
   "license": "MIT",
   "engines": {
-    "node": "24.x"
+    "node": "22.x"
   },
   "dependencies": {
-    "@octokit/app": "^16.0.0",
-    "better-sqlite3": "^12.0.0",
+    "@octokit/app": "^15.1.0",
+    "better-sqlite3": "^11.3.0",
     "cookie-parser": "^1.4.7",
     "date-fns": "^4.1.0",
     "express": "^5.0.0",
     "express-session": "^1.19.0",
     "nunjucks": "^3.2.4",
     "openid-client": "^6.8.4",
-    "undici": "^8.0.0"
+    "undici": "^6.19.8"
   },
   "devDependencies": {
-    "@eslint/js": "10.0.1",
-    "@playwright/test": "1.61.1",
-    "@types/cookie-parser": "1.4.10",
-    "@types/node": "24.13.2",
+    "@eslint/js": "9.23.0",
+    "@playwright/test": "1.51.1",
+    "@types/cookie-parser": "^1.4.10",
+    "@types/node": "22.13.14",
     "chokidar": "3.6.0",
-    "eslint": "10.6.0",
-    "eslint-config-prettier": "10.1.8",
-    "globals": "17.7.0"
+    "eslint": "9.23.0",
+    "eslint-config-prettier": "9.1.0",
+    "globals": "15.15.0"
   }
 }

@@ -168,6 +168,7 @@ export class TowtruckDatabase {
     return stmt.run(`${org}/${id}`, userEmail);
   }
 
+
   transaction(fn) {
     return this.#db.transaction(fn);
   }

@@ -6,7 +6,7 @@ import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
 import { normalizeDateStyle } from "./utils/dateFormatting.js";
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
-import { normalizeSelectedTags, filterByTags, excludeByTag } from "./utils/tagFiltering.js";
+import { normalizeSelectedTags, filterByTags } from "./utils/tagFiltering.js";
 import { calculatePagination } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
@@ -91,13 +91,13 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
 
   const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
 
-  const govpressExcluded = excludeByTag(reposForUi.repos, "govpress");
-  const filteredByAlerts = filterByAlerts(govpressExcluded, alertFilter);
+  const dPlusRepos = filterByTags(reposForUi.repos, ["d-plus", "delivery-plus", "internal"]);
+  const filteredByAlerts = filterByAlerts(dPlusRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
   const paginationData = calculatePagination(sortedRepos, pageParam);
 
-  const totalVulnerabilities = govpressExcluded.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
-  const totalCriticalVulnerabilities = govpressExcluded.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+  const totalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
+  const totalCriticalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
 
   const buildTopicFilterUrl = () => {
     const params = new URLSearchParams();
@@ -133,8 +133,10 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
     activeConfigId: null,
     dPlusMode: true,
     govpressMode: false,
+    opsMode: false,
     dPlusBaseUrl: `/${org}/d-plus`,
     govpressBaseUrl: `/${org}/govpress`,
+    opsBaseUrl: `/${org}/ops`,
   });
 
   return response.end(template);
@@ -199,8 +201,77 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
     activeConfigId: null,
     dPlusMode: false,
     govpressMode: true,
+    opsMode: false,
     dPlusBaseUrl: `/${org}/d-plus`,
     govpressBaseUrl: `/${org}/govpress`,
+    opsBaseUrl: `/${org}/ops`,
+  });
+
+  return response.end(template);
+});
+
+
+httpServer.get("/:org/ops", requireAuth, (request, response) => {
+  const { org } = request.params;
+  const db = new TowtruckDatabase();
+  const persistedRepoData = db.getAllRepositoriesForOrg(org);
+  const persistedLifetimeData = db.getAllDependencies();
+
+  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === "DD/MM/YY" ? "DD/MM/YY" : undefined));
+  if (request.cookies?.dateFormat !== dateFormat) {
+    response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
+  }
+
+  const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData, dateFormat);
+
+  const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
+
+  const opsRepos = filterByTags(reposForUi.repos, ["dalmatian", "tech-ops"]);
+  const filteredByAlerts = filterByAlerts(opsRepos, alertFilter);
+  const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
+  const paginationData = calculatePagination(sortedRepos, pageParam);
+
+  const totalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
+  const totalCriticalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+
+  const buildTopicFilterUrl = () => {
+    const params = new URLSearchParams();
+    if (sortBy) params.set("sortBy", sortBy);
+    if (sortDirection) params.set("sortDirection", sortDirection);
+    if (alertFilter) params.set("alertFilter", alertFilter);
+
+    const queryString = params.toString();
+    return queryString ? `/${org}/ops?${queryString}` : `/${org}/ops`;
+  };
+
+  const template = nunjucks.render("index.njk", {
+    sortBy,
+    sortDirection,
+    tag: "",
+    selectedTags: [],
+    buildTopicFilterUrl,
+    alertFilter,
+    dateFormat,
+    ...reposForUi,
+    totalVulnerabilities,
+    totalCriticalVulnerabilities,
+    org,
+    repos: paginationData.items,
+    totalRepos: reposForUi.totalRepos,
+    displayedRepos: filteredByAlerts.length,
+    currentPage: paginationData.currentPage,
+    totalPages: paginationData.totalPages,
+    pageNumbers: paginationData.pageNumbers,
+    hasPreviousPage: paginationData.hasPreviousPage,
+    hasNextPage: paginationData.hasNextPage,
+    savedConfigurations: [],
+    activeConfigId: null,
+    dPlusMode: false,
+    govpressMode: false,
+    opsMode: true,
+    dPlusBaseUrl: `/${org}/d-plus`,
+    govpressBaseUrl: `/${org}/govpress`,
+    opsBaseUrl: `/${org}/ops`,
   });
 
   return response.end(template);
@@ -289,12 +360,16 @@ httpServer.get("/:org", requireAuth, (request, response) => {
     activeConfigId,
     dPlusMode: false,
     govpressMode: false,
+    opsMode: false,
     dPlusBaseUrl: `/${org}/d-plus`,
     govpressBaseUrl: `/${org}/govpress`,
+    opsBaseUrl: `/${org}/ops`,
   });
 
   return response.end(template);
 });
+
+
 
 httpServer.post("/:org/saved-configurations", requireAuth, (request, response) => {
   const { org } = request.params;
