@@ -128,8 +128,12 @@
             <div class="flex items-center gap-1" data-testid="sort-controls">
               <label for="sort-select" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Sort:</label>
               <select id="sort-select" class="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 cursor-pointer"
-                onchange="if(this.value) window.location.href=this.value">
-                <option value="" {% if not sortBy %}selected{% endif %}>Default</option>
+                onchange="window.location.href=this.value">
+                {% set defaultParams = baseUrl %}
+                {% set defaultSep = "?" %}
+                {% if alertFilter %}{% set defaultParams = defaultParams + defaultSep + "alertFilter=" + alertFilter %}{% set defaultSep = "&" %}{% endif %}
+                {% if tag %}{% set defaultParams = defaultParams + defaultSep + "tag=" + tag %}{% endif %}
+                <option value="{{ defaultParams }}" {% if not sortBy %}selected{% endif %}>Default</option>
                 {% set sortOptions = [
                   { name: "Critical alerts", id: "criticalSeverityAlerts" },
                   { name: "Total alerts", id: "totalOpenAlerts" },
@@ -168,67 +172,61 @@
           </div>
 
 
-          <!-- Save current configuration -->
-          <div class="p-2">
-            <details class="group/save">
-              <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
-                <i class="bx bx-bookmark-plus"></i>
-                Save current configuration
-              </summary>
-              <form method="POST" action="/{{ org }}/saved-configurations" class="mt-3 flex items-center gap-2">
+          <!-- Save / saved configurations row -->
+          <div class="p-2 flex flex-wrap items-center gap-2">
+
+            <!-- Saved configs -->
+            {% if savedConfigurations and savedConfigurations.length %}
+            {% for config in savedConfigurations %}
+            <div class="flex items-center">
+              <a href="{{ config.applyUrl | safe }}" class="inline-flex items-center gap-1 rounded-l-full border px-2.5 py-0.5 text-xs font-medium transition-colors {% if config.id === activeConfigId %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-600{% endif %}">
+                <i class="bx bx-bookmark text-xs"></i>
+                {{ config.name }}
+              </a>
+              <form method="POST" action="/{{ org }}/saved-configurations/{{ config.id }}/delete" class="inline">
                 <input type="hidden" name="sortBy" value="{{ sortBy }}" />
                 <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
                 <input type="hidden" name="tag" value="{{ tag }}" />
                 <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
-                <input
-                  type="text"
-                  name="name"
-                  placeholder="Configuration name (optional)"
-                  class="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 w-64"
-                />
-                <button type="submit" class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-700 text-white border-slate-700 hover:bg-slate-600 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200 dark:hover:bg-slate-300">
-                  <i class="bx bx-save"></i>
-                  Save
+                <button type="submit" title="Delete" class="inline-flex items-center rounded-r-full border-t border-r border-b px-1.5 py-0.5 text-xs transition-colors bg-slate-200 text-slate-400 border-slate-400 hover:bg-red-100 hover:text-red-600 hover:border-red-400 dark:bg-slate-700 dark:text-slate-500 dark:border-slate-600 dark:hover:bg-red-950 dark:hover:text-red-400 dark:hover:border-red-800">
+                  <i class="bx bx-x text-sm"></i>
                 </button>
               </form>
-            </details>
-          </div>
-
-          <!-- Saved configurations panel -->
-          {% if savedConfigurations and savedConfigurations.length %}
-          <div class="p-2">
-            <div class="flex items-center justify-between mb-2">
-              <h3 class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                <i class="bx bx-bookmark"></i>
-                Saved configurations
-              </h3>
-              <a href="{{ baseUrl }}" class="inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
-                <i class="bx bx-reset"></i>
-                Clear configuration
-              </a>
             </div>
-            <ul class="flex flex-wrap gap-2">
-              {% for config in savedConfigurations %}
-              <li class="flex items-center gap-1">
-                <a href="{{ config.applyUrl | safe }}" class="inline-flex items-center gap-1 rounded-l-full border px-3 py-1 text-sm font-medium transition-colors {% if config.id === activeConfigId %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-600{% endif %}">
-                  <i class="bx bx-play-circle text-base"></i>
-                  {{ config.name }}
-                </a>
-                <form method="POST" action="/{{ org }}/saved-configurations/{{ config.id }}/delete" class="inline">
+            {% endfor %}
+
+            {% if activeConfigId %}
+            <a href="{{ baseUrl }}" class="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+              <i class="bx bx-reset text-xs"></i>
+              Clear
+            </a>
+            {% endif %}
+            {% endif %}
+
+            <!-- Save new config -->
+            <details class="group/save ml-auto">
+              <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+                <i class="bx bx-bookmark-plus text-sm"></i>
+                Save configuration
+              </summary>
+              <div class="absolute z-10 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-3">
+                <form method="POST" action="/{{ org }}/saved-configurations" class="flex items-center gap-2">
                   <input type="hidden" name="sortBy" value="{{ sortBy }}" />
                   <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
                   <input type="hidden" name="tag" value="{{ tag }}" />
                   <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
-                  <button type="submit" title="Delete this configuration" class="inline-flex items-center gap-1 rounded-r-full border-t border-r border-b px-2.5 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-500 border-slate-400 hover:bg-red-100 hover:text-red-700 hover:border-red-400 dark:bg-slate-700 dark:text-slate-400 dark:border-slate-600 dark:hover:bg-red-950 dark:hover:text-red-400 dark:hover:border-red-800">
-                    <i class="bx bx-trash text-sm"></i>
-                    <span class="text-xs">Delete</span>
+                  <input type="text" name="name" placeholder="Name (optional)"
+                    class="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400 w-44"
+                  />
+                  <button type="submit" class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors bg-slate-700 text-white border-slate-700 hover:bg-slate-600 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200 dark:hover:bg-slate-300">
+                    <i class="bx bx-save"></i>
+                    Save
                   </button>
                 </form>
-              </li>
-              {% endfor %}
-            </ul>
+              </div>
+            </details>
+
           </div>
-          {% endif %}
 
 
         </div>
@@ -331,8 +329,8 @@
               </div>
               <details class="mt-1 group/stats">
                 <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
-                  <span class="group-open/stats:hidden">More stats…</span>
-                  <span class="hidden group-open/stats:inline">Less</span>
+                  <span class="group-open/stats:hidden bg-slate-100 dark:bg-slate-700 rounded px-2 py-0.5">More stats…</span>
+                  <span class="hidden group-open/stats:inline bg-slate-100 dark:bg-slate-700 rounded px-2 py-0.5">Less</span>
                 </summary>
                 <div class="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
                   <div>
