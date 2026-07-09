@@ -23,6 +23,11 @@ httpServer.use(cookieParser());
 
 const sessionSecret = process.env.SESSION_SECRET ?? (process.env.NODE_ENV !== "production" ? "dev-session-secret" : undefined);
 
+if (!sessionSecret) {
+  console.error("FATAL: SESSION_SECRET environment variable is required in production.");
+  process.exit(1);
+}
+
 httpServer.use(
   session({
     secret: sessionSecret,
@@ -412,3 +417,4 @@ const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.info(`Server is running on port ${PORT}`);
 });
+

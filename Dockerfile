@@ -13,6 +13,7 @@ ARG GOOGLE_CLIENT_SECRET
 ARG SESSION_SECRET
 ARG BASE_URL
 ARG REDIRECT_URL_BASE
+ARG NODE_ENV
 
 COPY . .
 
@@ -28,7 +29,8 @@ RUN touch .env \
   && echo "GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET" >> .env \
   && echo "SESSION_SECRET=$SESSION_SECRET" >> .env \
   && echo "BASE_URL=$BASE_URL" >> .env \
-  && echo "REDIRECT_URL_BASE=$REDIRECT_URL_BASE" >> .env
+  && echo "REDIRECT_URL_BASE=$REDIRECT_URL_BASE" >> .env \
+  && echo "NODE_ENV=$NODE_ENV" >> .env
 
 RUN npm install
 
