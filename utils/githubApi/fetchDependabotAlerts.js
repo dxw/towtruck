@@ -12,7 +12,7 @@ export const getDependabotAlertsForRepo = async ({ octokit, repository }) => {
     })
     .then(handleDependabotAlertsApiResponse)
     .catch((error) => {
-      console.warn(`[${repository.name}] Dependabot alerts: ${error.message}`);
+      console.error(error);
       return {};
     });
 };

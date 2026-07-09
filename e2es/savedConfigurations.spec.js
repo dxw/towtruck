@@ -33,8 +33,8 @@ test("saved configurations are only visible to the user who created them", async
 
   // Sign in as user1 and save a configuration
   const alicePage = await signInAs(`${user1}@dxw.com`, aliceContext, baseURL);
-  await alicePage.getByTestId("sort-controls").locator("select").selectOption({ index: 1 });
-  await alicePage.getByText("Save configuration").click();
+  await alicePage.getByTestId("sort-controls").getByRole("link", { name: "Open issues" }).click();
+  await alicePage.getByText("Save current configuration").click();
   await alicePage.locator('input[name="name"]').fill("User 1 config");
   await alicePage.getByRole("button", { name: "Save" }).click();
 
@@ -43,8 +43,8 @@ test("saved configurations are only visible to the user who created them", async
 
   // Sign in as user2 and save a configuration
   const bobPage = await signInAs(`${user2}@dxw.com`, bobContext, baseURL);
-  await bobPage.getByTestId("sort-controls").locator("select").selectOption({ index: 3 });
-  await bobPage.getByText("Save configuration").click();
+  await bobPage.getByTestId("sort-controls").getByRole("link", { name: "Open PRs" }).click();
+  await bobPage.getByText("Save current configuration").click();
   await bobPage.locator('input[name="name"]').fill("User 2 config");
   await bobPage.getByRole("button", { name: "Save" }).click();
 
@@ -60,17 +60,15 @@ test("saved configurations are only visible to the user who created them", async
   await expect(alicePage.getByRole("link", { name: "User 2 config" })).not.toBeVisible();
 
   // Clean up: delete user 1's config
-  while (await alicePage.locator('button[title="Delete"]').first().isVisible()) {
-    await alicePage.locator('button[title="Delete"]').first().click();
-    await alicePage.waitForTimeout(300);
+  while (await alicePage.getByRole("button", { name: "Delete" }).first().isVisible()) {
+    await alicePage.getByRole("button", { name: "Delete" }).first().click();
   }
 
   // Clean up: delete user 2's config
   await bobContext.request.post(`${baseURL}/test/session`, { data: { email: `${user2}@dxw.com` } });
   await bobPage.goto(`${baseURL}/dxw`);
-  while (await bobPage.locator('button[title="Delete"]').first().isVisible()) {
-    await bobPage.locator('button[title="Delete"]').first().click();
-    await bobPage.waitForTimeout(300);
+  while (await bobPage.getByRole("button", { name: "Delete" }).first().isVisible()) {
+    await bobPage.getByRole("button", { name: "Delete" }).first().click();
   }
 
   await aliceContext.close();
