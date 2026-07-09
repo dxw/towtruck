@@ -55,6 +55,7 @@ export default defineConfig({
     stdout: "inherit",
     stderr: "inherit",
     env: {
+      ...process.env,
       NODE_ENV: "test",
     },
   },

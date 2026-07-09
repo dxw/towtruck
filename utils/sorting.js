@@ -59,6 +59,12 @@ export const sortByISO8601Timestamp = (repos, sortDirection, key) => {
  */
 export const sortByType = (repos, sortDirection, sortBy) => {
   switch (sortBy) {
+    case "criticalSeverityAlerts":
+      return sortByNumericValue(repos, sortDirection, "criticalSeverityAlerts");
+
+    case "totalOpenAlerts":
+      return sortByNumericValue(repos, sortDirection, "totalOpenAlerts");
+
     case "openPrCount":
       return sortByNumericValue(repos, sortDirection, "openPrCount");
 
