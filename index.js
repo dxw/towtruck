@@ -421,11 +421,14 @@ httpServer.listen(PORT, () => {
 
   // Run the seed in the background after the server is listening.
   // This ensures Heroku's boot timeout is not exceeded while seeding.
-  if (process.env.RUN_SEED_ON_START === "true") {
+  if (process.env.RUN_SEED_ON_START?.trim().toLowerCase() === "true") {
     console.info("Starting background seed...");
     const seedProc = spawn("npm", ["run", "seed"], {
       stdio: "inherit",
-      env: { ...process.env },
+      shell: true,
+    });
+    seedProc.on("error", (err) => {
+      console.error("Failed to start seed process:", err.message);
     });
     seedProc.on("close", (code) => {
       if (code === 0) {
@@ -434,6 +437,8 @@ httpServer.listen(PORT, () => {
         console.error(`Background seed exited with code ${code}`);
       }
     });
+  } else {
+    console.info("Seed on start is disabled (RUN_SEED_ON_START=%s)", process.env.RUN_SEED_ON_START);
   }
 });
 
