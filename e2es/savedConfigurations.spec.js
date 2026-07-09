@@ -33,8 +33,13 @@ test("saved configurations are only visible to the user who created them", async
 
   // Sign in as user1 and save a configuration
   const alicePage = await signInAs(`${user1}@dxw.com`, aliceContext, baseURL);
-  await alicePage.getByTestId("sort-controls").getByRole("link", { name: "Open issues" }).click();
-  await alicePage.getByText("Save current configuration").click();
+  const aliceSortSelect = alicePage.getByTestId("sort-controls").locator("select");
+  const aliceSortUrl = await aliceSortSelect.locator('option[value*="sortBy=openIssues"]').first().getAttribute("value");
+  await Promise.all([
+    alicePage.waitForURL(/sortBy=openIssues/),
+    aliceSortSelect.selectOption(aliceSortUrl),
+  ]);
+  await alicePage.getByText("Save configuration").click();
   await alicePage.locator('input[name="name"]').fill("User 1 config");
   await alicePage.getByRole("button", { name: "Save" }).click();
 
@@ -43,8 +48,13 @@ test("saved configurations are only visible to the user who created them", async
 
   // Sign in as user2 and save a configuration
   const bobPage = await signInAs(`${user2}@dxw.com`, bobContext, baseURL);
-  await bobPage.getByTestId("sort-controls").getByRole("link", { name: "Open PRs" }).click();
-  await bobPage.getByText("Save current configuration").click();
+  const bobSortSelect = bobPage.getByTestId("sort-controls").locator("select");
+  const bobSortUrl = await bobSortSelect.locator('option[value*="sortBy=openPrCount"]').first().getAttribute("value");
+  await Promise.all([
+    bobPage.waitForURL(/sortBy=openPrCount/),
+    bobSortSelect.selectOption(bobSortUrl),
+  ]);
+  await bobPage.getByText("Save configuration").click();
   await bobPage.locator('input[name="name"]').fill("User 2 config");
   await bobPage.getByRole("button", { name: "Save" }).click();
 

@@ -140,7 +140,9 @@ export const hashToTailwindColor = (str) => {
  * @returns {RepoData}
  */
 export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateStyle = "DD/MM/YY") => {
-  const mappedRepos = Object.entries(persistedData).map(([, repo]) => {
+  const mappedRepos = Object.entries(persistedData)
+    .filter(([, repo]) => repo.main.name !== ".github")
+    .map(([, repo]) => {
     const newDate = formatDate(repo.main.updatedAt, dateStyle);
     const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
 
