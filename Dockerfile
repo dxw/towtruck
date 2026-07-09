@@ -30,9 +30,10 @@ RUN touch .env \
   && echo "SESSION_SECRET=$SESSION_SECRET" >> .env \
   && echo "BASE_URL=$BASE_URL" >> .env \
   && echo "REDIRECT_URL_BASE=$REDIRECT_URL_BASE" >> .env \
-  && echo "NODE_ENV=$NODE_ENV" >> .env
+  && echo "NODE_ENV=$NODE_ENV" >> .env \
+  && echo "RUN_SEED_ON_START=true" >> .env
 
 RUN npm install
 
 EXPOSE 3000
-CMD [ "sh", "-c", "npm run seed && exec npm run start" ]
+CMD [ "sh", "-c", "exec npm run start" ]

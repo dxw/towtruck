@@ -413,8 +413,27 @@ httpServer.post("/:org/saved-configurations/:id/delete", requireAuth, (request, 
   return response.redirect(qs ? `/${org}?${qs}` : `/${org}`);
 });
 
+import { spawn } from "node:child_process";
+
 const PORT = process.env.PORT || 3000;
 httpServer.listen(PORT, () => {
   console.info(`Server is running on port ${PORT}`);
+
+  // Run the seed in the background after the server is listening.
+  // This ensures Heroku's boot timeout is not exceeded while seeding.
+  if (process.env.RUN_SEED_ON_START === "true") {
+    console.info("Starting background seed...");
+    const seedProc = spawn("npm", ["run", "seed"], {
+      stdio: "inherit",
+      env: { ...process.env },
+    });
+    seedProc.on("close", (code) => {
+      if (code === 0) {
+        console.info("Background seed completed successfully.");
+      } else {
+        console.error(`Background seed exited with code ${code}`);
+      }
+    });
+  }
 });
 
