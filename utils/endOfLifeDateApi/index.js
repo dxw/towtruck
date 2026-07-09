@@ -1,12 +1,9 @@
-import { Agent } from "undici";
-
 const END_OF_LIFE_DATE_BASE_URL = "https://endoflife.date/api";
 const DEFAULT_OPTIONS = {
   method: "GET",
   headers: {
     Accept: "application/json",
   },
-  dispatcher: new Agent({ connections: 75 }),
 };
 
 /**
