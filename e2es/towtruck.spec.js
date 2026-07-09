@@ -9,13 +9,11 @@ test("has dependency info", async ({ page, baseURL }) => {
   await page.getByRole("link", { name: "dxw" }).click();
   await expect(page).toHaveTitle(/Towtruck/);
 
-  await expect(page.getByText("repos tracked")).toBeVisible();
+  await expect(page.getByText("Towtruck is tracking for dxw")).toBeVisible();
 
   await testSortingForColumn(
     {
       name: "Open issues",
-      ascValue: "openIssues",
-      descValue: "openIssues",
       topAscending: "govuk-blogs",
       topDescending: "optionparser",
     },
@@ -25,8 +23,6 @@ test("has dependency info", async ({ page, baseURL }) => {
   await testSortingForColumn(
     {
       name: "Open bot PRs",
-      ascValue: "openBotPrCount",
-      descValue: "openBotPrCount",
       topAscending: "optionparser",
       topDescending: "govuk-blogs",
     },
@@ -36,8 +32,6 @@ test("has dependency info", async ({ page, baseURL }) => {
   await testSortingForColumn(
     {
       name: "Open PRs",
-      ascValue: "openPrCount",
-      descValue: "openPrCount",
       topAscending: "optionparser",
       topDescending: "php-missing",
     },
@@ -47,8 +41,6 @@ test("has dependency info", async ({ page, baseURL }) => {
   await testSortingForColumn(
     {
       name: "Updated at",
-      ascValue: "updatedAt",
-      descValue: "updatedAt",
       topAscending: "optionparser",
       topDescending: "govuk-blogs",
     },
@@ -57,23 +49,18 @@ test("has dependency info", async ({ page, baseURL }) => {
 });
 
 const testSortingForColumn = async (
-  { ascValue, descValue, topAscending, topDescending },
+  { name, topAscending, topDescending },
   page
 ) => {
-  const sortSelect = page.getByTestId("sort-controls").locator("select");
-
-  // Select ascending
-  const ascUrl = await sortSelect.locator(`option[value*="sortBy=${ascValue}"][value*="sortDirection=asc"]`).getAttribute("value");
-  await sortSelect.selectOption(ascUrl);
+  const sortControls = page.getByTestId("sort-controls");
+  await sortControls.getByRole("link", { name }).click();
   await assertFirstCard(topAscending, page);
 
-  // Select descending
-  const descUrl = await sortSelect.locator(`option[value*="sortBy=${descValue}"][value*="sortDirection=desc"]`).getAttribute("value");
-  await sortSelect.selectOption(descUrl);
+  await sortControls.getByRole("link", { name }).click();
   await assertFirstCard(topDescending, page);
 };
 
 const assertFirstCard = async (expectedRepoName, page) => {
-  const firstCard = page.locator("#card-view > div").first();
+  const firstCard = page.locator(".grid > div").first();
   await expect(firstCard).toContainText(expectedRepoName);
 };

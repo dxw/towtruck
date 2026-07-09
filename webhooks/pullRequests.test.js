@@ -33,9 +33,6 @@ describe("handleEvent", () => {
           },
         ],
       },
-      "https://some.api/pulls?state=closed&sort=updated&direction=desc&per_page=100": {
-        data: [],
-      },
     };
 
     t.mock.method(octokit, "request", async (url) =>
@@ -63,12 +60,11 @@ describe("handleEvent", () => {
       openBotPrCount: 1,
       oldestOpenPrOpenedAt: new Date("2024-01-01T12:34:56.789Z"),
       mostRecentPrOpenedAt: new Date("2024-10-10T11:22:33.444Z"),
-      mostRecentBotPrClosedAt: null,
     };
 
     await handleEvent(event, db);
 
-    expect.strictEqual(octokit.request.mock.callCount(), 2);
+    expect.strictEqual(octokit.request.mock.callCount(), 1);
 
     expect.strictEqual(db.saveToRepository.mock.callCount(), 1);
 

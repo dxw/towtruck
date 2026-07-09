@@ -129,9 +129,6 @@ describe("fetchForRepo", () => {
           },
         ],
       },
-      "https://some.api/pulls?state=closed&sort=updated&direction=desc&per_page=100": {
-        data: [],
-      },
     };
 
     t.mock.method(octokit, "request", async (url) =>
@@ -159,7 +156,6 @@ describe("fetchForRepo", () => {
       openBotPrCount: 1,
       oldestOpenPrOpenedAt: new Date("2024-01-01T12:34:56.789Z"),
       mostRecentPrOpenedAt: new Date("2024-10-10T11:22:33.444Z"),
-      mostRecentBotPrClosedAt: null,
     };
 
     const actual = await fetchForRepo(repository, octokit);
