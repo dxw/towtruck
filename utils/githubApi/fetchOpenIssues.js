@@ -8,7 +8,7 @@ export const getOpenIssuesForRepo = async ({ octokit, repository }) => {
   return octokit
     .request(repository.issues_url).then(handleIssuesApiResponse)
     .catch((error) => {
-      console.error(error);
+      console.warn(`[${repository.name}] Issues: ${error.message}`);
       return {};
     });;;
 };

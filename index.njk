@@ -8,6 +8,7 @@
     <title>Towtruck</title>
     <meta name="description" content="" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🚛</text></svg>" />
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>tailwind.config = { darkMode: 'class' }</script>
@@ -18,13 +19,13 @@
     </script>
   </head>
   <body class="bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-    {% set baseUrl = dPlusBaseUrl if dPlusMode else (govpressBaseUrl if govpressMode else "/" + org) %}
+    {% set baseUrl = dPlusBaseUrl if dPlusMode else (govpressBaseUrl if govpressMode else (opsBaseUrl if opsMode else "/" + org)) %}
     <header class="bg-slate-600 dark:bg-slate-900 text-white">
-      <nav class="w-full flex items-center gap-4 p-6 border-b-4 border-slate-700 dark:border-slate-950">
+      <nav class="w-full flex items-center gap-3 px-4 py-2 border-b-4 border-slate-700 dark:border-slate-950">
         <a href="/" class="text-slate-300 hover:text-white transition-colors" aria-label="Back to home">
-          <i class="bx bx-arrow-back text-2xl"></i>
+          <i class="bx bx-arrow-back text-xl"></i>
         </a>
-        <h1 class="text-3xl font-bold flex-1">Towtruck</h1>
+        <h1 class="text-xl font-bold flex-1">Towtruck</h1>
         {% if dPlusMode %}
         <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
           Exit D+ mode
@@ -32,6 +33,10 @@
         {% elif govpressMode %}
         <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
           Exit GovPress mode
+        </a>
+        {% elif opsMode %}
+        <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
+          Exit Ops mode
         </a>
         {% else %}
         <a href="/{{ org }}/d-plus" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-purple-600 text-white border-purple-500 hover:bg-purple-500">
@@ -42,78 +47,84 @@
           <i class="bx bx-globe"></i>
           GovPress mode
         </a>
+        <a href="/{{ org }}/ops" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-cyan-600 text-white border-cyan-500 hover:bg-cyan-500">
+          <i class="bx bx-server"></i>
+          Ops mode
+        </a>
         {% endif %}
+        <a href="/{{ org }}/settings" class="text-slate-200 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-500 dark:hover:bg-slate-700" aria-label="Email settings">
+          <i class="bx bx-envelope text-xl"></i>
+        </a>
         <button id="theme-toggle" aria-label="Toggle dark mode"
           class="text-slate-200 hover:text-white transition-colors p-1 rounded-lg hover:bg-slate-500 dark:hover:bg-slate-700">
-          <i id="theme-icon" class="bx text-2xl"></i>
+          <i id="theme-icon" class="bx text-xl"></i>
         </button>
       </nav>
     </header>
 
     {% if dPlusMode %}
-    <div class="bg-purple-600 dark:bg-purple-700 border-b-4 border-purple-800 dark:border-purple-900 px-6 py-4 text-white font-semibold text-base flex items-center gap-2">
-      <i class="bx bx-info-circle text-xl"></i>
-      This dashboard shows only repos not marked GovPress.
+    <div class="bg-purple-600 dark:bg-purple-700 border-b-2 border-purple-800 dark:border-purple-900 px-4 py-2 text-white font-semibold text-sm flex items-center gap-3">
+      <i class="bx bx-info-circle text-base"></i>
+      <span>This dashboard shows only repos marked D+, delivery-plus, or internal.</span>
+      <span class="flex items-center gap-3 text-xs font-medium">
+        <span class="text-red-300">Critical: <span class="font-bold text-sm">{{ totalCriticalVulnerabilities }}</span></span>
+        <span class="text-yellow-300">Total: <span class="font-bold text-sm">{{ totalVulnerabilities }}</span></span>
+      </span>
     </div>
     {% elif govpressMode %}
-    <div class="bg-orange-600 dark:bg-orange-700 border-b-4 border-orange-800 dark:border-orange-900 px-6 py-4 text-white font-semibold text-base flex items-center gap-2">
-      <i class="bx bx-info-circle text-xl"></i>
-      This dashboard shows only repos marked GovPress.
+    <div class="bg-orange-600 dark:bg-orange-700 border-b-2 border-orange-800 dark:border-orange-900 px-4 py-2 text-white font-semibold text-sm flex items-center gap-3">
+      <i class="bx bx-info-circle text-base"></i>
+      <span>This dashboard shows only repos marked GovPress.</span>
+      <span class="flex items-center gap-3 text-xs font-medium">
+        <span class="text-red-300">Critical: <span class="font-bold text-sm">{{ totalCriticalVulnerabilities }}</span></span>
+        <span class="text-yellow-300">Total: <span class="font-bold text-sm">{{ totalVulnerabilities }}</span></span>
+      </span>
+    </div>
+    {% elif opsMode %}
+    <div class="bg-cyan-600 dark:bg-cyan-700 border-b-2 border-cyan-800 dark:border-cyan-900 px-4 py-2 text-white font-semibold text-sm flex items-center gap-3">
+      <i class="bx bx-info-circle text-base"></i>
+      <span>This dashboard shows only repos marked dalmatian or tech-ops.</span>
+      <span class="flex items-center gap-3 text-xs font-medium">
+        <span class="text-red-300">Critical: <span class="font-bold text-sm">{{ totalCriticalVulnerabilities }}</span></span>
+        <span class="text-yellow-300">Total: <span class="font-bold text-sm">{{ totalVulnerabilities }}</span></span>
+      </span>
+    </div>
+    {% else %}
+    <div class="bg-slate-500 dark:bg-slate-800 border-b-2 border-slate-600 dark:border-slate-900 px-4 py-2 text-white text-sm flex items-center gap-3">
+      <span class="font-medium">{{ totalRepos }} {% if totalRepos === 1 %}repo{% else %}repos{% endif %} tracked</span>
+      <span class="flex items-center gap-3 text-xs font-medium">
+        <span class="text-red-300">Critical: <span class="font-bold text-sm">{{ totalCriticalVulnerabilities }}</span></span>
+        <span class="text-yellow-300">Total: <span class="font-bold text-sm">{{ totalVulnerabilities }}</span></span>
+      </span>
     </div>
     {% endif %}
 
-    <div class="container mx-auto flex flex-col mt-6 space-y-6">
-      <div class="bg-slate-100 dark:bg-slate-900 rounded-lg border-b-4 border-slate-300 dark:border-slate-950 space-y-4">
-        <h2 class="bg-slate-50 dark:bg-slate-800 rounded-t-lg border-b-2 border-slate-200 dark:border-slate-900 text-xl font-bold p-4">{{ org }}</h2>
-        <p class="mx-4">
-          {% if totalRepos === 1 %}
-          There is <span class="font-bold">1</span> repository
-          {% else %} 
-          There are <span class="font-bold">{{ totalRepos }}</span> repositories
-          {% endif %}
-          that Towtruck is tracking for <span class="font-bold">{{ org }}</span>.
-        </p>
-
-        <!-- Vulnerability summary counters -->
-        <div class="mx-4 flex flex-wrap justify-end gap-3">
-          <div class="rounded-lg px-4 py-3 min-w-[8rem] {% if totalCriticalVulnerabilities > 0 %}bg-red-100 dark:bg-red-950/60{% else %}bg-slate-200/60 dark:bg-slate-800/60{% endif %}">
-            <p class="text-xs uppercase tracking-wide font-medium {% if totalCriticalVulnerabilities > 0 %}text-red-600 dark:text-red-400{% else %}text-slate-400 dark:text-slate-500{% endif %}">Critical vulnerabilities</p>
-            <p class="text-3xl font-bold mt-0.5 {% if totalCriticalVulnerabilities > 0 %}text-red-700 dark:text-red-300{% else %}text-slate-400 dark:text-slate-500{% endif %}">{{ totalCriticalVulnerabilities }}</p>
-          </div>
-          <div class="rounded-lg px-4 py-3 min-w-[8rem] {% if totalVulnerabilities > 0 %}bg-yellow-100 dark:bg-yellow-950/60{% else %}bg-slate-200/60 dark:bg-slate-800/60{% endif %}">
-            <p class="text-xs uppercase tracking-wide font-medium {% if totalVulnerabilities > 0 %}text-yellow-700 dark:text-yellow-400{% else %}text-slate-400 dark:text-slate-500{% endif %}">Total vulnerabilities</p>
-            <p class="text-3xl font-bold mt-0.5 {% if totalVulnerabilities > 0 %}text-yellow-900 dark:text-yellow-200{% else %}text-slate-400 dark:text-slate-500{% endif %}">{{ totalVulnerabilities }}</p>
-          </div>
-        </div>
+    <div class="container mx-auto flex flex-col mt-3 space-y-3">
+      <div class="bg-slate-100 dark:bg-slate-900 rounded-lg border-b-4 border-slate-300 dark:border-slate-950 space-y-2">
+        <h2 class="bg-slate-50 dark:bg-slate-800 rounded-t-lg border-b-2 border-slate-200 dark:border-slate-900 text-base font-bold px-4 py-2">{{ org }}</h2>
 
         <!-- Controls box: filters, sorts, save, saved configurations -->
         <div class="mx-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-200 dark:divide-slate-700">
 
           <!-- Alert filters + sort row -->
-          <div class="p-3 flex flex-wrap items-center gap-2">
-            <!-- Critical alerts filter and sort -->
-            <div class="flex gap-2">
-              {% set criticalParams = baseUrl + "?alertFilter=criticalOnly" %}
-              {% if sortBy %}{% set criticalParams = criticalParams + "&sortBy=" + sortBy %}{% endif %}
-              {% if sortDirection %}{% set criticalParams = criticalParams + "&sortDirection=" + sortDirection %}{% endif %}
-              {% if tag %}{% set criticalParams = criticalParams + "&tag=" + tag %}{% endif %}
-              <a href="{{ criticalParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'criticalOnly' %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600{% else %}bg-red-200 text-red-700 border-red-400 hover:bg-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900{% endif %}">
-                Critical only
-              </a>
-              {{macros.sortableCardHeader("Critical alerts", "criticalSeverityAlerts", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            </div>
+          <div class="p-2 flex flex-wrap items-center gap-2">
+            <!-- Critical alerts filter -->
+            {% set criticalParams = baseUrl + "?alertFilter=criticalOnly" %}
+            {% if sortBy %}{% set criticalParams = criticalParams + "&sortBy=" + sortBy %}{% endif %}
+            {% if sortDirection %}{% set criticalParams = criticalParams + "&sortDirection=" + sortDirection %}{% endif %}
+            {% if tag %}{% set criticalParams = criticalParams + "&tag=" + tag %}{% endif %}
+            <a href="{{ criticalParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'criticalOnly' %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600{% else %}bg-red-200 text-red-700 border-red-400 hover:bg-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900{% endif %}">
+              Critical only
+            </a>
 
-            <!-- Any alerts filter and sort -->
-            <div class="flex gap-2">
-              {% set anyAlertsParams = baseUrl + "?alertFilter=anyAlerts" %}
-              {% if sortBy %}{% set anyAlertsParams = anyAlertsParams + "&sortBy=" + sortBy %}{% endif %}
-              {% if sortDirection %}{% set anyAlertsParams = anyAlertsParams + "&sortDirection=" + sortDirection %}{% endif %}
-              {% if tag %}{% set anyAlertsParams = anyAlertsParams + "&tag=" + tag %}{% endif %}
-              <a href="{{ anyAlertsParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'anyAlerts' %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500{% else %}bg-yellow-200 text-yellow-700 border-yellow-400 hover:bg-yellow-300 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800 dark:hover:bg-yellow-900{% endif %}">
-                Any alerts
-              </a>
-              {{macros.sortableCardHeader("Total alerts", "totalOpenAlerts", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            </div>
+            <!-- Any alerts filter -->
+            {% set anyAlertsParams = baseUrl + "?alertFilter=anyAlerts" %}
+            {% if sortBy %}{% set anyAlertsParams = anyAlertsParams + "&sortBy=" + sortBy %}{% endif %}
+            {% if sortDirection %}{% set anyAlertsParams = anyAlertsParams + "&sortDirection=" + sortDirection %}{% endif %}
+            {% if tag %}{% set anyAlertsParams = anyAlertsParams + "&tag=" + tag %}{% endif %}
+            <a href="{{ anyAlertsParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'anyAlerts' %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500{% else %}bg-yellow-200 text-yellow-700 border-yellow-400 hover:bg-yellow-300 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800 dark:hover:bg-yellow-900{% endif %}">
+              Any alerts
+            </a>
 
             <!-- Reset button -->
             {% set resetParams = baseUrl %}
@@ -124,23 +135,43 @@
             <a href="{{ resetParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
               Reset
             </a>
-          </div>
 
-          <!-- Sort row -->
-          <div class="p-3 flex flex-wrap items-center gap-2" data-testid="sort-controls">
-            {{macros.sortableCardHeader("Open issues", "openIssues", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Open bot PRs", "openBotPrCount", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Open PRs", "openPrCount", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Updated at", "updatedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Most recent PR", "mostRecentPrOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Oldest open PR", "oldestOpenPrOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Most recent issue", "mostRecentIssueOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
-            {{macros.sortableCardHeader("Oldest open issue", "oldestOpenIssueOpenedAt", sortDirection, sortBy, baseUrl, alertFilter, tag)}}
+            <!-- Sort dropdown -->
+            <div class="ml-auto flex items-center gap-1" data-testid="sort-controls">
+              <label for="sort-select" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Sort:</label>
+              <select id="sort-select" class="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 cursor-pointer"
+                onchange="if(this.value) window.location.href=this.value">
+                <option value="" {% if not sortBy %}selected{% endif %}>Default</option>
+                {% set sortOptions = [
+                  { name: "Critical alerts", id: "criticalSeverityAlerts" },
+                  { name: "Total alerts", id: "totalOpenAlerts" },
+                  { name: "Open issues", id: "openIssues" },
+                  { name: "Open bot PRs", id: "openBotPrCount" },
+                  { name: "Open PRs", id: "openPrCount" },
+                  { name: "Updated at", id: "updatedAt" },
+                  { name: "Most recent PR", id: "mostRecentPrOpenedAt" },
+                  { name: "Oldest open PR", id: "oldestOpenPrOpenedAt" },
+                  { name: "Last bot PR closed", id: "mostRecentBotPrClosedAt" },
+                  { name: "Most recent issue", id: "mostRecentIssueOpenedAt" },
+                  { name: "Oldest open issue", id: "oldestOpenIssueOpenedAt" }
+                ] %}
+                {% for opt in sortOptions %}
+                  {% set optParams = baseUrl + "?sortBy=" + opt.id + "&sortDirection=asc" %}
+                  {% if alertFilter %}{% set optParams = optParams + "&alertFilter=" + alertFilter %}{% endif %}
+                  {% if tag %}{% set optParams = optParams + "&tag=" + tag %}{% endif %}
+                  <option value="{{ optParams }}" {% if sortBy === opt.id and sortDirection === "asc" %}selected{% endif %}>{{ opt.name }} ↓</option>
+                  {% set optParamsDesc = baseUrl + "?sortBy=" + opt.id + "&sortDirection=desc" %}
+                  {% if alertFilter %}{% set optParamsDesc = optParamsDesc + "&alertFilter=" + alertFilter %}{% endif %}
+                  {% if tag %}{% set optParamsDesc = optParamsDesc + "&tag=" + tag %}{% endif %}
+                  <option value="{{ optParamsDesc }}" {% if sortBy === opt.id and sortDirection === "desc" %}selected{% endif %}>{{ opt.name }} ↑</option>
+                {% endfor %}
+              </select>
+            </div>
           </div>
 
 
           <!-- Save current configuration -->
-          <div class="p-3">
+          <div class="p-2">
             <details class="group/save">
               <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
                 <i class="bx bx-bookmark-plus"></i>
@@ -167,8 +198,8 @@
 
           <!-- Saved configurations panel -->
           {% if savedConfigurations and savedConfigurations.length %}
-          <div class="p-3">
-            <div class="flex items-center justify-between mb-3">
+          <div class="p-2">
+            <div class="flex items-center justify-between mb-2">
               <h3 class="text-sm font-semibold text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
                 <i class="bx bx-bookmark"></i>
                 Saved configurations
@@ -205,7 +236,7 @@
         </div>
 
         <!-- Card grid -->
-        <div class="mx-4 mb-6 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <div class="mx-4 mb-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {% for repo in repos %}
           <div class="rounded-lg border flex flex-col shadow-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
 
@@ -288,40 +319,57 @@
               {% endif %}
             </div>
 
-            <!-- Stats grid -->
-            <div class="grid grid-cols-2 gap-x-4 gap-y-2 p-4 text-sm border-b border-slate-100 dark:border-slate-700">
-              <div>
-                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Open issues</span>
-                <p class="font-semibold">{{ repo.openIssues }}</p>
+            <!-- Stats -->
+            <div class="px-4 py-2 text-sm border-b border-slate-100 dark:border-slate-700">
+              <div class="flex items-center gap-4">
+                <div>
+                  <span class="text-slate-400 text-xs uppercase tracking-wide">Bot PRs</span>
+                  <p class="font-semibold">{{ repo.openBotPrCount }}</p>
+                </div>
+                <div>
+                  <span class="text-slate-400 text-xs uppercase tracking-wide">Oldest open PR</span>
+                  <p class="font-semibold">{{ repo.oldestOpenPrOpenedAt }}</p>
+                </div>
               </div>
-              <div>
-                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Open PRs</span>
-                <p class="font-semibold">{{ repo.openPrCount }}</p>
-              </div>
-              <div>
-                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Bot PRs</span>
-                <p class="font-semibold">{{ repo.openBotPrCount }}</p>
-              </div>
-              <div>
-                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Updated at</span>
-                <p class="font-semibold">{{ repo.updatedAt }}</p>
-              </div>
-              <div>
-                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Most recent PR</span>
-                <p class="font-semibold">{{ repo.mostRecentPrOpenedAt }}</p>
-              </div>
-              <div>
-                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Oldest open PR</span>
-                <p class="font-semibold">{{ repo.oldestOpenPrOpenedAt }}</p>
-              </div>
-              <div>
-                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Most recent issue</span>
-                <p class="font-semibold">{{ repo.mostRecentIssueOpenedAt }}</p>
-              </div>
-              <div>
-                <span class="text-slate-400 dark:text-slate-400 text-xs uppercase tracking-wide">Oldest open issue</span>
-                <p class="font-semibold">{{ repo.oldestOpenIssueOpenedAt }}</p>
-              </div>
+              <details class="mt-1 group/stats">
+                <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
+                  <span class="group-open/stats:hidden">More stats…</span>
+                  <span class="hidden group-open/stats:inline">Less</span>
+                </summary>
+                <div class="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
+                  <div>
+                    <span class="text-slate-400 text-xs uppercase tracking-wide">Open issues</span>
+                    <p class="font-semibold">{{ repo.openIssues }}</p>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 text-xs uppercase tracking-wide">Open PRs</span>
+                    <p class="font-semibold">{{ repo.openPrCount }}</p>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 text-xs uppercase tracking-wide">Updated at</span>
+                    <p class="font-semibold">{{ repo.updatedAt }}</p>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 text-xs uppercase tracking-wide">Most recent PR</span>
+                    <p class="font-semibold">{{ repo.mostRecentPrOpenedAt }}</p>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 text-xs uppercase tracking-wide">Most recent issue</span>
+                    <p class="font-semibold">{{ repo.mostRecentIssueOpenedAt }}</p>
+                  </div>
+                  <div>
+                    <span class="text-slate-400 text-xs uppercase tracking-wide">Oldest open issue</span>
+                    <p class="font-semibold">{{ repo.oldestOpenIssueOpenedAt }}</p>
+                  </div>
+                </div>
+              </details>
+            </div>
+
+            <!-- Last bot PR closed -->
+            <div class="mx-4 flex items-center gap-2 rounded border px-3 py-1.5 text-xs {% if repo.botPrStale %}bg-orange-50 dark:bg-orange-950/30 border-orange-400 dark:border-orange-700 border-2{% else %}border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50{% endif %}">
+              <i class="bx bx-bot text-sm {% if repo.botPrStale %}text-orange-500 dark:text-orange-400{% else %}text-slate-400 dark:text-slate-500{% endif %}"></i>
+              <span class="{% if repo.botPrStale %}text-orange-600 dark:text-orange-400{% else %}text-slate-400 dark:text-slate-500{% endif %} uppercase tracking-wide font-medium">Last bot PR closed</span>
+              <span class="font-semibold {% if repo.botPrStale %}text-orange-700 dark:text-orange-300{% else %}text-slate-700 dark:text-slate-200{% endif %}">{{ repo.mostRecentBotPrClosedAt or "—" }}</span>
             </div>
 
             <!-- Dependencies -->
@@ -345,30 +393,30 @@
                   <li>
                     <div class="inline-block whitespace-nowrap text-[0px]">
                       <span>
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-200 dark:bg-{{ dependency.color }}-800 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-200 dark:bg-{{ dependency.color }}-600 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
                         {% if dependency.version %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-300 dark:bg-{{ dependency.color }}-900 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-300 dark:bg-{{ dependency.color }}-700 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
                         {% endif %}
                         {% if dependency.tag %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-400 dark:bg-{{ dependency.color }}-950 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-400 dark:bg-{{ dependency.color }}-800 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
                         {% endif %}
                       </span>
                       <span class="inline-block w-1"></span>
                       <span>
                         {% if dependency.isOutdated %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-500 dark:bg-{{ dependency.color }}-600 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-500 dark:bg-{{ dependency.color }}-500 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
                           <i class="align-[-1px] bx {{dependency.icon}}"></i>
                           {{ dependency.changelog }}
                           v{{ dependency.latestVersion }}
                         </span>
                         {% endif %}
                         {% if dependency.isEndOfLifeSoon %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-700 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-500 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
                           <i class="align-[-1px] bx bxs-hourglass"></i>
                           <span class="font-sans">Support ends {{ dependency.endOfLifeRelative }}</span>
                         </span>
                         {% elif dependency.isOutOfSupport %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-700 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
+                        <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-500 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
                           <i class="align-[-1px] bx bxs-hourglass-bottom"></i>
                           <span class="font-sans">Support ended {{ dependency.endOfLifeRelative }}</span>
                         </span>
@@ -380,11 +428,6 @@
                 </ul>
               </div>
               {% else %}
-              <p class="text-slate-400 font-light italic text-sm">
-                No dependencies have been discovered.
-                <br/>
-                Please make sure that Renovate has been configured on the repository to produce a dependency dashboard.
-              </p>
               {% endif %}
             </div>
 
@@ -405,7 +448,7 @@
       const icon = document.getElementById('theme-icon');
       function applyTheme() {
         const isDark = document.documentElement.classList.contains('dark');
-        icon.className = 'bx text-2xl ' + (isDark ? 'bx-sun' : 'bx-moon');
+        icon.className = 'bx text-xl ' + (isDark ? 'bx-sun' : 'bx-moon');
       }
       applyTheme();
       toggle.addEventListener('click', () => {
