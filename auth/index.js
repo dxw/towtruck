@@ -22,12 +22,17 @@ export const buildOidcConfig = async () => {
   if (!process.env.GOOGLE_CLIENT_ID) {
     return null;
   }
-  const config = await openidClient.discovery(
-    new URL(GOOGLE_ISSUER),
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
-  );
-  return config;
+  try {
+    const config = await openidClient.discovery(
+      new URL(GOOGLE_ISSUER),
+      process.env.GOOGLE_CLIENT_ID,
+      process.env.GOOGLE_CLIENT_SECRET,
+    );
+    return config;
+  } catch (err) {
+    console.error("Failed to discover OIDC configuration:", err.message);
+    return null;
+  }
 };
 
 /**
