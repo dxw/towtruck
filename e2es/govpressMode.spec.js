@@ -23,7 +23,7 @@ test("GovPress mode can be exited back to normal view", async ({ page, baseURL }
   await page.getByRole("link", { name: "Exit GovPress mode" }).click();
 
   // Should be back on the normal org page
-  await expect(page.getByText("Towtruck is tracking for dxw")).toBeVisible();
+  await expect(page.getByText("repos tracked")).toBeVisible();
 
   // Should show both D+ mode and GovPress mode buttons
   await expect(page.getByRole("link", { name: "D+ mode" })).toBeVisible();
