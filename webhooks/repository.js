@@ -15,7 +15,8 @@ export const handleEvent = async ({ payload }, db) => {
 
   let repo = mapRepoFromApiForStorage(payload.repository);
 
-  db.saveToRepository(payload.repository.name, "main", repo);
+  const repoKey = `${payload.repository.owner.login}/${payload.repository.name}`;
+  db.saveToRepository(repoKey, "main", repo);
 };
 
 /**

@@ -16,7 +16,8 @@ export const handleEvent = async ({ payload, octokit }, db) => {
     repository: payload.repository,
   });
 
-  db.saveToRepository(payload.repository.name, "pullRequests", prInfo);
+  const repoKey = `${payload.repository.owner.login}/${payload.repository.name}`;
+  db.saveToRepository(repoKey, "pullRequests", prInfo);
 };
 
 /**
