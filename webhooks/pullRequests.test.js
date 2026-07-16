@@ -46,6 +46,7 @@ describe("handleEvent", () => {
     const payload = {
       repository: {
         name: "repo",
+        full_name: "dxw/repo",
         owner: {
           login: "dxw",
         },
@@ -73,7 +74,7 @@ describe("handleEvent", () => {
     expect.strictEqual(db.saveToRepository.mock.callCount(), 1);
 
     expect.deepStrictEqual(db.saveToRepository.mock.calls[0].arguments, [
-      `${payload.repository.owner.login}/${payload.repository.name}`,
+      payload.repository.full_name,
       "pullRequests",
       expected,
     ]);
