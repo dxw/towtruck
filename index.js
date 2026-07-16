@@ -6,7 +6,7 @@ import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
 import { normalizeDateStyle } from "./utils/dateFormatting.js";
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
-import { normalizeSelectedTags, filterByTags } from "./utils/tagFiltering.js";
+import { normalizeSelectedTags, filterByTags, excludeByTag } from "./utils/tagFiltering.js";
 import { calculatePagination, ROW_PAGE_SIZE } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
@@ -96,7 +96,7 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
 
   const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
 
-  const dPlusRepos = filterByTags(reposForUi.repos, ["d-plus", "delivery-plus", "internal"]);
+  const dPlusRepos = excludeByTag(filterByTags(reposForUi.repos, ["d-plus", "delivery-plus", "internal"]), "govpress");
   const filteredByAlerts = filterByAlerts(dPlusRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
   const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
@@ -104,6 +104,7 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
 
   const totalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+  const totalOpenBotPrs = dPlusRepos.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
   const buildTopicFilterUrl = () => {
     const params = new URLSearchParams();
@@ -126,6 +127,7 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
     ...reposForUi,
     totalVulnerabilities,
     totalCriticalVulnerabilities,
+    totalOpenBotPrs,
     org,
     repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
@@ -173,6 +175,7 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
 
   const totalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+  const totalOpenBotPrs = govpressOnly.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
   const buildTopicFilterUrl = () => {
     const params = new URLSearchParams();
@@ -195,6 +198,7 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
     ...reposForUi,
     totalVulnerabilities,
     totalCriticalVulnerabilities,
+    totalOpenBotPrs,
     org,
     repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
@@ -241,6 +245,7 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
 
   const totalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+  const totalOpenBotPrs = opsRepos.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
   const buildTopicFilterUrl = () => {
     const params = new URLSearchParams();
@@ -263,6 +268,7 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
     ...reposForUi,
     totalVulnerabilities,
     totalCriticalVulnerabilities,
+    totalOpenBotPrs,
     org,
     repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
