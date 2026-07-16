@@ -6,7 +6,7 @@ import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
 import { normalizeDateStyle } from "./utils/dateFormatting.js";
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
-import { normalizeSelectedTags, filterByTags } from "./utils/tagFiltering.js";
+import { normalizeSelectedTags, filterByTags, excludeByTag } from "./utils/tagFiltering.js";
 import { calculatePagination, ROW_PAGE_SIZE } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
@@ -96,7 +96,7 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
 
   const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
 
-  const dPlusRepos = filterByTags(reposForUi.repos, ["d-plus", "delivery-plus", "internal"]);
+  const dPlusRepos = excludeByTag(filterByTags(reposForUi.repos, ["d-plus", "delivery-plus", "internal"]), "govpress");
   const filteredByAlerts = filterByAlerts(dPlusRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
   const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
