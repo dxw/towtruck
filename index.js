@@ -104,6 +104,7 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
 
   const totalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+  const totalOpenBotPrs = dPlusRepos.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
   const buildTopicFilterUrl = () => {
     const params = new URLSearchParams();
@@ -126,6 +127,7 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
     ...reposForUi,
     totalVulnerabilities,
     totalCriticalVulnerabilities,
+    totalOpenBotPrs,
     org,
     repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
@@ -173,6 +175,7 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
 
   const totalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+  const totalOpenBotPrs = govpressOnly.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
   const buildTopicFilterUrl = () => {
     const params = new URLSearchParams();
@@ -195,6 +198,7 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
     ...reposForUi,
     totalVulnerabilities,
     totalCriticalVulnerabilities,
+    totalOpenBotPrs,
     org,
     repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
@@ -241,6 +245,7 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
 
   const totalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+  const totalOpenBotPrs = opsRepos.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
   const buildTopicFilterUrl = () => {
     const params = new URLSearchParams();
@@ -263,6 +268,7 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
     ...reposForUi,
     totalVulnerabilities,
     totalCriticalVulnerabilities,
+    totalOpenBotPrs,
     org,
     repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,

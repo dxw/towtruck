@@ -83,6 +83,7 @@
           <span class="text-xs font-medium text-slate-500 dark:text-slate-400">{{ totalRepos }} repos tracked</span>
           <span class="text-xs font-medium text-red-600 dark:text-red-400">Critical: {{ totalCriticalVulnerabilities }}</span>
           <span class="text-xs font-medium text-yellow-600 dark:text-yellow-400">Total: {{ totalVulnerabilities }}</span>
+          {% if dPlusMode or govpressMode or opsMode %}<span class="text-xs font-medium text-blue-600 dark:text-blue-400">Open bot PRs: {{ totalOpenBotPrs }}</span>{% endif %}
         </h2>
 
         <!-- Controls box: filters, sorts, save, saved configurations -->
