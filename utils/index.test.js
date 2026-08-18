@@ -22,6 +22,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: "2024-06-06T00:00:00Z",
         },
         issues: {
           openIssues: 0,
@@ -50,6 +51,7 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
         oldestOpenPrOpenedAt: formatDate("2022-02-02T00:00:00Z"),
         oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentBotPrClosedAt: formatDate("2024-06-06T00:00:00Z"),
         mostRecentIssueOpenedAt: formatDate("2023-03-03T00:00:00Z"),
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
@@ -79,6 +81,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,
@@ -103,6 +106,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,
@@ -131,6 +135,7 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
         oldestOpenPrOpenedAt: formatDate("2022-02-02T00:00:00Z"),
         oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentBotPrClosedAt: null,
         mostRecentIssueOpenedAt: formatDate("2023-03-03T00:00:00Z"),
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
@@ -154,6 +159,7 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentPrOpenedAtISO8601: "2021-01-01T00:00:00Z",
         oldestOpenPrOpenedAt: formatDate("2022-02-02T00:00:00Z"),
         oldestOpenPrOpenedAtISO8601: "2022-02-02T00:00:00Z",
+        mostRecentBotPrClosedAt: null,
         mostRecentIssueOpenedAt: formatDate("2023-03-03T00:00:00Z"),
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
@@ -183,6 +189,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: null,
           oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,
@@ -215,6 +222,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: null,
           oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,
@@ -247,6 +255,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: "2024-06-06T00:00:00Z",
         },
         issues: {
           openIssues: 0,
@@ -271,6 +280,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: "2024-06-06T00:00:00Z",
         },
         issues: {
           openIssues: 0,
@@ -295,6 +305,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: "2021-01-01T00:00:00Z",
           oldestOpenPrOpenedAt: "2022-02-02T00:00:00Z",
+          mostRecentBotPrClosedAt: "2024-06-06T00:00:00Z",
         },
         issues: {
           openIssues: 0,
@@ -333,6 +344,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: null,
           oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,
@@ -364,6 +376,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: null,
           oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,
@@ -397,6 +410,7 @@ describe("mapRepoFromStorageToUi", () => {
         pullRequests: {
           mostRecentPrOpenedAt: null,
           oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: null,
         },
         issues: {
           openIssues: 0,

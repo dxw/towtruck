@@ -148,6 +148,7 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
 
     const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDate(repo.pullRequests.mostRecentPrOpenedAt, dateStyle);
     const oldestOpenPrOpenedAt = repo.pullRequests.oldestOpenPrOpenedAt && formatDate(repo.pullRequests.oldestOpenPrOpenedAt, dateStyle);
+    const mostRecentBotPrClosedAt = repo.pullRequests.mostRecentBotPrClosedAt && formatDate(repo.pullRequests.mostRecentBotPrClosedAt, dateStyle);
     const mostRecentIssueOpenedAt = repo.issues.mostRecentIssueOpenedAt && formatDate(repo.issues.mostRecentIssueOpenedAt, dateStyle);
     const oldestOpenIssueOpenedAt = repo.issues.oldestOpenIssueOpenedAt && formatDate(repo.issues.oldestOpenIssueOpenedAt, dateStyle);
 
@@ -165,6 +166,7 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
       mostRecentPrOpenedAtISO8601: repo.pullRequests.mostRecentPrOpenedAt,
       oldestOpenPrOpenedAt,
       oldestOpenPrOpenedAtISO8601: repo.pullRequests.oldestOpenPrOpenedAt,
+      mostRecentBotPrClosedAt,
       mostRecentIssueOpenedAt,
       mostRecentIssueOpenedAtISO8601: repo.issues.mostRecentIssueOpenedAt,
       oldestOpenIssueOpenedAt,

@@ -22,7 +22,7 @@ export const handleEvent = async ({ payload, octokit }, db, apiClient) => {
     repository: payload.repository,
   });
 
-  db.saveToRepository(payload.repository.name, "dependencies", dependencies);
+  db.saveToRepository(payload.repository.full_name, "dependencies", dependencies);
 
   const allLifetimes = await fetchAllDependencyLifetimes(db, apiClient);
   await saveAllDependencyLifetimes(allLifetimes, db);
