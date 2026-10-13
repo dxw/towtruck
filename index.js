@@ -50,11 +50,9 @@ if (oidcConfig) {
   // When OIDC is not configured (e.g. in test environments), provide a stub
   // /auth/login so that requireAuth redirects land somewhere valid (not 404).
   httpServer.get("/auth/login", (req, res) => res.status(200).send("Auth not configured"));
-}
 
-// Test-only endpoint: creates an authenticated session without going through Google SSO.
-// Only available outside of production.
-if (process.env.NODE_ENV !== "production") {
+  // Test-only endpoint: creates an authenticated session without going through Google SSO.
+  // Only available outside of production.
   httpServer.post("/test/session", express.json(), (req, res) => {
     const { email } = req.body ?? {};
     if (!email || !email.endsWith("@dxw.com")) {
