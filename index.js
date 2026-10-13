@@ -55,8 +55,6 @@ if (oidcConfig) {
 // Test-only endpoint: creates an authenticated session without going through Google SSO.
 // Only available outside of production.
 if (process.env.NODE_ENV !== "production") {
-  httpServer.get("/health", (req, res) => res.status(200).send("ok"));
-
   httpServer.post("/test/session", express.json(), (req, res) => {
     const { email } = req.body ?? {};
     if (!email || !email.endsWith("@dxw.com")) {
