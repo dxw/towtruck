@@ -1,3 +1,4 @@
+import express from "express";
 import * as openidClient from "openid-client";
 
 const ALLOWED_EMAIL_DOMAIN = "dxw.com";
@@ -125,6 +126,27 @@ export const registerAuthRoutes = (app, oidcConfig) => {
     req.session.destroy(() => {
       res.redirect("/");
     });
+  });
+};
+
+/**
+ * Registers the authentication routes to use when OIDC is not configured
+ * (e.g. in test environments). Must not be used in production.
+ * @param {import("express").Express} app
+ */
+export const registerDevAuthRoutes = (app) => {
+  // Provide a stub /auth/login so that requireAuth redirects land somewhere
+  // valid (not 404).
+  app.get("/auth/login", (req, res) => res.status(200).send("Auth not configured"));
+
+  // Test-only endpoint: creates an authenticated session without going through Google SSO.
+  app.post("/test/session", express.json(), (req, res) => {
+    const { email } = req.body ?? {};
+    if (!email || !email.endsWith("@dxw.com")) {
+      return res.status(400).json({ error: "A valid @dxw.com email is required." });
+    }
+    req.session.user = { email };
+    return res.status(201).json({ email });
   });
 };
 

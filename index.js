@@ -10,7 +10,7 @@ import { normalizeSelectedTags, filterByTags, excludeByTag } from "./utils/tagFi
 import { calculatePagination, ROW_PAGE_SIZE } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
-import { buildOidcConfig, registerAuthRoutes, requireAuth } from "./auth/index.js";
+import { buildOidcConfig, registerAuthRoutes, registerDevAuthRoutes, requireAuth } from "./auth/index.js";
 
 nunjucks.configure({
   autoescape: true,
@@ -47,20 +47,7 @@ const oidcConfig = await buildOidcConfig();
 if (oidcConfig) {
   registerAuthRoutes(httpServer, oidcConfig);
 } else if (process.env.NODE_ENV !== "production") {
-  // When OIDC is not configured (e.g. in test environments), provide a stub
-  // /auth/login so that requireAuth redirects land somewhere valid (not 404).
-  httpServer.get("/auth/login", (req, res) => res.status(200).send("Auth not configured"));
-
-  // Test-only endpoint: creates an authenticated session without going through Google SSO.
-  // Only available outside of production.
-  httpServer.post("/test/session", express.json(), (req, res) => {
-    const { email } = req.body ?? {};
-    if (!email || !email.endsWith("@dxw.com")) {
-      return res.status(400).json({ error: "A valid @dxw.com email is required." });
-    }
-    req.session.user = { email };
-    return res.status(201).json({ email });
-  });
+  registerDevAuthRoutes(httpServer);
 }
 
 httpServer.use(express.urlencoded({ extended: false }));
