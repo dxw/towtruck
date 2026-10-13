@@ -1,4 +1,5 @@
 import express from "express";
+import nunjucks from "nunjucks";
 import * as openidClient from "openid-client";
 
 const ALLOWED_EMAIL_DOMAIN = "dxw.com";
@@ -135,9 +136,21 @@ export const registerAuthRoutes = (app, oidcConfig) => {
  * @param {import("express").Express} app
  */
 export const registerDevAuthRoutes = (app) => {
-  // Provide a stub /auth/login so that requireAuth redirects land somewhere
-  // valid (not 404).
-  app.get("/auth/login", (req, res) => res.status(200).send("Auth not configured"));
+  // Provide a login form that accepts any allowed email address, so that
+  // requireAuth redirects land somewhere usable.
+  app.get("/auth/login", (req, res) => res.status(200).send(nunjucks.render("login.njk")));
+
+  app.post("/auth/login", (req, res) => {
+    const { email } = req.body ?? {};
+    if (!isAllowedEmail(email)) {
+      return res.status(400).send(`A valid @${ALLOWED_EMAIL_DOMAIN} email is required.`);
+    }
+    req.session.user = { email };
+
+    const returnTo = req.session.returnTo ?? "/";
+    req.session.returnTo = null;
+    return res.redirect(returnTo);
+  });
 
   // Test-only endpoint: creates an authenticated session without going through Google SSO.
   app.post("/test/session", express.json(), (req, res) => {

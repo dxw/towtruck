@@ -43,14 +43,14 @@ httpServer.use(
 
 httpServer.use(handleWebhooks);
 
+httpServer.use(express.urlencoded({ extended: false }));
+
 const oidcConfig = await buildOidcConfig();
 if (oidcConfig) {
   registerAuthRoutes(httpServer, oidcConfig);
 } else if (process.env.NODE_ENV !== "production") {
   registerDevAuthRoutes(httpServer);
 }
-
-httpServer.use(express.urlencoded({ extended: false }));
 
 httpServer.get("/", requireAuth, (request, response) => {
   const db = new TowtruckDatabase();
