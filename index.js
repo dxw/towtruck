@@ -422,7 +422,12 @@ httpServer.post("/:org/saved-configurations/:id/delete", requireAuth, (request, 
 import { spawn } from "node:child_process";
 
 const PORT = process.env.PORT || 3000;
-httpServer.listen(PORT, () => {
+httpServer.listen(PORT, (listeningError) => {
+  if (listeningError !== undefined) {
+    console.log(`Unable to listen on port ${PORT}: ${listeningError}`);
+    process.exit(1);
+  }
+
   console.info(`Server is running on port ${PORT}`);
 
   // Run the seed in the background after the server is listening.
