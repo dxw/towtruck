@@ -7,9 +7,12 @@ Please review the [High Level Design document](/doc/high-level-design.md) if thi
 
 ## Prerequisites
 
-You must have [nvm](https://github.com/nvm-sh/nvm) or [nodenv](https://github.com/nodenv/nodenv) installed. Both are available via Homebrew.
-With either installed you should be able to run `script/setup` followed by `script/server` to run the application.
+You must have [nvm](https://github.com/nvm-sh/nvm), [nodenv](https://github.com/nodenv/nodenv), or [asdf](https://github.com/asdf-vm/asdf) installed. All are available via Homebrew.
 
+> [!note]
+> If you want to use asdf to manage Node, you'll need to install the [nodejs plugin](https://github.com/asdf-vm/asdf-nodejs). You'll also need to turn on the [`legacy_version_file`](https://asdf-vm.com/manage/configuration.html#legacy-version-file) option in your `~/.asdfrc` to make asdf read this repository's `.node-version` file.
+
+With any of them installed you should be able to run `script/setup` followed by `script/server` to run the application.
 
 ## Configuration
 
