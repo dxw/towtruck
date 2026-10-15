@@ -1,3 +1,5 @@
+import express from "express";
+import nunjucks from "nunjucks";
 import * as openidClient from "openid-client";
 
 const ALLOWED_EMAIL_DOMAIN = "dxw.com";
@@ -125,6 +127,39 @@ export const registerAuthRoutes = (app, oidcConfig) => {
     req.session.destroy(() => {
       res.redirect("/");
     });
+  });
+};
+
+/**
+ * Registers the authentication routes to use when OIDC is not configured
+ * (e.g. in test environments). Must not be used in production.
+ * @param {import("express").Express} app
+ */
+export const registerDevAuthRoutes = (app) => {
+  // Provide a login form that accepts any allowed email address, so that
+  // requireAuth redirects land somewhere usable.
+  app.get("/auth/login", (req, res) => res.status(200).send(nunjucks.render("login.njk")));
+
+  app.post("/auth/login", (req, res) => {
+    const { email } = req.body ?? {};
+    if (!isAllowedEmail(email)) {
+      return res.status(400).send(`A valid @${ALLOWED_EMAIL_DOMAIN} email is required.`);
+    }
+    req.session.user = { email };
+
+    const returnTo = req.session.returnTo ?? "/";
+    req.session.returnTo = null;
+    return res.redirect(returnTo);
+  });
+
+  // Test-only endpoint: creates an authenticated session without going through Google SSO.
+  app.post("/test/session", express.json(), (req, res) => {
+    const { email } = req.body ?? {};
+    if (!isAllowedEmail(email)) {
+      return res.status(400).json({ error: `A valid @${ALLOWED_EMAIL_DOMAIN} email is required.` });
+    }
+    req.session.user = { email };
+    return res.status(201).json({ email });
   });
 };
 
