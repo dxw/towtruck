@@ -74,3 +74,13 @@ const assertFirstCard = async (expectedRepoName, page) => {
   const firstCard = page.locator("#card-view > div").first();
   await expect(firstCard).toContainText(expectedRepoName);
 };
+
+test("only shows the security alert details toggle when there are alerts to show", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const cardFor = (repoName) => page.locator("#card-view > div").filter({ hasText: repoName });
+
+  await expect(cardFor("optionparser").getByText("Show security alert details")).toBeVisible();
+  await expect(cardFor("php-missing").getByText("Show security alert details")).toHaveCount(0);
+  await expect(cardFor("php-missing").locator("details.group\\/alerts")).toHaveCount(0);
+});
