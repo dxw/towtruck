@@ -14,6 +14,19 @@ You must have [nvm](https://github.com/nvm-sh/nvm), [nodenv](https://github.com/
 
 With any of them installed you should be able to run `script/setup` followed by `script/server` to run the application.
 
+## Local development
+
+To get Towtruck working in a local development environment:
+
+1. [Log in using the non-production login form](#logging-in-using-the-non-production-login-form).
+2. Follow the [general configuration instructions](#configuration).
+
+### Logging in using the non-production login form
+
+In production, Towtruck uses Google single sign-on as its authentication mechanism.
+
+If you're running in a non-production environment and Google single sign-on is not configured, you can instead access a login form that allows you to log in to Towtruck with any `@dxw.com` email address. To do this, once the server is running, visit http://localhost:3000 and enter a `@dxw.com` email address.
+
 ## Configuration
 
 Towtruck is set up as a [GitHub App](https://docs.github.com/en/apps).
