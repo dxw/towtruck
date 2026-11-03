@@ -2,7 +2,7 @@ import { test, expect } from "@playwright/test";
 
 test("GovPress mode shows only repos marked govpress", async ({ page, baseURL }) => {
   await page.goto(baseURL);
-  await page.getByRole("link", { name: "dxw" }).click();
+  await expect(page).toHaveURL(`${baseURL}/dxw`);
 
   // Navigate to GovPress mode
   await page.getByRole("link", { name: "GovPress mode" }).click();

@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 import path from "path";
 
 const authFile = path.join(import.meta.dirname, "e2es/.auth/user.json");
+const baseURL = `http://127.0.0.1:${process.env.PLAYWRIGHT_PORT ?? 3000}`;
 
 /**
  * @see https://playwright.dev/docs/test-configuration
@@ -21,7 +22,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: "http://127.0.0.1:3000",
+    baseURL,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: "on-first-retry",
@@ -50,12 +51,13 @@ export default defineConfig({
   /* Run your local dev server before starting the tests */
   webServer: {
     command: "node ./e2es/seedTestData.js && node index.js",
-    url: "http://127.0.0.1:3000",
+    url: baseURL,
     reuseExistingServer: !process.env.CI,
     stdout: "inherit",
     stderr: "inherit",
     env: {
       NODE_ENV: "test",
+      PORT: process.env.PLAYWRIGHT_PORT ?? "3000",
     },
   },
 });

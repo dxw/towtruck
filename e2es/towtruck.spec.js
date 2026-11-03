@@ -1,12 +1,9 @@
 import { test, expect } from "@playwright/test";
 
 test("has dependency info", async ({ page, baseURL }) => {
-  // Home page lists orgs
-  await page.goto(baseURL);
-  await expect(page).toHaveTitle(/Towtruck/);
-
-  // Navigate to the dxw org page
-  await page.getByRole("link", { name: "dxw" }).click();
+  const response = await page.goto(baseURL);
+  expect(response.request().redirectedFrom()?.url()).toBe(`${baseURL}/`);
+  await expect(page).toHaveURL(`${baseURL}/dxw`);
   await expect(page).toHaveTitle(/Towtruck/);
 
   await expect(page.getByText("repos tracked")).toBeVisible();

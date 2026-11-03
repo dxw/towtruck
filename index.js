@@ -57,6 +57,10 @@ httpServer.get("/", requireAuth, (request, response) => {
   const persistedRepoData = db.getAllRepositories();
   const orgs = getOrgs(persistedRepoData);
 
+  if (orgs.length === 1) {
+    return response.redirect(`/${encodeURIComponent(orgs[0])}`);
+  }
+
   const template = nunjucks.render("home.njk", { orgs });
 
   return response.end(template);
