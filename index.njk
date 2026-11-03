@@ -125,12 +125,14 @@
             </div>
 
             <!-- View toggle -->
+            {% set viewToggleActive = "bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900" %}
+            {% set viewToggleInactive = "bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700" %}
             <div class="ml-auto inline-flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden text-sm">
-              <button id="view-cards" class="px-3 py-1 flex items-center gap-1 transition-colors bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900" aria-label="Card view">
+              <button id="view-cards" class="px-3 py-1 flex items-center gap-1 transition-colors {{ viewToggleInactive if isRowView else viewToggleActive }}" aria-label="Card view" aria-pressed="{{ 'false' if isRowView else 'true' }}">
                 <i class="bx bx-grid-alt"></i> Cards
               </button>
-              <button id="view-rows" class="px-3 py-1 flex items-center gap-1 transition-colors bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700" aria-label="Row view">
-                <i class="bx bx-list-ul"></i> Rows
+              <button id="view-rows" class="px-3 py-1 flex items-center gap-1 transition-colors {{ viewToggleActive if isRowView else viewToggleInactive }}" aria-label="Table view" aria-pressed="{{ 'true' if isRowView else 'false' }}">
+                <i class="bx bx-table"></i> Table
               </button>
             </div>
           </div>
@@ -195,6 +197,7 @@
 
         </div>
 
+        {% if not isRowView %}
         <!-- Card grid -->
         <div id="card-view" class="mx-4 mb-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
           {% for repo in repos %}
@@ -401,142 +404,13 @@
            {% endfor %}
         </div>
 
-        <!-- Row view -->
-        <div id="row-view" class="mx-4 mb-4 hidden space-y-2">
-          {% for repo in repos %}
-          <div class="rounded-lg border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 px-4 py-3">
-            <div class="flex flex-wrap items-start gap-x-6 gap-y-2">
-
-              <!-- Name, language, description, topics -->
-              <div class="flex-1 min-w-[200px]">
-                <div class="flex flex-wrap items-center gap-2">
-                  <a target="_blank" class="text-base font-semibold text-slate-600 dark:text-slate-300 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a>
-                  {% if repo.language %}
-                  <span class="text-xs text-{{ repo.languageColor }}-600 dark:text-{{ repo.languageColor }}-400 border-{{ repo.languageColor }}-600 dark:border-{{ repo.languageColor }}-400 border rounded-lg py-0.5 px-2">{{ repo.language }}</span>
-                  {% endif %}
-                </div>
-                {% if repo.description %}
-                <p class="mt-0.5 text-sm text-slate-600 dark:text-slate-300 line-clamp-1">{{ repo.description }}</p>
-                {% endif %}
-                {% if repo.topics.length %}
-                <div class="mt-1 flex flex-wrap gap-1">
-                  {% for topic in repo.topics %}
-                  {% set topicSelected = topic in selectedTags %}
-                  <a href="{{ buildTopicFilterUrl(topic) }}" class="text-xs rounded-full py-0.5 px-2 transition-colors {% if topicSelected %}text-white bg-slate-700 dark:text-slate-900 dark:bg-slate-200{% else %}text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800{% endif %}">{{ topic }}</a>
-                  {% endfor %}
-                </div>
-                {% endif %}
-              </div>
-
-              <!-- Alerts -->
-              <div class="w-28">
-                {% if repo.totalOpenAlerts !== undefined %}
-                <div class="flex flex-wrap gap-0 text-[0px]">
-                  {% set hasAlerts = repo.criticalSeverityAlerts and repo.criticalSeverityAlerts > 0 %}
-                  <div class="inline-block text-xs {% if hasAlerts %}text-white bg-red-600{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-2 last:pr-2 py-0.5 px-1"><span {% if repo.criticalSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.criticalSeverityAlerts }}</span></div>
-                  {% set hasAlerts = repo.highSeverityAlerts and repo.highSeverityAlerts > 0 %}
-                  <div class="inline-block text-xs {% if hasAlerts %}text-white bg-red-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-2 last:pr-2 py-0.5 px-1"><span {% if repo.highSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.highSeverityAlerts }}</span></div>
-                  {% set hasAlerts = repo.mediumSeverityAlerts and repo.mediumSeverityAlerts > 0 %}
-                  <div class="inline-block text-xs {% if hasAlerts %}text-white bg-orange-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-2 last:pr-2 py-0.5 px-1"><span {% if repo.mediumSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.mediumSeverityAlerts }}</span></div>
-                  {% set hasAlerts = repo.lowSeverityAlerts and repo.lowSeverityAlerts > 0 %}
-                  <div class="inline-block text-xs {% if hasAlerts %}text-white bg-amber-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-2 last:pr-2 py-0.5 px-1"><span {% if repo.lowSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.lowSeverityAlerts }}</span></div>
-                </div>
-                {% else %}
-                <span class="text-xs text-slate-400 italic">No Dependabot</span>
-                {% endif %}
-              </div>
-
-              <!-- Stats -->
-              <div class="flex flex-wrap gap-x-4 gap-y-1 text-xs">
-                <div>
-                  <span class="text-slate-400 uppercase tracking-wide">Bot PRs</span>
-                  <p class="font-semibold text-sm">{{ repo.openBotPrCount }}</p>
-                </div>
-                <div>
-                  <span class="text-slate-400 uppercase tracking-wide">PRs</span>
-                  <p class="font-semibold text-sm">{{ repo.openPrCount }}</p>
-                </div>
-                <div>
-                  <span class="text-slate-400 uppercase tracking-wide">Issues</span>
-                  <p class="font-semibold text-sm">{{ repo.openIssues }}</p>
-                </div>
-                <div>
-                  <span class="text-slate-400 uppercase tracking-wide">Oldest PR</span>
-                  <p class="font-semibold text-sm">{{ repo.oldestOpenPrOpenedAt or "—" }}</p>
-                </div>
-                <div>
-                  <span class="text-slate-400 uppercase tracking-wide">Last bot closed</span>
-                  <p class="font-semibold text-sm {% if repo.botPrStale %}text-orange-600 dark:text-orange-400{% endif %}">{{ repo.mostRecentBotPrClosedAt or "—" }}</p>
-                </div>
-              </div>
-
-              <!-- Dependencies count -->
-              <div class="text-xs">
-                <span class="text-slate-400 uppercase tracking-wide">Deps</span>
-                <p class="font-semibold text-sm">{{ repo.dependencies.length or "—" }}</p>
-              </div>
-
-            </div>
-
-            <!-- Expandable sections -->
-            <div class="mt-2 flex flex-wrap gap-x-4 gap-y-2 text-xs">
-              <!-- More stats -->
-              <details class="group/stats">
-                <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
-                  <span class="group-open/stats:hidden bg-slate-100 dark:bg-slate-700 rounded px-2 py-0.5">More stats…</span>
-                  <span class="hidden group-open/stats:inline bg-slate-100 dark:bg-slate-700 rounded px-2 py-0.5">Less</span>
-                </summary>
-                <div class="mt-1.5 flex flex-wrap gap-x-4 gap-y-1">
-                  <div>
-                    <span class="text-slate-400 uppercase tracking-wide">Updated at</span>
-                    <p class="font-semibold text-sm">{{ repo.updatedAt }}</p>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 uppercase tracking-wide">Most recent PR</span>
-                    <p class="font-semibold text-sm">{{ repo.mostRecentPrOpenedAt or "—" }}</p>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 uppercase tracking-wide">Most recent issue</span>
-                    <p class="font-semibold text-sm">{{ repo.mostRecentIssueOpenedAt or "—" }}</p>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 uppercase tracking-wide">Oldest open issue</span>
-                    <p class="font-semibold text-sm">{{ repo.oldestOpenIssueOpenedAt or "—" }}</p>
-                  </div>
-                </div>
-              </details>
-
-              <!-- Dependencies expandable -->
-              {% if repo.dependencies.length %}
-              <details class="group/deps">
-                <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
-                  <span class="group-open/deps:hidden bg-slate-100 dark:bg-slate-700 rounded px-2 py-0.5">Show dependencies…</span>
-                  <span class="hidden group-open/deps:inline bg-slate-100 dark:bg-slate-700 rounded px-2 py-0.5">Hide dependencies</span>
-                </summary>
-                <ul class="mt-1.5 flex flex-wrap gap-1.5">
-                  {% for dependency in repo.dependencies %}
-                  <li class="inline-block whitespace-nowrap text-[0px]">
-                    <span class="font-mono text-xs bg-{{ dependency.color }}-200 dark:bg-{{ dependency.color }}-600 rounded-l-full last:rounded-r-full py-0.5 px-2">{{ dependency.name }}</span>
-                    {% if dependency.version %}
-                    <span class="font-mono text-xs bg-{{ dependency.color }}-300 dark:bg-{{ dependency.color }}-700 last:rounded-r-full py-0.5 px-2">v{{ dependency.version }}</span>
-                    {% endif %}
-                    {% if dependency.isOutdated %}
-                    <span class="font-mono text-xs bg-{{ dependency.color }}-500 dark:bg-{{ dependency.color }}-500 text-white last:rounded-r-full py-0.5 px-2">
-                      <i class="align-[-1px] bx {{dependency.icon}}"></i> v{{ dependency.latestVersion }}
-                    </span>
-                    {% endif %}
-                  </li>
-                  {% endfor %}
-                </ul>
-              </details>
-              {% endif %}
-            </div>
-
-          </div>
-          {% else %}
-          <p class="py-4 text-center text-slate-400 font-light italic">No repositories found.</p>
-          {% endfor %}
+        {% else %}
+        <!-- Row view: AG Grid table -->
+        <div id="row-view" class="mx-4 mb-4">
+          <div id="repo-grid" class="w-full" style="height: 75vh" data-testid="repo-grid"></div>
+          <script type="application/json" id="repo-grid-data">{{ gridRows | safe }}</script>
         </div>
+        {% endif %}
 
         <!-- Pagination -->
         {% if totalPages > 1 %}
@@ -564,49 +438,177 @@
         element.textContent = `${ageInDays} days`;
       });
 
-      // View toggle (cards/rows)
-      const cardView = document.getElementById('card-view');
-      const rowView = document.getElementById('row-view');
-      const btnCards = document.getElementById('view-cards');
-      const btnRows = document.getElementById('view-rows');
-      const activeClass = 'bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900';
-      const inactiveClass = 'bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700';
+      // View toggle (cards/table). The server renders whichever view is in the URL.
+      const isRowView = {{ 'true' if isRowView else 'false' }};
 
-      function setView(view, navigate) {
-        if (view === 'rows') {
-          cardView.classList.add('hidden');
-          rowView.classList.remove('hidden');
-          btnRows.className = `px-3 py-1 flex items-center gap-1 transition-colors ${activeClass}`;
-          btnCards.className = `px-3 py-1 flex items-center gap-1 transition-colors ${inactiveClass}`;
-        } else {
-          cardView.classList.remove('hidden');
-          rowView.classList.add('hidden');
-          btnCards.className = `px-3 py-1 flex items-center gap-1 transition-colors ${activeClass}`;
-          btnRows.className = `px-3 py-1 flex items-center gap-1 transition-colors ${inactiveClass}`;
-        }
+      function navigateToView(view) {
         localStorage.towtruckView = view;
-
-        if (navigate) {
-          const url = new URL(window.location.href);
-          if (view === 'rows') {
-            url.searchParams.set('view', 'rows');
-          } else {
-            url.searchParams.delete('view');
-          }
-          url.searchParams.delete('page');
-          window.location.href = url.toString();
+        const url = new URL(window.location.href);
+        if (view === 'rows') {
+          url.searchParams.set('view', 'rows');
+        } else {
+          url.searchParams.delete('view');
         }
+        url.searchParams.delete('page');
+        window.location.href = url.toString();
       }
 
-      btnCards.addEventListener('click', () => setView('cards', true));
-      btnRows.addEventListener('click', () => setView('rows', true));
+      document.getElementById('view-cards').addEventListener('click', () => {
+        if (isRowView) navigateToView('cards');
+      });
+      document.getElementById('view-rows').addEventListener('click', () => {
+        if (!isRowView) navigateToView('rows');
+      });
 
-      // Apply saved view on load (without navigating if already correct)
-      const currentView = new URLSearchParams(window.location.search).get('view');
-      if (localStorage.towtruckView === 'rows' && currentView !== 'rows') {
-        setView('rows', true);
+      if (isRowView) {
+        localStorage.towtruckView = 'rows';
       } else if (localStorage.towtruckView === 'rows') {
-        setView('rows', false);
+        navigateToView('rows');
       }
     </script>
+
+    {% if isRowView %}
+    <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@36.2.0/dist/ag-grid-community.min.js"
+      integrity="sha384-icvtRKM0YJJgeDhXnWY8UlF1PVBFd4K8Pj61la+vG+EU+awBeoP0xGPZhCD2SQOV"
+      crossorigin="anonymous"></script>
+    <script>
+      (() => {
+        const DASH = '\u2014';
+        const rowData = JSON.parse(document.getElementById('repo-grid-data').textContent);
+
+        const compareDateToFilter = (filterDate, cellValue) => {
+          if (!cellValue) return -1;
+          const date = new Date(cellValue);
+          const cellDay = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+          if (cellDay < filterDate) return -1;
+          if (cellDay > filterDate) return 1;
+          return 0;
+        };
+
+        // Dates are sorted/filtered on their ISO value but displayed in the user's chosen format.
+        const dateColumn = (field, headerName) => ({
+          colId: field,
+          headerName,
+          cellDataType: false,
+          valueGetter: (params) => params.data[field].iso,
+          valueFormatter: (params) => params.data[field].display ?? DASH,
+          filter: 'agDateColumnFilter',
+          filterParams: { comparator: compareDateToFilter },
+          width: 130,
+        });
+
+        const numberColumn = (field, headerName, extra = {}) => ({
+          field,
+          headerName,
+          cellDataType: 'number',
+          type: 'rightAligned',
+          filter: 'agNumberColumnFilter',
+          valueFormatter: (params) => params.value ?? DASH,
+          width: 105,
+          ...extra,
+        });
+
+        const severityColumn = (field, headerName, color) =>
+          numberColumn(field, headerName, {
+            cellStyle: (params) => (params.value > 0 ? { color, fontWeight: '700' } : null),
+          });
+
+        const vulnerabilityGroup = (prefix, headerName) => ({
+          headerName,
+          marryChildren: true,
+          children: [
+            severityColumn(`${prefix}Critical`, 'Critical', '#dc2626'),
+            severityColumn(`${prefix}High`, 'High', '#ef4444'),
+            severityColumn(`${prefix}Medium`, 'Medium', '#f97316'),
+            severityColumn(`${prefix}Low`, 'Low', '#f59e0b'),
+            numberColumn(`${prefix}Total`, 'Total', { cellStyle: { fontWeight: '600' } }),
+          ],
+        });
+
+        const repoLinkRenderer = (params) => {
+          const link = document.createElement('a');
+          link.href = params.data.htmlUrl;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = params.value;
+          link.className = 'font-semibold hover:underline';
+          return link;
+        };
+
+        const tagsRenderer = (params) => {
+          const container = document.createElement('div');
+          container.className = 'flex gap-1 items-center h-full overflow-hidden';
+          for (const tag of params.data.tags) {
+            const chip = document.createElement('span');
+            chip.className = 'text-xs rounded-full px-2 leading-5 bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300';
+            chip.textContent = tag;
+            container.appendChild(chip);
+          }
+          return container;
+        };
+
+        const columnDefs = [
+          { field: 'name', headerName: 'Repo', pinned: 'left', width: 220, cellRenderer: repoLinkRenderer },
+          { field: 'language', headerName: 'Language', width: 120, valueFormatter: (params) => params.value ?? DASH },
+          numberColumn('openPrCount', 'Open PRs'),
+          numberColumn('openBotPrCount', 'Open bot PRs'),
+          dateColumn('oldestOpenPrOpenedAt', 'Oldest open PR'),
+          dateColumn('updatedAt', 'Updated at'),
+          dateColumn('mostRecentPrOpenedAt', 'Most recent PR'),
+          dateColumn('mostRecentIssueOpenedAt', 'Most recent issue'),
+          dateColumn('oldestOpenIssueOpenedAt', 'Oldest open issue'),
+          numberColumn('openIssues', 'Open issues'),
+          vulnerabilityGroup('prod', 'Prod vulnerabilities'),
+          vulnerabilityGroup('dev', 'Dev vulnerabilities'),
+          {
+            colId: 'tags',
+            headerName: 'Tags',
+            width: 260,
+            valueGetter: (params) => params.data.tags.join(', '),
+            tooltipValueGetter: (params) => params.value || null,
+            cellRenderer: tagsRenderer,
+          },
+          { field: 'responsibleTeam', headerName: 'Responsible team', width: 150, valueFormatter: (params) => params.value ?? DASH },
+          {
+            colId: 'hasProdAlertOlderThan14Days',
+            headerName: 'Prod vulnerability > 14 days old',
+            headerTooltip: 'Has an open production vulnerability more than 14 days old',
+            width: 150,
+            cellDataType: false,
+            valueGetter: (params) => {
+              const value = params.data.hasProdAlertOlderThan14Days;
+              if (value === null) return null;
+              return value ? 'Yes' : 'No';
+            },
+            valueFormatter: (params) => params.value ?? DASH,
+            cellStyle: (params) => (params.value === 'Yes' ? { color: '#dc2626', fontWeight: '700' } : null),
+          },
+        ];
+
+        const theme = agGrid.themeQuartz
+          .withParams({ fontFamily: 'inherit', fontSize: 13, headerFontWeight: 600, wrapperBorderRadius: 8 })
+          .withParams({ accentColor: '#475569', browserColorScheme: 'light' }, 'light')
+          .withParams({
+            backgroundColor: '#1e293b',
+            foregroundColor: '#e2e8f0',
+            headerBackgroundColor: '#0f172a',
+            borderColor: '#334155',
+            accentColor: '#94a3b8',
+            browserColorScheme: 'dark',
+          }, 'dark');
+
+        agGrid.createGrid(document.getElementById('repo-grid'), {
+          theme,
+          rowData,
+          columnDefs,
+          defaultColDef: { sortable: true, filter: true, resizable: true, wrapHeaderText: true, autoHeaderHeight: true },
+          pagination: true,
+          paginationPageSize: 50,
+          paginationPageSizeSelector: [25, 50, 100],
+          suppressColumnVirtualisation: true,
+          overlayNoRowsTemplate: '<span class="italic text-slate-400">No repositories found.</span>',
+        });
+      })();
+    </script>
+    {% endif %}
 {% endblock %}

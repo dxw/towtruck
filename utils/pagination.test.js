@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { calculatePagination, PAGE_SIZE } from "./pagination.js";
+import { calculatePagination, paginateForView, PAGE_SIZE } from "./pagination.js";
 
 describe("calculatePagination", () => {
   it("returns the first page when no page parameter is provided", () => {
@@ -121,5 +121,32 @@ describe("calculatePagination", () => {
     // 13 items should give 2 pages (12 + 1)
     result = calculatePagination(Array.from({ length: 13 }, (_, i) => i + 1));
     assert.strictEqual(result.totalPages, 2);
+  });
+});
+
+describe("paginateForView", () => {
+  const items = Array.from({ length: 25 }, (_, i) => i + 1);
+
+  it("paginates the card view using the default page size", () => {
+    const result = paginateForView(items, 2, undefined);
+
+    assert.deepStrictEqual(result.items, Array.from({ length: 12 }, (_, i) => i + 13));
+    assert.strictEqual(result.currentPage, 2);
+    assert.strictEqual(result.totalPages, 3);
+  });
+
+  it("returns every item on a single page for the row view, ignoring the page param", () => {
+    const result = paginateForView(items, 3, "rows");
+
+    assert.deepStrictEqual(result.items, items);
+    assert.strictEqual(result.currentPage, 1);
+    assert.strictEqual(result.totalPages, 1);
+  });
+
+  it("handles an empty row view", () => {
+    const result = paginateForView([], 1, "rows");
+
+    assert.deepStrictEqual(result.items, []);
+    assert.strictEqual(result.totalPages, 1);
   });
 });

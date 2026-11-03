@@ -1,5 +1,4 @@
 const PAGE_SIZE = 12;
-const ROW_PAGE_SIZE = 24;
 
 /**
  * Calculates pagination data for a given page
@@ -36,5 +35,20 @@ export function calculatePagination(items, page = 1, pageSize = PAGE_SIZE) {
   };
 }
 
-export { PAGE_SIZE, ROW_PAGE_SIZE };
+/**
+ * Paginates items for the selected view. The row view is an AG Grid table that
+ * paginates client-side, so it receives every item on a single page.
+ * @param {Array} items
+ * @param {number|string} page
+ * @param {string} [view] - "rows" for the grid view, anything else for cards
+ * @returns {Object} Pagination data as returned by `calculatePagination`
+ */
+export function paginateForView(items, page, view) {
+  if (view === "rows") {
+    return calculatePagination(items, 1, Math.max(items.length, 1));
+  }
+  return calculatePagination(items, page);
+}
+
+export { PAGE_SIZE };
 

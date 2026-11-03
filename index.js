@@ -7,7 +7,8 @@ import { DEFAULT_DATE_STYLE, normalizeDateStyle } from "./utils/dateFormatting.j
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
 import { normalizeSelectedTags, filterByTags, excludeByTag } from "./utils/tagFiltering.js";
-import { calculatePagination, ROW_PAGE_SIZE } from "./utils/pagination.js";
+import { paginateForView } from "./utils/pagination.js";
+import { serialiseGridRows } from "./utils/repoGrid.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
 import { buildOidcConfig, registerAuthRoutes, registerDevAuthRoutes, requireAuth } from "./auth/index.js";
@@ -92,8 +93,8 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
   const dPlusRepos = excludeByTag(filterByTags(reposForUi.repos, ["d-plus", "delivery-plus", "internal"]), "govpress");
   const filteredByAlerts = filterByAlerts(dPlusRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
-  const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
+  const isRowView = request.query.view === "rows";
+  const paginationData = paginateForView(sortedRepos, pageParam, request.query.view);
 
   const totalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
@@ -110,6 +111,8 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
   };
 
   const template = nunjucks.render("index.njk", {
+    isRowView,
+    gridRows: isRowView ? serialiseGridRows(sortedRepos) : "[]",
     sortBy,
     sortDirection,
     tag: "",
@@ -163,8 +166,8 @@ httpServer.get("/:org/publishing", requireAuth, (request, response) => {
   const publishingOnly = filterByTags(reposForUi.repos, ["govpress"]);
   const filteredByAlerts = filterByAlerts(publishingOnly, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
-  const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
+  const isRowView = request.query.view === "rows";
+  const paginationData = paginateForView(sortedRepos, pageParam, request.query.view);
 
   const totalVulnerabilities = publishingOnly.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = publishingOnly.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
@@ -181,6 +184,8 @@ httpServer.get("/:org/publishing", requireAuth, (request, response) => {
   };
 
   const template = nunjucks.render("index.njk", {
+    isRowView,
+    gridRows: isRowView ? serialiseGridRows(sortedRepos) : "[]",
     sortBy,
     sortDirection,
     tag: "",
@@ -233,8 +238,8 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
   const opsRepos = filterByTags(reposForUi.repos, ["dalmatian", "tech-ops"]);
   const filteredByAlerts = filterByAlerts(opsRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
-  const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
+  const isRowView = request.query.view === "rows";
+  const paginationData = paginateForView(sortedRepos, pageParam, request.query.view);
 
   const totalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
@@ -251,6 +256,8 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
   };
 
   const template = nunjucks.render("index.njk", {
+    isRowView,
+    gridRows: isRowView ? serialiseGridRows(sortedRepos) : "[]",
     sortBy,
     sortDirection,
     tag: "",
@@ -306,8 +313,8 @@ httpServer.get("/:org", requireAuth, (request, response) => {
 
   const filteredByAlerts = filterByAlerts(filteredByTag, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
-  const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
+  const isRowView = request.query.view === "rows";
+  const paginationData = paginateForView(sortedRepos, pageParam, request.query.view);
 
   const savedConfigurations = db.getAllSavedConfigurationsForUser(org, request.session.user.email).map((config) => {
     const params = new URLSearchParams(config.query || {});
@@ -347,6 +354,8 @@ httpServer.get("/:org", requireAuth, (request, response) => {
   };
 
   const template = nunjucks.render("index.njk", {
+    isRowView,
+    gridRows: isRowView ? serialiseGridRows(sortedRepos) : "[]",
     sortBy,
     sortDirection,
     tag: selectedTags.join(","),
