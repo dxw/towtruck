@@ -69,9 +69,13 @@ export const handleDependabotAlertsApiResponse = ({ data }) => {
   const otherOpenAlertsCreatedAt = otherOpenAlerts.map((alert) => alert.createdAt);
 
   const fourteenDaysInMs = 14 * 24 * 60 * 60 * 1000;
-  const hasOpenAlertOlderThan14Days = oldestOpenAlertCreatedAt
-    ? Date.now() - new Date(oldestOpenAlertCreatedAt).getTime() > fourteenDaysInMs
-    : false;
+  const isOlderThan14Days = (createdAt) =>
+    Boolean(createdAt) && Date.now() - new Date(createdAt).getTime() > fourteenDaysInMs;
+
+  const hasOpenAlertOlderThan14Days = isOlderThan14Days(oldestOpenAlertCreatedAt);
+
+  const prodOpenAlerts = openAlerts.filter(isProdAlert);
+  const devOpenAlerts = openAlerts.filter((alert) => !isProdAlert(alert));
 
   return {
     totalOpenAlerts,
@@ -83,5 +87,42 @@ export const handleDependabotAlertsApiResponse = ({ data }) => {
     otherOpenAlerts,
     otherOpenAlertsCreatedAt,
     hasOpenAlertOlderThan14Days,
+    prodAlerts: countAlertsBySeverity(prodOpenAlerts),
+    devAlerts: countAlertsBySeverity(devOpenAlerts),
+    hasOpenProdAlertOlderThan14Days: prodOpenAlerts.some((alert) => isOlderThan14Days(alert.created_at)),
   };
 };
+
+/**
+ * Dependabot reports `dependency.scope` as "runtime", "development" or null (unknown).
+ * Unknown scopes are treated as production so they aren't under-reported.
+ * @param {any} alert
+ * @returns {boolean}
+ */
+const isProdAlert = (alert) => alert.dependency?.scope !== "development";
+
+/**
+ * @typedef {Object} AlertCounts
+ * @property {number} critical
+ * @property {number} high
+ * @property {number} medium
+ * @property {number} low
+ * @property {number} total
+ */
+
+/**
+ * @param {any[]} alerts
+ * @returns {AlertCounts}
+ */
+const countAlertsBySeverity = (alerts) => {
+  const counts = { critical: 0, high: 0, medium: 0, low: 0, total: alerts.length };
+  for (const alert of alerts) {
+    const severity = alert.security_vulnerability?.severity;
+    if (SEVERITIES.includes(severity)) {
+      counts[severity] += 1;
+    }
+  }
+  return counts;
+};
+
+const SEVERITIES = ["critical", "high", "medium", "low"];

@@ -194,4 +194,71 @@ describe("handleDependabotAlertsApiResponse", () => {
       ]);
     });
   });
+
+  describe("prodAlerts and devAlerts", () => {
+    it("splits open alerts by dependency scope and severity", () => {
+      const runtime = (severity, state = "open") => ({ state, dependency: { scope: "runtime" }, security_vulnerability: { severity } });
+      const development = (severity, state = "open") => ({ state, dependency: { scope: "development" }, security_vulnerability: { severity } });
+
+      const actual = handleDependabotAlertsApiResponse({
+        data: [
+          runtime("critical"),
+          runtime("critical"),
+          runtime("high"),
+          runtime("low"),
+          runtime("medium", "fixed"),
+          development("medium"),
+          development("low"),
+          development("critical", "dismissed"),
+        ],
+      });
+
+      expect.deepStrictEqual(actual.prodAlerts, { critical: 2, high: 1, medium: 0, low: 1, total: 4 });
+      expect.deepStrictEqual(actual.devAlerts, { critical: 0, high: 0, medium: 1, low: 1, total: 2 });
+    });
+
+    it("treats alerts with an unknown scope as production", () => {
+      const actual = handleDependabotAlertsApiResponse({
+        data: [
+          { state: "open", dependency: { scope: null }, security_vulnerability: { severity: "high" } },
+          { state: "open", security_vulnerability: { severity: "low" } },
+        ],
+      });
+
+      expect.deepStrictEqual(actual.prodAlerts, { critical: 0, high: 1, medium: 0, low: 1, total: 2 });
+      expect.deepStrictEqual(actual.devAlerts, { critical: 0, high: 0, medium: 0, low: 0, total: 0 });
+    });
+  });
+
+  describe("hasOpenProdAlertOlderThan14Days", () => {
+    const now = new Date("2026-07-01T00:00:00Z");
+    const fifteenDaysAgo = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000)).toISOString();
+    const oneDayAgo = new Date(now.getTime() - (1 * 24 * 60 * 60 * 1000)).toISOString();
+
+    it("returns true when an open production alert is older than 14 days", (t) => {
+      t.mock.method(Date, "now", () => now.getTime());
+      const actual = handleDependabotAlertsApiResponse({
+        data: [
+          { state: "open", created_at: oneDayAgo, dependency: { scope: "runtime" }, security_vulnerability: { severity: "low" } },
+          { state: "open", created_at: fifteenDaysAgo, dependency: { scope: "runtime" }, security_vulnerability: { severity: "high" } },
+        ],
+      });
+
+      expect.strictEqual(actual.hasOpenProdAlertOlderThan14Days, true);
+    });
+
+    it("ignores old development and closed production alerts", (t) => {
+      t.mock.method(Date, "now", () => now.getTime());
+      const actual = handleDependabotAlertsApiResponse({
+        data: [
+          { state: "open", created_at: fifteenDaysAgo, dependency: { scope: "development" }, security_vulnerability: { severity: "critical" } },
+          { state: "fixed", created_at: fifteenDaysAgo, dependency: { scope: "runtime" }, security_vulnerability: { severity: "critical" } },
+          { state: "open", created_at: oneDayAgo, dependency: { scope: "runtime" }, security_vulnerability: { severity: "low" } },
+        ],
+      });
+
+      expect.strictEqual(actual.hasOpenAlertOlderThan14Days, true);
+      expect.strictEqual(actual.hasOpenProdAlertOlderThan14Days, false);
+    });
+  });
 });
