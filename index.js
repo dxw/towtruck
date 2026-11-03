@@ -7,7 +7,6 @@ import { DEFAULT_DATE_STYLE, normalizeDateStyle } from "./utils/dateFormatting.j
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
 import { normalizeSelectedTags, filterByTags, excludeByTag } from "./utils/tagFiltering.js";
-import { paginateForView } from "./utils/pagination.js";
 import { serialiseGridRows } from "./utils/repoGrid.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
@@ -88,36 +87,22 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData, dateFormat);
 
-  const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
+  const { sortDirection, sortBy, alertFilter } = request.query;
 
   const dPlusRepos = excludeByTag(filterByTags(reposForUi.repos, ["d-plus", "delivery-plus", "internal"]), "govpress");
   const filteredByAlerts = filterByAlerts(dPlusRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const isRowView = request.query.view === "rows";
-  const paginationData = paginateForView(sortedRepos, pageParam, request.query.view);
 
   const totalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = dPlusRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
   const totalOpenBotPrs = dPlusRepos.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
-  const buildTopicFilterUrl = () => {
-    const params = new URLSearchParams();
-    if (sortBy) params.set("sortBy", sortBy);
-    if (sortDirection) params.set("sortDirection", sortDirection);
-    if (alertFilter) params.set("alertFilter", alertFilter);
-
-    const queryString = params.toString();
-    return queryString ? `/${org}/d-plus?${queryString}` : `/${org}/d-plus`;
-  };
-
   const template = nunjucks.render("index.njk", {
-    isRowView,
-    gridRows: isRowView ? serialiseGridRows(sortedRepos) : "[]",
+    gridRows: serialiseGridRows(sortedRepos),
     sortBy,
     sortDirection,
     tag: "",
     selectedTags: [],
-    buildTopicFilterUrl,
     alertFilter,
     dateFormat,
     ...reposForUi,
@@ -125,14 +110,8 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
     totalCriticalVulnerabilities,
     totalOpenBotPrs,
     org,
-    repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
     displayedRepos: filteredByAlerts.length,
-    currentPage: paginationData.currentPage,
-    totalPages: paginationData.totalPages,
-    pageNumbers: paginationData.pageNumbers,
-    hasPreviousPage: paginationData.hasPreviousPage,
-    hasNextPage: paginationData.hasNextPage,
     savedConfigurations: [],
     activeConfigId: null,
     dPlusMode: true,
@@ -161,36 +140,22 @@ httpServer.get("/:org/publishing", requireAuth, (request, response) => {
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData, dateFormat);
 
-  const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
+  const { sortDirection, sortBy, alertFilter } = request.query;
 
   const publishingOnly = filterByTags(reposForUi.repos, ["govpress"]);
   const filteredByAlerts = filterByAlerts(publishingOnly, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const isRowView = request.query.view === "rows";
-  const paginationData = paginateForView(sortedRepos, pageParam, request.query.view);
 
   const totalVulnerabilities = publishingOnly.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = publishingOnly.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
   const totalOpenBotPrs = publishingOnly.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
-  const buildTopicFilterUrl = () => {
-    const params = new URLSearchParams();
-    if (sortBy) params.set("sortBy", sortBy);
-    if (sortDirection) params.set("sortDirection", sortDirection);
-    if (alertFilter) params.set("alertFilter", alertFilter);
-
-    const queryString = params.toString();
-    return queryString ? `/${org}/publishing?${queryString}` : `/${org}/publishing`;
-  };
-
   const template = nunjucks.render("index.njk", {
-    isRowView,
-    gridRows: isRowView ? serialiseGridRows(sortedRepos) : "[]",
+    gridRows: serialiseGridRows(sortedRepos),
     sortBy,
     sortDirection,
     tag: "",
     selectedTags: [],
-    buildTopicFilterUrl,
     alertFilter,
     dateFormat,
     ...reposForUi,
@@ -198,14 +163,8 @@ httpServer.get("/:org/publishing", requireAuth, (request, response) => {
     totalCriticalVulnerabilities,
     totalOpenBotPrs,
     org,
-    repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
     displayedRepos: filteredByAlerts.length,
-    currentPage: paginationData.currentPage,
-    totalPages: paginationData.totalPages,
-    pageNumbers: paginationData.pageNumbers,
-    hasPreviousPage: paginationData.hasPreviousPage,
-    hasNextPage: paginationData.hasNextPage,
     savedConfigurations: [],
     activeConfigId: null,
     dPlusMode: false,
@@ -233,36 +192,22 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData, dateFormat);
 
-  const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
+  const { sortDirection, sortBy, alertFilter } = request.query;
 
   const opsRepos = filterByTags(reposForUi.repos, ["dalmatian", "tech-ops"]);
   const filteredByAlerts = filterByAlerts(opsRepos, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const isRowView = request.query.view === "rows";
-  const paginationData = paginateForView(sortedRepos, pageParam, request.query.view);
 
   const totalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
   const totalCriticalVulnerabilities = opsRepos.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
   const totalOpenBotPrs = opsRepos.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
-  const buildTopicFilterUrl = () => {
-    const params = new URLSearchParams();
-    if (sortBy) params.set("sortBy", sortBy);
-    if (sortDirection) params.set("sortDirection", sortDirection);
-    if (alertFilter) params.set("alertFilter", alertFilter);
-
-    const queryString = params.toString();
-    return queryString ? `/${org}/ops?${queryString}` : `/${org}/ops`;
-  };
-
   const template = nunjucks.render("index.njk", {
-    isRowView,
-    gridRows: isRowView ? serialiseGridRows(sortedRepos) : "[]",
+    gridRows: serialiseGridRows(sortedRepos),
     sortBy,
     sortDirection,
     tag: "",
     selectedTags: [],
-    buildTopicFilterUrl,
     alertFilter,
     dateFormat,
     ...reposForUi,
@@ -270,14 +215,8 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
     totalCriticalVulnerabilities,
     totalOpenBotPrs,
     org,
-    repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
     displayedRepos: filteredByAlerts.length,
-    currentPage: paginationData.currentPage,
-    totalPages: paginationData.totalPages,
-    pageNumbers: paginationData.pageNumbers,
-    hasPreviousPage: paginationData.hasPreviousPage,
-    hasNextPage: paginationData.hasNextPage,
     savedConfigurations: [],
     activeConfigId: null,
     dPlusMode: false,
@@ -306,15 +245,13 @@ httpServer.get("/:org", requireAuth, (request, response) => {
 
   const reposForUi = mapRepoFromStorageToUi(persistedRepoData, persistedLifetimeData, dateFormat);
 
-  const { sortDirection, sortBy, tag, page: pageParam, alertFilter } = request.query;
+  const { sortDirection, sortBy, tag, alertFilter } = request.query;
   const selectedTags = normalizeSelectedTags(tag);
 
   const filteredByTag = filterByTags(reposForUi.repos, selectedTags);
 
   const filteredByAlerts = filterByAlerts(filteredByTag, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
-  const isRowView = request.query.view === "rows";
-  const paginationData = paginateForView(sortedRepos, pageParam, request.query.view);
 
   const savedConfigurations = db.getAllSavedConfigurationsForUser(org, request.session.user.email).map((config) => {
     const params = new URLSearchParams(config.query || {});
@@ -338,41 +275,18 @@ httpServer.get("/:org", requireAuth, (request, response) => {
     (config) => normalizeQuery(config.query) === currentQs
   )?.id ?? null;
 
-  const buildTopicFilterUrl = (topic) => {
-    const toggledTags = selectedTags.includes(topic)
-      ? selectedTags.filter((selectedTag) => selectedTag !== topic)
-      : [...selectedTags, topic];
-
-    const params = new URLSearchParams();
-    if (toggledTags.length) params.set("tag", toggledTags.join(","));
-    if (sortBy) params.set("sortBy", sortBy);
-    if (sortDirection) params.set("sortDirection", sortDirection);
-    if (alertFilter) params.set("alertFilter", alertFilter);
-
-    const queryString = params.toString();
-    return queryString ? `/${org}?${queryString}` : `/${org}`;
-  };
-
   const template = nunjucks.render("index.njk", {
-    isRowView,
-    gridRows: isRowView ? serialiseGridRows(sortedRepos) : "[]",
+    gridRows: serialiseGridRows(sortedRepos),
     sortBy,
     sortDirection,
     tag: selectedTags.join(","),
     selectedTags,
-    buildTopicFilterUrl,
     alertFilter,
     dateFormat,
     ...reposForUi,
     org,
-    repos: paginationData.items,
     totalRepos: reposForUi.totalRepos,
     displayedRepos: filteredByAlerts.length,
-    currentPage: paginationData.currentPage,
-    totalPages: paginationData.totalPages,
-    pageNumbers: paginationData.pageNumbers,
-    hasPreviousPage: paginationData.hasPreviousPage,
-    hasNextPage: paginationData.hasNextPage,
     savedConfigurations,
     activeConfigId,
     dPlusMode: false,

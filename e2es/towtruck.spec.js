@@ -62,35 +62,21 @@ const testSortingForColumn = async (
   // Select ascending
   const ascUrl = await sortSelect.locator(`option[value*="sortBy=${ascValue}"][value*="sortDirection=asc"]`).getAttribute("value");
   await sortSelect.selectOption(ascUrl);
-  await assertFirstCard(topAscending, page);
+  await assertFirstRow(topAscending, page);
 
   // Select descending
   const descUrl = await sortSelect.locator(`option[value*="sortBy=${descValue}"][value*="sortDirection=desc"]`).getAttribute("value");
   await sortSelect.selectOption(descUrl);
-  await assertFirstCard(topDescending, page);
+  await assertFirstRow(topDescending, page);
 };
 
-const assertFirstCard = async (expectedRepoName, page) => {
-  const firstCard = page.locator("#card-view > div").first();
-  await expect(firstCard).toContainText(expectedRepoName);
+const assertFirstRow = async (expectedRepoName, page) => {
+  const firstRowName = page.getByTestId("repo-grid").locator(".ag-row[row-index='0'] [col-id='name']");
+  await expect(firstRowName).toHaveText(expectedRepoName);
 };
 
-test("only shows the security alert details toggle when there are alerts to show", async ({ page, baseURL }) => {
+test("shows every repo in an AG Grid table with the expected columns", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw`);
-
-  const cardFor = (repoName) => page.locator("#card-view > div").filter({ hasText: repoName });
-
-  await expect(cardFor("optionparser").getByText("Show security alert details")).toBeVisible();
-  await expect(cardFor("php-missing").getByText("Show security alert details")).toHaveCount(0);
-  await expect(cardFor("php-missing").locator("details.group\\/alerts")).toHaveCount(0);
-});
-
-test("table view shows every repo in an AG Grid table with the expected columns", async ({ page, baseURL }) => {
-  await page.goto(`${baseURL}/dxw`);
-  await page.getByRole("button", { name: "Table view" }).click();
-
-  await expect(page).toHaveURL(/view=rows/);
-  await expect(page.locator("#card-view")).toHaveCount(0);
 
   const grid = page.getByTestId("repo-grid");
   await expect(grid.locator(".ag-root")).toBeVisible();
@@ -130,11 +116,20 @@ test("table view shows every repo in an AG Grid table with the expected columns"
   await openIssuesHeader.click();
   await expect(openIssuesHeader).toHaveAttribute("aria-sort", "descending");
   await expect(firstRowName).toHaveText("optionparser");
+});
 
-  // The preference persists, and switching back to cards works
+test("clicking a tag in the table toggles the tag filter", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw`);
-  await expect(page).toHaveURL(/view=rows/);
-  await page.getByRole("button", { name: "Card view" }).click();
-  await expect(page.locator("#card-view")).toBeVisible();
-  await expect(page).not.toHaveURL(/view=rows/);
+
+  const grid = page.getByTestId("repo-grid");
+  const repoNames = grid.locator("[col-id='name'].ag-cell");
+  await expect(repoNames).toHaveCount(3);
+
+  await grid.getByRole("link", { name: "wordpress-theme" }).click();
+  await expect(page).toHaveURL(/tag=wordpress-theme/);
+  await expect(repoNames).toHaveText(["govuk-blogs"]);
+
+  await grid.getByRole("link", { name: "wordpress-theme" }).click();
+  await expect(page).not.toHaveURL(/tag=/);
+  await expect(repoNames).toHaveCount(3);
 });

@@ -1,5 +1,4 @@
 {% extends "./layout.njk" %}
-{% import "./macros.njk" as macros %}
 
 {% block navStart %}
         <a href="/" class="text-slate-300 hover:text-white transition-colors" aria-label="Back to home">
@@ -123,18 +122,6 @@
                 {% endfor %}
               </select>
             </div>
-
-            <!-- View toggle -->
-            {% set viewToggleActive = "bg-slate-700 text-white dark:bg-slate-200 dark:text-slate-900" %}
-            {% set viewToggleInactive = "bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:hover:bg-slate-700" %}
-            <div class="ml-auto inline-flex rounded-lg border border-slate-300 dark:border-slate-600 overflow-hidden text-sm">
-              <button id="view-cards" class="px-3 py-1 flex items-center gap-1 transition-colors {{ viewToggleInactive if isRowView else viewToggleActive }}" aria-label="Card view" aria-pressed="{{ 'false' if isRowView else 'true' }}">
-                <i class="bx bx-grid-alt"></i> Cards
-              </button>
-              <button id="view-rows" class="px-3 py-1 flex items-center gap-1 transition-colors {{ viewToggleActive if isRowView else viewToggleInactive }}" aria-label="Table view" aria-pressed="{{ 'true' if isRowView else 'false' }}">
-                <i class="bx bx-table"></i> Table
-              </button>
-            </div>
           </div>
 
 
@@ -197,284 +184,43 @@
 
         </div>
 
-        {% if not isRowView %}
-        <!-- Card grid -->
-        <div id="card-view" class="mx-4 mb-4 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3">
-          {% for repo in repos %}
-          <div class="rounded-lg border flex flex-col shadow-sm bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-
-            <!-- Card header -->
-            <div class="p-4 border-b border-slate-100 dark:border-slate-700">
-              <div class="flex flex-wrap items-center gap-2">
-                <a target="_blank" class="text-lg font-semibold text-slate-600 dark:text-slate-300 hover:underline" href="{{repo.htmlUrl}}">{{ repo.name }}</a>
-                {% if repo.language %}
-                <span class="text-xs text-{{ repo.languageColor }}-600 dark:text-{{ repo.languageColor }}-400 border-{{ repo.languageColor }}-600 dark:border-{{ repo.languageColor }}-400 border rounded-lg py-0.5 px-2">{{ repo.language }}</span>
-                {% endif %}
-              </div>
-
-              {% if repo.totalOpenAlerts !== undefined %}
-              <div class="mt-3 rounded-lg border p-3 {% if repo.hasOpenAlertOlderThan14Days %}bg-red-50 dark:bg-red-950/20 border-red-500 dark:border-red-500 border-2{% else %}border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50{% endif %}">
-                {% set hasAlertDetails = repo.oldestOpenAlertCreatedAt %}
-                {% if hasAlertDetails %}
-                <details class="group/alerts">
-                  <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden">
-                {% else %}
-                <div>
-                {% endif %}
-                    <div class="flex flex-wrap gap-0 text-[0px]">
-                      {% set hasAlerts = repo.criticalSeverityAlerts and repo.criticalSeverityAlerts > 0 %}
-                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-red-600{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.criticalSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.criticalSeverityAlerts }}</span></div>
-                      {% set hasAlerts = repo.highSeverityAlerts and repo.highSeverityAlerts > 0 %}
-                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-red-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.highSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.highSeverityAlerts }}</span></div>
-                      {% set hasAlerts = repo.mediumSeverityAlerts and repo.mediumSeverityAlerts > 0 %}
-                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-orange-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.mediumSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.mediumSeverityAlerts }}</span></div>
-                      {% set hasAlerts = repo.lowSeverityAlerts and repo.lowSeverityAlerts > 0 %}
-                      <div class="inline-block text-sm {% if hasAlerts %}text-white bg-amber-500{% else %}text-slate-400 bg-slate-300 dark:text-slate-500 dark:bg-slate-700{% endif %} first:rounded-l-full last:rounded-r-full first:pl-3 last:pr-3 py-1 px-2"><span {% if repo.lowSeverityAlerts %}class="font-bold"{% endif %}>{{ repo.lowSeverityAlerts }}</span></div>
-                    </div>
-                    {% if repo.hasOpenAlertOlderThan14Days %}
-                    <p class="mt-2 text-sm font-medium text-red-700 dark:text-red-400">
-                      Security alert older than 14 days.
-                    </p>
-                    {% endif %}
-                {% if hasAlertDetails %}
-                    <div class="flex items-center gap-2 mt-2">
-                      <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 hidden group-open/alerts:inline">Hide security alert details</span>
-                      <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 group-open/alerts:hidden">Show security alert details</span>
-                    </div>
-                  </summary>
-                  <div class="mt-2 text-xs text-slate-600 dark:text-slate-300">
-                    Oldest vulnerability age:
-                    <span class="js-alert-age font-semibold" data-created-at="{{ repo.oldestOpenAlertCreatedAt }}"></span>
-
-                    {% if repo.otherOpenAlerts and repo.otherOpenAlerts.length %}
-                    <p class="mt-2">Other vulnerabilities:</p>
-                    <ul class="mt-1 list-disc pl-5 space-y-1">
-                      {% for alert in repo.otherOpenAlerts %}
-                      <li>
-                        <span class="js-alert-age font-semibold {% if alert.severity === 'critical' %}text-red-700 dark:text-red-400{% endif %}" data-created-at="{{ alert.createdAt }}"></span>
-                      </li>
-                      {% endfor %}
-                    </ul>
-                    {% elif repo.otherOpenAlertsCreatedAt and repo.otherOpenAlertsCreatedAt.length %}
-                    <p class="mt-2">Other vulnerabilities:</p>
-                    <ul class="mt-1 list-disc pl-5 space-y-1">
-                      {% for createdAt in repo.otherOpenAlertsCreatedAt %}
-                      <li><span class="js-alert-age font-semibold" data-created-at="{{ createdAt }}"></span></li>
-                      {% endfor %}
-                    </ul>
-                    {% endif %}
-                  </div>
-                </details>
-                {% else %}
-                </div>
-                {% endif %}
-              </div>
-              {% else %}
-              <p class="mt-1 text-slate-400 text-xs font-light italic">Dependabot alerts disabled</p>
-              {% endif %}
-
-              {% if repo.description %}
-              <p class="mt-2 text-sm text-slate-700 dark:text-slate-200">{{ repo.description }}</p>
-              {% endif %}
-
-              {% if repo.topics.length %}
-              <div class="mt-2 flex flex-wrap gap-1">
-                {% for topic in repo.topics %}
-                {% set topicSelected = topic in selectedTags %}
-                <a href="{{ buildTopicFilterUrl(topic) }}" class="text-xs rounded-full py-0.5 px-2 transition-colors {% if topicSelected %}text-white bg-slate-700 dark:text-slate-900 dark:bg-slate-200{% else %}text-slate-600 dark:text-slate-300 bg-slate-200 dark:bg-slate-900 hover:bg-slate-300 dark:hover:bg-slate-800{% endif %}">{{ topic }}</a>
-                {% endfor %}
-              </div>
-              {% endif %}
-            </div>
-
-            <!-- Stats -->
-            <div class="px-4 py-2 text-sm border-b border-slate-100 dark:border-slate-700">
-              <div class="flex items-center gap-4">
-                <div>
-                  <span class="text-slate-400 text-xs uppercase tracking-wide">Bot PRs</span>
-                  <p class="font-semibold">{{ repo.openBotPrCount }}</p>
-                </div>
-                <div>
-                  <span class="text-slate-400 text-xs uppercase tracking-wide">Oldest open PR</span>
-                  <p class="font-semibold">{{ repo.oldestOpenPrOpenedAt or "—" }}</p>
-                </div>
-              </div>
-              <details class="mt-1 group/stats">
-                <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200">
-                  <span class="group-open/stats:hidden bg-slate-100 dark:bg-slate-700 rounded px-2 py-0.5">More stats…</span>
-                  <span class="hidden group-open/stats:inline bg-slate-100 dark:bg-slate-700 rounded px-2 py-0.5">Less</span>
-                </summary>
-                <div class="grid grid-cols-2 gap-x-4 gap-y-1 mt-2">
-                  <div>
-                    <span class="text-slate-400 text-xs uppercase tracking-wide">Open issues</span>
-                    <p class="font-semibold">{{ repo.openIssues }}</p>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 text-xs uppercase tracking-wide">Open PRs</span>
-                    <p class="font-semibold">{{ repo.openPrCount }}</p>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 text-xs uppercase tracking-wide">Updated at</span>
-                    <p class="font-semibold">{{ repo.updatedAt }}</p>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 text-xs uppercase tracking-wide">Most recent PR</span>
-                    <p class="font-semibold">{{ repo.mostRecentPrOpenedAt }}</p>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 text-xs uppercase tracking-wide">Most recent issue</span>
-                    <p class="font-semibold">{{ repo.mostRecentIssueOpenedAt }}</p>
-                  </div>
-                  <div>
-                    <span class="text-slate-400 text-xs uppercase tracking-wide">Oldest open issue</span>
-                    <p class="font-semibold">{{ repo.oldestOpenIssueOpenedAt }}</p>
-                  </div>
-                </div>
-              </details>
-            </div>
-
-            <!-- Last bot PR closed -->
-            <div class="mx-4 my-2 flex items-center gap-2 rounded border px-3 py-1.5 text-xs {% if repo.botPrStale %}bg-orange-50 dark:bg-orange-950/30 border-orange-400 dark:border-orange-700 border-2{% else %}border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50{% endif %}">
-              <i class="bx bx-bot text-sm {% if repo.botPrStale %}text-orange-500 dark:text-orange-400{% else %}text-slate-400 dark:text-slate-500{% endif %}"></i>
-              <span class="{% if repo.botPrStale %}text-orange-600 dark:text-orange-400{% else %}text-slate-400 dark:text-slate-500{% endif %} uppercase tracking-wide font-medium">Last bot PR closed</span>
-              <span class="font-semibold {% if repo.botPrStale %}text-orange-700 dark:text-orange-300{% else %}text-slate-700 dark:text-slate-200{% endif %}">{{ repo.mostRecentBotPrClosedAt or "—" }}</span>
-            </div>
-
-            <!-- Dependencies -->
-              {% if repo.dependencies.length %}
-            <div class="px-4 pt-2 pb-3 flex-1">
-              <div class="group space-y-2">
-                <p class="text-sm">
-                  {% if repo.dependencies.length === 1 %}
-                  <span class="font-bold">1</span> dependency:
-                  {% else %}
-                  <span class="font-bold">{{ repo.dependencies.length }}</span> dependencies:
-                  {% endif %}
-                  <label>
-                    <input class="hidden" type="checkbox" />
-                    <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 hidden group-has-[:checked]:inline">Hide</span>
-                    <span class="text-xs bg-slate-600 text-white rounded-lg py-0.5 px-2 group-has-[:checked]:hidden">Show</span>
-                  </label>
-                </p>
-                <ul class="space-y-1.5 hidden group-has-[:checked]:block">
-                  {% for dependency in repo.dependencies %}
-                  <li>
-                    <div class="inline-block whitespace-nowrap text-[0px]">
-                      <span>
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-200 dark:bg-{{ dependency.color }}-600 rounded-l-full last:rounded-r-full py-1 px-2">{{ dependency.name }}</span>
-                        {% if dependency.version %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-300 dark:bg-{{ dependency.color }}-700 last:rounded-r-full py-1 px-2">v{{ dependency.version }}</span>
-                        {% endif %}
-                        {% if dependency.tag %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-400 dark:bg-{{ dependency.color }}-800 text-white last:rounded-r-full py-1 px-2">{{ dependency.tag }}</span>
-                        {% endif %}
-                      </span>
-                      <span class="inline-block w-1"></span>
-                      <span>
-                        {% if dependency.isOutdated %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-500 dark:bg-{{ dependency.color }}-500 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
-                          <i class="align-[-1px] bx {{dependency.icon}}"></i>
-                          {{ dependency.changelog }}
-                          v{{ dependency.latestVersion }}
-                        </span>
-                        {% endif %}
-                        {% if dependency.isEndOfLifeSoon %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-500 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
-                          <i class="align-[-1px] bx bxs-hourglass"></i>
-                          <span class="font-sans">Support ends {{ dependency.endOfLifeRelative }}</span>
-                        </span>
-                        {% elif dependency.isOutOfSupport %}
-                        <span class="font-mono text-sm bg-{{ dependency.color }}-600 dark:bg-{{ dependency.color }}-500 text-white first:rounded-l-full last:rounded-r-full py-1 px-2">
-                          <i class="align-[-1px] bx bxs-hourglass-bottom"></i>
-                          <span class="font-sans">Support ended {{ dependency.endOfLifeRelative }}</span>
-                        </span>
-                        {% endif %}
-                      </span>
-                    </div>
-                  </li>
-                  {% endfor %}
-                </ul>
-              </div>
-            </div>
-              {% endif %}
-
-          </div>
-          {% else %}
-          <p class="col-span-full py-4 text-center text-slate-400 font-light italic">No repositories found.</p>
-           {% endfor %}
-        </div>
-
-        {% else %}
-        <!-- Row view: AG Grid table -->
-        <div id="row-view" class="mx-4 mb-4">
-          <div id="repo-grid" class="w-full" style="height: 75vh" data-testid="repo-grid"></div>
+        <!-- Repo table -->
+        <div id="repo-table" class="mx-4 mb-4">
+          <div id="repo-grid" class="w-full" style="height: 75vh" data-testid="repo-grid"
+            data-tag-links="{{ 'false' if (dPlusMode or publishingMode or opsMode) else 'true' }}"
+            data-selected-tags="{{ tag }}"></div>
           <script type="application/json" id="repo-grid-data">{{ gridRows | safe }}</script>
         </div>
-        {% endif %}
 
-        <!-- Pagination -->
-        {% if totalPages > 1 %}
-        {{macros.pagination(currentPage, pageNumbers, totalPages, baseUrl, sortBy, sortDirection, tag, alertFilter)}}
-        {% endif %}
       </div>
     </div>
 {% endblock %}
 
 {% block scripts %}
-    <script>
-      document.querySelectorAll('.js-alert-age').forEach((element) => {
-        const createdAt = element.dataset.createdAt;
-        if (!createdAt) return;
-
-        const createdAtDate = new Date(createdAt);
-        const now = new Date();
-        const ageInDays = Math.floor((now.getTime() - createdAtDate.getTime()) / (24 * 60 * 60 * 1000));
-
-        if (ageInDays === 1) {
-          element.textContent = '1 day';
-          return;
-        }
-
-        element.textContent = `${ageInDays} days`;
-      });
-
-      // View toggle (cards/table). The server renders whichever view is in the URL.
-      const isRowView = {{ 'true' if isRowView else 'false' }};
-
-      function navigateToView(view) {
-        localStorage.towtruckView = view;
-        const url = new URL(window.location.href);
-        if (view === 'rows') {
-          url.searchParams.set('view', 'rows');
-        } else {
-          url.searchParams.delete('view');
-        }
-        url.searchParams.delete('page');
-        window.location.href = url.toString();
-      }
-
-      document.getElementById('view-cards').addEventListener('click', () => {
-        if (isRowView) navigateToView('cards');
-      });
-      document.getElementById('view-rows').addEventListener('click', () => {
-        if (!isRowView) navigateToView('rows');
-      });
-
-      if (isRowView) {
-        localStorage.towtruckView = 'rows';
-      } else if (localStorage.towtruckView === 'rows') {
-        navigateToView('rows');
-      }
-    </script>
-
-    {% if isRowView %}
     <script src="https://cdn.jsdelivr.net/npm/ag-grid-community@36.2.0/dist/ag-grid-community.min.js"
       integrity="sha384-icvtRKM0YJJgeDhXnWY8UlF1PVBFd4K8Pj61la+vG+EU+awBeoP0xGPZhCD2SQOV"
       crossorigin="anonymous"></script>
     <script>
       (() => {
         const DASH = '\u2014';
+        const gridElement = document.getElementById('repo-grid');
         const rowData = JSON.parse(document.getElementById('repo-grid-data').textContent);
+        const tagLinksEnabled = gridElement.dataset.tagLinks === 'true';
+        const selectedTags = (gridElement.dataset.selectedTags || '').split(',').filter(Boolean);
+
+        // Clicking a tag toggles it in the server-side `tag` filter
+        const tagFilterUrl = (tag) => {
+          const tags = selectedTags.includes(tag)
+            ? selectedTags.filter((selectedTag) => selectedTag !== tag)
+            : [...selectedTags, tag];
+          const url = new URL(window.location.href);
+          if (tags.length) {
+            url.searchParams.set('tag', tags.join(','));
+          } else {
+            url.searchParams.delete('tag');
+          }
+          return url.toString();
+        };
 
         const compareDateToFilter = (filterDate, cellValue) => {
           if (!cellValue) return -1;
@@ -539,8 +285,12 @@
           const container = document.createElement('div');
           container.className = 'flex gap-1 items-center h-full overflow-hidden';
           for (const tag of params.data.tags) {
-            const chip = document.createElement('span');
-            chip.className = 'text-xs rounded-full px-2 leading-5 bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300';
+            const isSelected = selectedTags.includes(tag);
+            const chip = document.createElement(tagLinksEnabled ? 'a' : 'span');
+            if (tagLinksEnabled) chip.href = tagFilterUrl(tag);
+            chip.className = 'text-xs rounded-full px-2 leading-5 transition-colors ' + (isSelected
+              ? 'text-white bg-slate-700 dark:text-slate-900 dark:bg-slate-200'
+              : 'bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300' + (tagLinksEnabled ? ' hover:bg-slate-300 dark:hover:bg-slate-800' : ''));
             chip.textContent = tag;
             container.appendChild(chip);
           }
@@ -597,7 +347,7 @@
             browserColorScheme: 'dark',
           }, 'dark');
 
-        agGrid.createGrid(document.getElementById('repo-grid'), {
+        agGrid.createGrid(gridElement, {
           theme,
           rowData,
           columnDefs,
@@ -610,5 +360,4 @@
         });
       })();
     </script>
-    {% endif %}
 {% endblock %}
