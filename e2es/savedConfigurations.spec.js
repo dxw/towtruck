@@ -21,6 +21,14 @@ const signInAs = async (email, context, baseURL) => {
   return page;
 };
 
+test("save configuration button is on the filter row", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const filterRow = page.getByTestId("filter-row");
+  await expect(filterRow.getByRole("link", { name: "Critical only" })).toBeVisible();
+  await expect(filterRow.getByText("Save configuration")).toBeVisible();
+});
+
 test("saved configurations are only visible to the user who created them", async ({
   browser,
   baseURL,

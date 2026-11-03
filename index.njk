@@ -39,8 +39,8 @@
         <!-- Controls box: filters, sorts, save, saved configurations -->
         <div class="mx-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-200 dark:divide-slate-700">
 
-          <!-- Alert filters + sort row -->
-          <div class="p-2 flex flex-wrap items-center gap-2">
+          <!-- Alert filters + sort + save row -->
+          <div class="p-2 flex flex-wrap items-center gap-2" data-testid="filter-row">
             <!-- Critical alerts filter (toggles off when already active) -->
             {% if alertFilter === 'criticalOnly' %}
               {% set criticalParams = baseUrl %}
@@ -122,14 +122,35 @@
                 {% endfor %}
               </select>
             </div>
+
+            <!-- Save new config -->
+            <details class="group/save relative ml-auto">
+              <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+                <i class="bx bx-bookmark-plus text-sm"></i>
+                Save configuration
+              </summary>
+              <div class="absolute right-0 z-10 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-3">
+                <form method="POST" action="/{{ org }}/saved-configurations" class="flex items-center gap-2">
+                  <input type="hidden" name="sortBy" value="{{ sortBy }}" />
+                  <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
+                  <input type="hidden" name="tag" value="{{ tag }}" />
+                  <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
+                  <input type="text" name="name" placeholder="Name (optional)"
+                    class="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400 w-44"
+                  />
+                  <button type="submit" class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors bg-slate-700 text-white border-slate-700 hover:bg-slate-600 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200 dark:hover:bg-slate-300">
+                    <i class="bx bx-save"></i>
+                    Save
+                  </button>
+                </form>
+              </div>
+            </details>
           </div>
 
 
-          <!-- Save / saved configurations row -->
+          <!-- Saved configurations row -->
+          {% if savedConfigurations and savedConfigurations.length %}
           <div class="p-2 flex flex-wrap items-center gap-2">
-
-            <!-- Saved configs -->
-            {% if savedConfigurations and savedConfigurations.length %}
             {% for config in savedConfigurations %}
             <div class="flex items-center">
               <a href="{{ config.applyUrl | safe }}" class="inline-flex items-center gap-1 rounded-l-full border px-2.5 py-0.5 text-xs font-medium transition-colors {% if config.id === activeConfigId %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-600{% endif %}">
@@ -154,32 +175,8 @@
               Clear
             </a>
             {% endif %}
-            {% endif %}
-
-            <!-- Save new config -->
-            <details class="group/save ml-auto">
-              <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
-                <i class="bx bx-bookmark-plus text-sm"></i>
-                Save configuration
-              </summary>
-              <div class="absolute z-10 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-3">
-                <form method="POST" action="/{{ org }}/saved-configurations" class="flex items-center gap-2">
-                  <input type="hidden" name="sortBy" value="{{ sortBy }}" />
-                  <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
-                  <input type="hidden" name="tag" value="{{ tag }}" />
-                  <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
-                  <input type="text" name="name" placeholder="Name (optional)"
-                    class="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400 w-44"
-                  />
-                  <button type="submit" class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors bg-slate-700 text-white border-slate-700 hover:bg-slate-600 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200 dark:hover:bg-slate-300">
-                    <i class="bx bx-save"></i>
-                    Save
-                  </button>
-                </form>
-              </div>
-            </details>
-
           </div>
+          {% endif %}
 
 
         </div>
