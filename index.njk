@@ -104,7 +104,7 @@
               {% if sortDirection %}{% set criticalParams = criticalParams + "&sortDirection=" + sortDirection %}{% endif %}
               {% if tag %}{% set criticalParams = criticalParams + "&tag=" + tag %}{% endif %}
             {% endif %}
-            <a href="{{ criticalParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'criticalOnly' %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600{% else %}bg-red-200 text-red-700 border-red-400 hover:bg-red-300 dark:bg-red-950 dark:text-red-300 dark:border-red-800 dark:hover:bg-red-900{% endif %}">
+            <a href="{{ criticalParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'criticalOnly' %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
               Critical only
             </a>
 
@@ -121,7 +121,7 @@
               {% if sortDirection %}{% set anyAlertsParams = anyAlertsParams + "&sortDirection=" + sortDirection %}{% endif %}
               {% if tag %}{% set anyAlertsParams = anyAlertsParams + "&tag=" + tag %}{% endif %}
             {% endif %}
-            <a href="{{ anyAlertsParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'anyAlerts' %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500{% else %}bg-yellow-200 text-yellow-700 border-yellow-400 hover:bg-yellow-300 dark:bg-yellow-950 dark:text-yellow-300 dark:border-yellow-800 dark:hover:bg-yellow-900{% endif %}">
+            <a href="{{ anyAlertsParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'anyAlerts' %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
               Any alerts
             </a>
 
