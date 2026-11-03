@@ -168,6 +168,23 @@ export class TowtruckDatabase {
     return stmt.run(`${org}/${id}`, userEmail);
   }
 
+  saveSession(sid, session, expiresAt) {
+    return this.#save("session", sid, "data", { session, expiresAt });
+  }
+
+  getSession(sid) {
+    return this.#get("session", sid, "data");
+  }
+
+  deleteSession(sid) {
+    return this.#db.prepare("DELETE FROM towtruck_data WHERE scope = 'session' AND name = ?;").run(sid);
+  }
+
+  deleteExpiredSessions(now = Date.now()) {
+    return this.#db
+      .prepare("DELETE FROM towtruck_data WHERE scope = 'session' AND json_extract(value, '$.expiresAt') <= ?;")
+      .run(now);
+  }
 
   transaction(fn) {
     return this.#db.transaction(fn);

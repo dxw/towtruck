@@ -11,6 +11,9 @@ import { calculatePagination, ROW_PAGE_SIZE } from "./utils/pagination.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
 import { buildOidcConfig, registerAuthRoutes, registerDevAuthRoutes, requireAuth } from "./auth/index.js";
+import { SqliteSessionStore } from "./auth/sessionStore.js";
+
+const SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 
 nunjucks.configure({
   autoescape: true,
@@ -31,12 +34,15 @@ if (!sessionSecret) {
 httpServer.use(
   session({
     secret: sessionSecret,
+    store: new SqliteSessionStore(),
     resave: false,
     saveUninitialized: false,
+    rolling: true,
     cookie: {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
+      maxAge: SESSION_MAX_AGE_MS,
     },
   }),
 );

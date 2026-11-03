@@ -680,4 +680,53 @@ describe("TowtruckDatabase", () => {
       expect.strictEqual(after.length, 1);
     });
   });
+
+  describe("sessions", () => {
+    it("saves and retrieves a session", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveSession("sid-1", { user: { email: "alice@dxw.com" } }, 1234);
+
+      expect.deepStrictEqual(db.getSession("sid-1"), { session: { user: { email: "alice@dxw.com" } }, expiresAt: 1234 });
+    });
+
+    it("returns undefined for an unknown session", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      expect.strictEqual(db.getSession("missing"), undefined);
+    });
+
+    it("overwrites an existing session", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveSession("sid-1", { user: { email: "alice@dxw.com" } }, 1000);
+      db.saveSession("sid-1", { user: { email: "bob@dxw.com" } }, 2000);
+
+      expect.deepStrictEqual(db.getSession("sid-1"), { session: { user: { email: "bob@dxw.com" } }, expiresAt: 2000 });
+    });
+
+    it("deletes a session", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveSession("sid-1", {}, 1000);
+      db.saveSession("sid-2", {}, 1000);
+      db.deleteSession("sid-1");
+
+      expect.strictEqual(db.getSession("sid-1"), undefined);
+      expect.notStrictEqual(db.getSession("sid-2"), undefined);
+    });
+
+    it("deletes only expired sessions", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      db.saveSession("expired", {}, 1000);
+      db.saveSession("current", {}, 3000);
+      db.saveToRepository("some-repo", "data", "value");
+      db.deleteExpiredSessions(2000);
+
+      expect.strictEqual(db.getSession("expired"), undefined);
+      expect.notStrictEqual(db.getSession("current"), undefined);
+      expect.strictEqual(db.getFromRepository("some-repo", "data"), "value");
+    });
+  });
 });
