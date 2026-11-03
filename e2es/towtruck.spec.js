@@ -157,6 +157,23 @@ test("the No tags button toggles filtering to repos without tags", async ({ page
   await expect(repoNames).toHaveCount(countWithAlerts);
 });
 
+const DATE_COLUMN_IDS = ["oldestOpenPrOpenedAt", "updatedAt", "mostRecentPrOpenedAt", "mostRecentIssueOpenedAt", "oldestOpenIssueOpenedAt"];
+
+test("shows dates in the table as MMM YYYY", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const grid = page.getByTestId("repo-grid");
+  await expect(grid.locator(".ag-root")).toBeVisible();
+
+  for (const colId of DATE_COLUMN_IDS) {
+    const cells = grid.locator(`[col-id='${colId}'].ag-cell`);
+    await expect(cells).toHaveCount(3);
+    for (const cell of await cells.all()) {
+      await expect(cell).toHaveText(/^([A-Z][a-z]{2} \d{4}|\u2014)$/);
+    }
+  }
+});
+
 test("shows a placeholder in the end of life column when no dependencies are affected", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw`);
 

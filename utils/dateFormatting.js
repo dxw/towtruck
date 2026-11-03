@@ -11,18 +11,18 @@ function pad2(n) {
 const SHORT_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /**
- * @typedef {"D MMM YYYY"|"DD/MM/YY"|"DD/MM/YYYY"|"MM/DD/YYYY"} DateStyle
+ * @typedef {"MMM YYYY"|"D MMM YYYY"|"DD/MM/YY"|"DD/MM/YYYY"|"MM/DD/YYYY"} DateStyle
  */
 
 /** @type {DateStyle} */
-export const DEFAULT_DATE_STYLE = "D MMM YYYY";
+export const DEFAULT_DATE_STYLE = "MMM YYYY";
 
 /**
- * Formats a date value as D MMM YYYY (e.g. "1 Jan 2026"), DD/MM/YY,
- * DD/MM/YYYY, or MM/DD/YYYY.
+ * Formats a date value as MMM YYYY (e.g. "Jan 2026"), D MMM YYYY
+ * (e.g. "1 Jan 2026"), DD/MM/YY, DD/MM/YYYY, or MM/DD/YYYY.
  * Returns an empty string for null/undefined/invalid values.
  * @param {Date|string|null|undefined} dateInput
- * @param {DateStyle} [style="D MMM YYYY"]
+ * @param {DateStyle} [style="MMM YYYY"]
  * @returns {string}
  */
 export const formatDate = (dateInput, style = DEFAULT_DATE_STYLE) => {
@@ -38,11 +38,12 @@ export const formatDate = (dateInput, style = DEFAULT_DATE_STYLE) => {
   if (style === "MM/DD/YYYY") return `${month}/${day}/${year}`;
   if (style === "DD/MM/YYYY") return `${day}/${month}/${year}`;
   if (style === "DD/MM/YY") return `${day}/${month}/${shortYear}`;
-  return `${d.getUTCDate()} ${SHORT_MONTH_NAMES[d.getUTCMonth()]} ${year}`;
+  if (style === "D MMM YYYY") return `${d.getUTCDate()} ${SHORT_MONTH_NAMES[d.getUTCMonth()]} ${year}`;
+  return `${SHORT_MONTH_NAMES[d.getUTCMonth()]} ${year}`;
 };
 
 /**
- * Normalises a date style value. Falls back to the default ("D MMM YYYY")
+ * Normalises a date style value. Falls back to the default ("MMM YYYY")
  * for any unrecognised value.
  * @param {string|undefined} value
  * @returns {DateStyle}

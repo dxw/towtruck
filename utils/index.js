@@ -136,7 +136,7 @@ export const hashToTailwindColor = (str) => {
  * Maps the persisted repo data from storage to a format suitable for the UI
  * @param {PersistedData} persistedData
  * @param {import("./endOfLifeDateApi/fetchAllDependencyEolInfo").DependencyLifetimes[]} persistedLifetimes
- * @param {import("./dateFormatting").DateStyle} [dateStyle="D MMM YYYY"]
+ * @param {import("./dateFormatting").DateStyle} [dateStyle="MMM YYYY"]
  * @returns {RepoData}
  */
 export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateStyle = DEFAULT_DATE_STYLE) => {

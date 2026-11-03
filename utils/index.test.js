@@ -171,7 +171,7 @@ describe("mapRepoFromStorageToUi", () => {
     expect.deepEqual(mapRepoFromStorageToUi(persistedData).repos, expected);
   });
 
-  it("formats updatedAt as D MMM YYYY by default", () => {
+  it("formats updatedAt as MMM YYYY by default", () => {
     const persistedData = {
       repo1: {
         owner: "dxw",
@@ -201,7 +201,7 @@ describe("mapRepoFromStorageToUi", () => {
     };
 
     const [repo] = mapRepoFromStorageToUi(persistedData, {}).repos;
-    expect.strictEqual(repo.updatedAt, "15 Jan 2021");
+    expect.strictEqual(repo.updatedAt, "Jan 2021");
   });
 
   it("formats updatedAt as MM/DD/YYYY when dateStyle is MM/DD/YYYY", () => {
