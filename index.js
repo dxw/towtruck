@@ -127,17 +127,17 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
     savedConfigurations: [],
     activeConfigId: null,
     dPlusMode: true,
-    govpressMode: false,
+    publishingMode: false,
     opsMode: false,
     dPlusBaseUrl: `/${org}/d-plus`,
-    govpressBaseUrl: `/${org}/govpress`,
+    publishingBaseUrl: `/${org}/publishing`,
     opsBaseUrl: `/${org}/ops`,
   });
 
   return response.end(template);
 });
 
-httpServer.get("/:org/govpress", requireAuth, (request, response) => {
+httpServer.get("/:org/publishing", requireAuth, (request, response) => {
   const { org } = request.params;
   const db = new TowtruckDatabase();
   const persistedRepoData = db.getAllRepositoriesForOrg(org);
@@ -154,15 +154,15 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
 
   const { sortDirection, sortBy, page: pageParam, alertFilter } = request.query;
 
-  const govpressOnly = filterByTags(reposForUi.repos, ["govpress"]);
-  const filteredByAlerts = filterByAlerts(govpressOnly, alertFilter);
+  const publishingOnly = filterByTags(reposForUi.repos, ["govpress"]);
+  const filteredByAlerts = filterByAlerts(publishingOnly, alertFilter);
   const sortedRepos = sortByType(filteredByAlerts, sortDirection, sortBy);
   const pageSize = request.query.view === "rows" ? ROW_PAGE_SIZE : undefined;
   const paginationData = calculatePagination(sortedRepos, pageParam, pageSize);
 
-  const totalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
-  const totalCriticalVulnerabilities = govpressOnly.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
-  const totalOpenBotPrs = govpressOnly.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
+  const totalVulnerabilities = publishingOnly.reduce((sum, repo) => sum + (repo.totalOpenAlerts ?? 0), 0);
+  const totalCriticalVulnerabilities = publishingOnly.reduce((sum, repo) => sum + (repo.criticalSeverityAlerts ?? 0), 0);
+  const totalOpenBotPrs = publishingOnly.reduce((sum, repo) => sum + (repo.openBotPrCount ?? 0), 0);
 
   const buildTopicFilterUrl = () => {
     const params = new URLSearchParams();
@@ -171,7 +171,7 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
     if (alertFilter) params.set("alertFilter", alertFilter);
 
     const queryString = params.toString();
-    return queryString ? `/${org}/govpress?${queryString}` : `/${org}/govpress`;
+    return queryString ? `/${org}/publishing?${queryString}` : `/${org}/publishing`;
   };
 
   const template = nunjucks.render("index.njk", {
@@ -198,10 +198,10 @@ httpServer.get("/:org/govpress", requireAuth, (request, response) => {
     savedConfigurations: [],
     activeConfigId: null,
     dPlusMode: false,
-    govpressMode: true,
+    publishingMode: true,
     opsMode: false,
     dPlusBaseUrl: `/${org}/d-plus`,
-    govpressBaseUrl: `/${org}/govpress`,
+    publishingBaseUrl: `/${org}/publishing`,
     opsBaseUrl: `/${org}/ops`,
   });
 
@@ -268,10 +268,10 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
     savedConfigurations: [],
     activeConfigId: null,
     dPlusMode: false,
-    govpressMode: false,
+    publishingMode: false,
     opsMode: true,
     dPlusBaseUrl: `/${org}/d-plus`,
-    govpressBaseUrl: `/${org}/govpress`,
+    publishingBaseUrl: `/${org}/publishing`,
     opsBaseUrl: `/${org}/ops`,
   });
 
@@ -361,10 +361,10 @@ httpServer.get("/:org", requireAuth, (request, response) => {
     savedConfigurations,
     activeConfigId,
     dPlusMode: false,
-    govpressMode: false,
+    publishingMode: false,
     opsMode: false,
     dPlusBaseUrl: `/${org}/d-plus`,
-    govpressBaseUrl: `/${org}/govpress`,
+    publishingBaseUrl: `/${org}/publishing`,
     opsBaseUrl: `/${org}/ops`,
   });
 

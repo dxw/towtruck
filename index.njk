@@ -19,7 +19,7 @@
     </script>
   </head>
   <body class="bg-slate-200 text-slate-900 dark:bg-slate-950 dark:text-slate-100">
-    {% set baseUrl = dPlusBaseUrl if dPlusMode else (govpressBaseUrl if govpressMode else (opsBaseUrl if opsMode else "/" + org)) %}
+    {% set baseUrl = dPlusBaseUrl if dPlusMode else (publishingBaseUrl if publishingMode else (opsBaseUrl if opsMode else "/" + org)) %}
     <header class="bg-slate-600 dark:bg-slate-900 text-white">
       <nav class="w-full flex items-center gap-3 px-4 py-2 border-b-4 border-slate-700 dark:border-slate-950">
         <a href="/" class="text-slate-300 hover:text-white transition-colors" aria-label="Back to home">
@@ -30,9 +30,9 @@
         <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
           Exit D+ mode
         </a>
-        {% elif govpressMode %}
+        {% elif publishingMode %}
         <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
-          Exit GovPress mode
+          Exit Publishing mode
         </a>
         {% elif opsMode %}
         <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
@@ -43,9 +43,9 @@
           <i class="bx bx-rocket"></i>
           D+ mode
         </a>
-        <a href="/{{ org }}/govpress" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-orange-600 text-white border-orange-500 hover:bg-orange-500">
+        <a href="/{{ org }}/publishing" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-orange-600 text-white border-orange-500 hover:bg-orange-500">
           <i class="bx bx-globe"></i>
-          GovPress mode
+          Publishing mode
         </a>
         <a href="/{{ org }}/ops" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-cyan-600 text-white border-cyan-500 hover:bg-cyan-500">
           <i class="bx bx-server"></i>
@@ -64,10 +64,10 @@
       <i class="bx bx-info-circle text-base"></i>
       <span>This dashboard shows only repos marked D+, delivery-plus, or internal.</span>
     </div>
-    {% elif govpressMode %}
+    {% elif publishingMode %}
     <div class="bg-orange-600 dark:bg-orange-700 border-b-2 border-orange-800 dark:border-orange-900 px-4 py-2 text-white font-semibold text-sm flex items-center gap-3">
       <i class="bx bx-info-circle text-base"></i>
-      <span>This dashboard shows only repos marked GovPress.</span>
+      <span>This dashboard shows only repos marked Publishing.</span>
     </div>
     {% elif opsMode %}
     <div class="bg-cyan-600 dark:bg-cyan-700 border-b-2 border-cyan-800 dark:border-cyan-900 px-4 py-2 text-white font-semibold text-sm flex items-center gap-3">
@@ -83,7 +83,7 @@
           <span class="text-xs font-medium text-slate-500 dark:text-slate-400">{{ totalRepos }} repos tracked</span>
           <span class="text-xs font-medium text-red-600 dark:text-red-400">Critical: {{ totalCriticalVulnerabilities }}</span>
           <span class="text-xs font-medium text-yellow-600 dark:text-yellow-400">Total: {{ totalVulnerabilities }}</span>
-          {% if dPlusMode or govpressMode or opsMode %}<span class="text-xs font-medium text-blue-600 dark:text-blue-400">Open bot PRs: {{ totalOpenBotPrs }}</span>{% endif %}
+          {% if dPlusMode or publishingMode or opsMode %}<span class="text-xs font-medium text-blue-600 dark:text-blue-400">Open bot PRs: {{ totalOpenBotPrs }}</span>{% endif %}
         </h2>
 
         <!-- Controls box: filters, sorts, save, saved configurations -->
