@@ -246,6 +246,7 @@
           colId: field,
           headerName,
           cellDataType: false,
+          type: 'rightAligned',
           valueGetter: (params) => params.data[field].iso,
           valueFormatter: (params) => params.data[field].display ?? DASH,
           filter: 'agDateColumnFilter',

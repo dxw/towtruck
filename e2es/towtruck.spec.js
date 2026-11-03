@@ -174,6 +174,23 @@ test("shows dates in the table as MMM YYYY", async ({ page, baseURL }) => {
   }
 });
 
+test("right aligns the date columns", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const grid = page.getByTestId("repo-grid");
+  await expect(grid.locator(".ag-root")).toBeVisible();
+
+  for (const colId of DATE_COLUMN_IDS) {
+    await expect(grid.locator(`.ag-header-cell[col-id='${colId}']`)).toHaveClass(/ag-right-aligned-header/);
+
+    const cells = grid.locator(`[col-id='${colId}'].ag-cell`);
+    await expect(cells).toHaveCount(3);
+    for (const cell of await cells.all()) {
+      await expect(cell).toHaveClass(/ag-right-aligned-cell/);
+    }
+  }
+});
+
 test("shows a placeholder in the end of life column when no dependencies are affected", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw`);
 
