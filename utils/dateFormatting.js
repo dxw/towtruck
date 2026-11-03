@@ -7,18 +7,25 @@ function pad2(n) {
   return String(n).padStart(2, "0");
 }
 
-/**
- * @typedef {"DD/MM/YY"|"DD/MM/YYYY"|"MM/DD/YYYY"} DateStyle
- */
+// Fixed English abbreviations so output doesn't vary with ICU/locale data (e.g. "Sept" in en-GB).
+const SHORT_MONTH_NAMES = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 
 /**
- * Formats a date value as DD/MM/YY, DD/MM/YYYY, or MM/DD/YYYY.
+ * @typedef {"D MMM YYYY"|"DD/MM/YY"|"DD/MM/YYYY"|"MM/DD/YYYY"} DateStyle
+ */
+
+/** @type {DateStyle} */
+export const DEFAULT_DATE_STYLE = "D MMM YYYY";
+
+/**
+ * Formats a date value as D MMM YYYY (e.g. "1 Jan 2026"), DD/MM/YY,
+ * DD/MM/YYYY, or MM/DD/YYYY.
  * Returns an empty string for null/undefined/invalid values.
  * @param {Date|string|null|undefined} dateInput
- * @param {DateStyle} [style="DD/MM/YY"]
+ * @param {DateStyle} [style="D MMM YYYY"]
  * @returns {string}
  */
-export const formatDate = (dateInput, style = "DD/MM/YY") => {
+export const formatDate = (dateInput, style = DEFAULT_DATE_STYLE) => {
   if (!dateInput) return "";
   const d = dateInput instanceof Date ? dateInput : new Date(dateInput);
   if (Number.isNaN(d.getTime())) return "";
@@ -30,17 +37,18 @@ export const formatDate = (dateInput, style = "DD/MM/YY") => {
 
   if (style === "MM/DD/YYYY") return `${month}/${day}/${year}`;
   if (style === "DD/MM/YYYY") return `${day}/${month}/${year}`;
-  return `${day}/${month}/${shortYear}`;
+  if (style === "DD/MM/YY") return `${day}/${month}/${shortYear}`;
+  return `${d.getUTCDate()} ${SHORT_MONTH_NAMES[d.getUTCMonth()]} ${year}`;
 };
 
 /**
- * Normalises a date style value. Falls back to "DD/MM/YY" for any
- * unrecognised value.
+ * Normalises a date style value. Falls back to the default ("D MMM YYYY")
+ * for any unrecognised value.
  * @param {string|undefined} value
  * @returns {DateStyle}
  */
 export const normalizeDateStyle = (value) => {
   if (value === "MM/DD/YYYY") return "MM/DD/YYYY";
-  return "DD/MM/YY";
+  return DEFAULT_DATE_STYLE;
 };
 

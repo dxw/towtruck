@@ -171,6 +171,39 @@ describe("mapRepoFromStorageToUi", () => {
     expect.deepEqual(mapRepoFromStorageToUi(persistedData).repos, expected);
   });
 
+  it("formats updatedAt as D MMM YYYY by default", () => {
+    const persistedData = {
+      repo1: {
+        owner: "dxw",
+        main: {
+          name: "repo1",
+          description: "description1",
+          updatedAt: "2021-01-15T00:00:00Z",
+          htmlUrl: "http://url.com/repo1",
+          apiUrl: "http://api.com/repo1",
+          pullsUrl: "http://api.com/repo1/pulls",
+          issuesUrl: "http://api.com/repo1/issues",
+          language: null,
+          topics: [],
+        },
+        pullRequests: {
+          mostRecentPrOpenedAt: null,
+          oldestOpenPrOpenedAt: null,
+          mostRecentBotPrClosedAt: null,
+        },
+        issues: {
+          openIssues: 0,
+          mostRecentIssueOpenedAt: null,
+          oldestOpenIssueOpenedAt: null,
+        },
+        dependencies: [],
+      },
+    };
+
+    const [repo] = mapRepoFromStorageToUi(persistedData, {}).repos;
+    expect.strictEqual(repo.updatedAt, "15 Jan 2021");
+  });
+
   it("formats updatedAt as MM/DD/YYYY when dateStyle is MM/DD/YYYY", () => {
     const persistedData = {
       repo1: {

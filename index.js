@@ -3,7 +3,7 @@ import cookieParser from "cookie-parser";
 import session from "express-session";
 import nunjucks from "nunjucks";
 import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
-import { normalizeDateStyle } from "./utils/dateFormatting.js";
+import { DEFAULT_DATE_STYLE, normalizeDateStyle } from "./utils/dateFormatting.js";
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
 import { normalizeSelectedTags, filterByTags, excludeByTag } from "./utils/tagFiltering.js";
@@ -79,8 +79,8 @@ httpServer.get("/:org/d-plus", requireAuth, (request, response) => {
   const persistedLifetimeData = db.getAllDependencies();
 
   // Resolve date format: query param takes precedence.
-  // Only persist DD/MM/YY in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
-  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === "DD/MM/YY" ? "DD/MM/YY" : undefined));
+  // Only persist the default date style in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
+  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === DEFAULT_DATE_STYLE ? DEFAULT_DATE_STYLE : undefined));
   if (request.cookies?.dateFormat !== dateFormat) {
     response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
   }
@@ -150,8 +150,8 @@ httpServer.get("/:org/publishing", requireAuth, (request, response) => {
   const persistedLifetimeData = db.getAllDependencies();
 
   // Resolve date format: query param takes precedence.
-  // Only persist DD/MM/YY in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
-  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === "DD/MM/YY" ? "DD/MM/YY" : undefined));
+  // Only persist the default date style in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
+  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === DEFAULT_DATE_STYLE ? DEFAULT_DATE_STYLE : undefined));
   if (request.cookies?.dateFormat !== dateFormat) {
     response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
   }
@@ -221,7 +221,7 @@ httpServer.get("/:org/ops", requireAuth, (request, response) => {
   const persistedRepoData = db.getAllRepositoriesForOrg(org);
   const persistedLifetimeData = db.getAllDependencies();
 
-  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === "DD/MM/YY" ? "DD/MM/YY" : undefined));
+  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === DEFAULT_DATE_STYLE ? DEFAULT_DATE_STYLE : undefined));
   if (request.cookies?.dateFormat !== dateFormat) {
     response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
   }
@@ -291,8 +291,8 @@ httpServer.get("/:org", requireAuth, (request, response) => {
   const persistedLifetimeData = db.getAllDependencies();
 
   // Resolve date format: query param takes precedence.
-  // Only persist DD/MM/YY in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
-  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === "DD/MM/YY" ? "DD/MM/YY" : undefined));
+  // Only persist the default date style in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
+  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === DEFAULT_DATE_STYLE ? DEFAULT_DATE_STYLE : undefined));
   if (request.cookies?.dateFormat !== dateFormat) {
     response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
   }
