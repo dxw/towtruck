@@ -38,6 +38,16 @@ describe("TowtruckDatabase", () => {
       expect(log.find(str => str === "PRAGMA journal_mode = WAL"), "Journal mode should be set to WAL.");
       expect(log.find(str => str.includes("CREATE TABLE IF NOT EXISTS towtruck_data")), "A `towtruck_data` table schema should be defined.");
     });
+
+    it("uses the DB_PATH environment variable when no filename is given", (t) => {
+      t.after(() => delete process.env.DB_PATH);
+      process.env.DB_PATH = testDbPath;
+
+      new TowtruckDatabase().saveToRepository("test-repo", "some-data", "value");
+      const actual = new Database(testDbPath).prepare("SELECT name FROM towtruck_data;").get();
+
+      expect.deepStrictEqual(actual, { name: "test-repo" });
+    });
   });
 
   describe("saveToRepository", () => {

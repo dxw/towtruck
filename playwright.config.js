@@ -9,6 +9,8 @@ const baseURL = `http://127.0.0.1:${process.env.PLAYWRIGHT_PORT ?? 3000}`;
  */
 export default defineConfig({
   testDir: "./e2es",
+  /* Unit tests for the e2e helpers are run by `npm test` */
+  testIgnore: "**/*.test.js",
   /* Run tests in files in parallel */
   fullyParallel: true,
   /* Fail the build on CI if you accidentally left test.only in the source code. */
@@ -58,6 +60,7 @@ export default defineConfig({
     env: {
       NODE_ENV: "test",
       PORT: process.env.PLAYWRIGHT_PORT ?? "3000",
+      DB_PATH: "./data/e2e.db",
     },
   },
 });

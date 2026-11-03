@@ -37,7 +37,7 @@ export class TowtruckDatabase {
   #getAllConfigurationsForOrgStatement;
   #getAllConfigurationsForUserStatement;
 
-  constructor(filename = "./data/towtruck.db", options) {
+  constructor(filename = process.env.DB_PATH ?? "./data/towtruck.db", options) {
     this.#db = initialiseDatabase(filename, options);
 
     this.#saveStatement = this.#db.prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?) ON CONFLICT DO UPDATE SET value = excluded.value;");
