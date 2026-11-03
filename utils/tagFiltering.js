@@ -1,3 +1,8 @@
+// GitHub topics must start with a letter or number, so this can never clash with a real tag.
+export const UNTAGGED = "_untagged";
+
+const hasNoTags = (repo) => !Array.isArray(repo.topics) || repo.topics.length === 0;
+
 export const normalizeSelectedTags = (tagParam) => {
   const rawTags = Array.isArray(tagParam)
     ? tagParam
@@ -13,7 +18,9 @@ export const filterByTags = (repos, selectedTags) => {
     return repos;
   }
 
-  return repos.filter((repo) => Array.isArray(repo.topics) && selectedTags.some((tag) => repo.topics.includes(tag)));
+  return repos.filter((repo) => selectedTags.some((tag) =>
+    tag === UNTAGGED ? hasNoTags(repo) : Array.isArray(repo.topics) && repo.topics.includes(tag)
+  ));
 };
 
 export const excludeByTag = (repos, tag) => {

@@ -87,6 +87,19 @@
             </a>
             {% endfor %}
 
+            <!-- No tags filter (toggles off when already active) -->
+            {% set untaggedActive = untaggedTag in selectedTags %}
+            {% set untaggedTags = (selectedTags | reject("equalto", untaggedTag) | join(",")) if untaggedActive else untaggedTag %}
+            {% set untaggedParams = "/" + org %}
+            {% set untaggedSep = "?" %}
+            {% if untaggedTags %}{% set untaggedParams = untaggedParams + untaggedSep + "tag=" + untaggedTags %}{% set untaggedSep = "&" %}{% endif %}
+            {% if alertFilter %}{% set untaggedParams = untaggedParams + untaggedSep + "alertFilter=" + alertFilter %}{% set untaggedSep = "&" %}{% endif %}
+            {% if sortBy %}{% set untaggedParams = untaggedParams + untaggedSep + "sortBy=" + sortBy %}{% set untaggedSep = "&" %}{% endif %}
+            {% if sortDirection %}{% set untaggedParams = untaggedParams + untaggedSep + "sortDirection=" + sortDirection %}{% endif %}
+            <a href="{{ untaggedParams }}" data-testid="untagged-filter" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if untaggedActive %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
+              No tags
+            </a>
+
             <!-- Sort dropdown -->
             <div class="flex items-center gap-1" data-testid="sort-controls">
               <label for="sort-select" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Sort:</label>

@@ -6,7 +6,7 @@ import { mapRepoFromStorageToUi, getOrgs } from "./utils/index.js";
 import { DEFAULT_DATE_STYLE, normalizeDateStyle } from "./utils/dateFormatting.js";
 import { sortByType } from "./utils/sorting.js";
 import { filterByAlerts } from "./utils/alertFiltering.js";
-import { normalizeSelectedTags, filterByTags, excludeByTag } from "./utils/tagFiltering.js";
+import { normalizeSelectedTags, filterByTags, excludeByTag, UNTAGGED } from "./utils/tagFiltering.js";
 import { serialiseGridRows } from "./utils/repoGrid.js";
 import { TowtruckDatabase } from "./db/index.js";
 import { handleWebhooks } from "./webhooks/index.js";
@@ -18,7 +18,7 @@ const SESSION_MAX_AGE_MS = 30 * 24 * 60 * 60 * 1000;
 nunjucks.configure({
   autoescape: true,
   watch: process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test",
-});
+}).addGlobal("untaggedTag", UNTAGGED);
 
 const httpServer = express();
 

@@ -135,6 +135,28 @@ test("clicking a tag in the table toggles the tag filter", async ({ page, baseUR
   await expect(repoNames).toHaveCount(3);
 });
 
+test("the No tags button toggles filtering to repos without tags", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw?alertFilter=anyAlerts`);
+
+  const grid = page.getByTestId("repo-grid");
+  const repoNames = grid.locator("[col-id='name'].ag-cell");
+  const untaggedFilter = page.getByTestId("untagged-filter");
+  await expect(grid.locator(".ag-root")).toBeVisible();
+  const countWithAlerts = await repoNames.count();
+  expect(countWithAlerts).toBeGreaterThan(0);
+
+  // Every seeded test repo has tags, so nothing should be shown
+  await untaggedFilter.click();
+  await expect(page).toHaveURL(/tag=_untagged/);
+  await expect(page).toHaveURL(/alertFilter=anyAlerts/);
+  await expect(repoNames).toHaveCount(0);
+
+  await untaggedFilter.click();
+  await expect(page).not.toHaveURL(/tag=/);
+  await expect(page).toHaveURL(/alertFilter=anyAlerts/);
+  await expect(repoNames).toHaveCount(countWithAlerts);
+});
+
 test("shows a placeholder in the end of life column when no dependencies are affected", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw`);
 

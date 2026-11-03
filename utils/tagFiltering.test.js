@@ -1,6 +1,6 @@
 import { describe, it } from "node:test";
 import assert from "node:assert";
-import { normalizeSelectedTags, filterByTags, excludeByTag } from "./tagFiltering.js";
+import { normalizeSelectedTags, filterByTags, excludeByTag, UNTAGGED } from "./tagFiltering.js";
 
 describe("normalizeSelectedTags", () => {
   it("returns an empty array when no tags are provided", () => {
@@ -44,6 +44,17 @@ describe("filterByTags", () => {
   it("ignores repos with no topics", () => {
 	const result = filterByTags(repos, ["govpress"]);
 	assert.deepStrictEqual(result.map((repo) => repo.name), ["repo-1"]);
+  });
+
+  it("returns only repos with no topics when the untagged filter is selected", () => {
+	const reposWithMissingTopics = [...repos, { name: "repo-5", topics: null }, { name: "repo-6" }];
+	const result = filterByTags(reposWithMissingTopics, [UNTAGGED]);
+	assert.deepStrictEqual(result.map((repo) => repo.name), ["repo-4", "repo-5", "repo-6"]);
+  });
+
+  it("combines the untagged filter with other selected tags", () => {
+	const result = filterByTags(repos, [UNTAGGED, "delivery-plus"]);
+	assert.deepStrictEqual(result.map((repo) => repo.name), ["repo-2", "repo-4"]);
   });
 });
 
