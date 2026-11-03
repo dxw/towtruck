@@ -99,33 +99,17 @@
               Any alerts
             </a>
 
-            <!-- Mode filters -->
-            {% if dPlusMode %}
-            <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
-              Exit D+ mode
+            <!-- Mode filters (toggle off when already active) -->
+            {% set modeFilters = [
+              { name: "Only D+", path: "d-plus", active: dPlusMode },
+              { name: "Only Publishing", path: "publishing", active: publishingMode },
+              { name: "Only Ops", path: "ops", active: opsMode }
+            ] %}
+            {% for mode in modeFilters %}
+            <a href="/{{ org }}{% if not mode.active %}/{{ mode.path }}{% endif %}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if mode.active %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
+              {{ mode.name }}
             </a>
-            {% elif publishingMode %}
-            <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
-              Exit Publishing mode
-            </a>
-            {% elif opsMode %}
-            <a href="/{{ org }}" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-500 text-white border-slate-400 hover:bg-slate-400">
-              Exit Ops mode
-            </a>
-            {% else %}
-            <a href="/{{ org }}/d-plus" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-purple-600 text-white border-purple-500 hover:bg-purple-500">
-              <i class="bx bx-rocket"></i>
-              D+ mode
-            </a>
-            <a href="/{{ org }}/publishing" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-orange-600 text-white border-orange-500 hover:bg-orange-500">
-              <i class="bx bx-globe"></i>
-              Publishing mode
-            </a>
-            <a href="/{{ org }}/ops" class="inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-cyan-600 text-white border-cyan-500 hover:bg-cyan-500">
-              <i class="bx bx-server"></i>
-              Ops mode
-            </a>
-            {% endif %}
+            {% endfor %}
 
             <!-- Sort dropdown -->
             <div class="flex items-center gap-1" data-testid="sort-controls">
