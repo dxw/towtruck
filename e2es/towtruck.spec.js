@@ -94,6 +94,7 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Open issues",
     "Prod vulnerabilities",
     "Dev vulnerabilities",
+    "End of life",
     "Tags",
     "Responsible team",
     "Prod vulnerability > 14 days old",
@@ -132,4 +133,11 @@ test("clicking a tag in the table toggles the tag filter", async ({ page, baseUR
   await grid.getByRole("link", { name: "wordpress-theme" }).click();
   await expect(page).not.toHaveURL(/tag=/);
   await expect(repoNames).toHaveCount(3);
+});
+
+test("shows a placeholder in the end of life column when no dependencies are affected", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const endOfLifeCells = page.getByTestId("repo-grid").locator("[col-id='endOfLifeDependencies'].ag-cell");
+  await expect(endOfLifeCells).toHaveText(["\u2014", "\u2014", "\u2014"]);
 });

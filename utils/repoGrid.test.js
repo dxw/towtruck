@@ -24,6 +24,11 @@ const uiRepo = {
   prodAlerts: { critical: 1, high: 2, medium: 0, low: 1, total: 4 },
   devAlerts: { critical: 0, high: 0, medium: 1, low: 1, total: 2 },
   hasOpenProdAlertOlderThan14Days: true,
+  dependencies: [
+    { name: "node", version: "18.0.0", isOutOfSupport: true, isEndOfLifeSoon: false, endOfLifeDate: new Date("2025-04-30T00:00:00Z"), endOfLifeRelative: "7 months ago" },
+    { name: "php", version: "8.2.0", isOutOfSupport: false, isEndOfLifeSoon: true, endOfLifeDate: new Date("2026-12-31T00:00:00Z"), endOfLifeRelative: "in about 2 months" },
+    { name: "express", version: "5.0.0", isOutOfSupport: false, isEndOfLifeSoon: false, endOfLifeDate: null, endOfLifeRelative: null },
+  ],
 };
 
 describe("mapRepoToGridRow", () => {
@@ -53,7 +58,23 @@ describe("mapRepoToGridRow", () => {
       tags: ["d-plus", "internal"],
       responsibleTeam: null,
       hasProdAlertOlderThan14Days: true,
+      endOfLifeDependencies: [
+        { name: "node", version: "18.0.0", status: "ended", date: "2025-04-30T00:00:00.000Z", relative: "7 months ago" },
+        { name: "php", version: "8.2.0", status: "endingSoon", date: "2026-12-31T00:00:00.000Z", relative: "in about 2 months" },
+      ],
     });
+  });
+
+  it("lists only dependencies that are out of support or reaching end of life soon", () => {
+    const row = mapRepoToGridRow(uiRepo);
+
+    expect.deepStrictEqual(row.endOfLifeDependencies.map((dependency) => dependency.name), ["node", "php"]);
+  });
+
+  it("uses null for a missing dependency version", () => {
+    const repo = { ...uiRepo, dependencies: [{ name: "node", isOutOfSupport: true, isEndOfLifeSoon: false, endOfLifeDate: new Date("2025-04-30T00:00:00Z"), endOfLifeRelative: "7 months ago" }] };
+
+    expect.strictEqual(mapRepoToGridRow(repo).endOfLifeDependencies[0].version, null);
   });
 
   it("uses nulls for vulnerability fields when Dependabot data has no prod/dev split", () => {
@@ -72,6 +93,7 @@ describe("mapRepoToGridRow", () => {
     expect.deepStrictEqual(row.tags, []);
     expect.strictEqual(row.language, null);
     expect.strictEqual(row.openPrCount, null);
+    expect.deepStrictEqual(row.endOfLifeDependencies, []);
   });
 });
 

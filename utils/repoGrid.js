@@ -30,9 +30,34 @@
  * @property {string[]} tags
  * @property {string|null} responsibleTeam
  * @property {boolean|null} hasProdAlertOlderThan14Days
+ * @property {GridEndOfLifeDependency[]} endOfLifeDependencies
+ */
+
+/**
+ * @typedef {Object} GridEndOfLifeDependency
+ * @property {string} name
+ * @property {string|null} version
+ * @property {"ended"|"endingSoon"} status
+ * @property {string|null} date - ISO8601 end-of-life date.
+ * @property {string|null} relative - e.g. "in 3 months" or "2 years ago".
  */
 
 const gridDate = (iso, display) => ({ iso: iso ?? null, display: display ?? null });
+
+/**
+ * @param {import("./index.js").UiDependency[]} [dependencies]
+ * @returns {GridEndOfLifeDependency[]}
+ */
+const mapEndOfLifeDependencies = (dependencies = []) =>
+  dependencies
+    .filter((dependency) => dependency.isOutOfSupport || dependency.isEndOfLifeSoon)
+    .map((dependency) => ({
+      name: dependency.name,
+      version: dependency.version ?? null,
+      status: dependency.isOutOfSupport ? "ended" : "endingSoon",
+      date: dependency.endOfLifeDate?.toISOString() ?? null,
+      relative: dependency.endOfLifeRelative ?? null,
+    }));
 
 /**
  * Maps a UI repo (from `mapRepoFromStorageToUi`) to a flat row for the AG Grid table.
@@ -68,6 +93,7 @@ export const mapRepoToGridRow = (repo) => {
     tags: repo.topics ?? [],
     responsibleTeam: null,
     hasProdAlertOlderThan14Days: repo.hasOpenProdAlertOlderThan14Days ?? null,
+    endOfLifeDependencies: mapEndOfLifeDependencies(repo.dependencies),
   };
 };
 

@@ -297,6 +297,33 @@
           return container;
         };
 
+        const describeEndOfLife = (dependency) => {
+          const label = dependency.version ? `${dependency.name} v${dependency.version}` : dependency.name;
+          const support = dependency.status === 'ended' ? 'support ended' : 'support ends';
+          return dependency.relative ? `${label}: ${support} ${dependency.relative}` : `${label}: ${support}`;
+        };
+
+        // Ranks repos by how many dependencies are out of support, then by how many are ending soon
+        const endOfLifeScore = (dependencies) => dependencies.reduce(
+          (score, dependency) => score + (dependency.status === 'ended' ? 1000 : 1),
+          0,
+        );
+
+        const endOfLifeRenderer = (params) => {
+          const container = document.createElement('div');
+          container.className = 'flex gap-1 items-center h-full overflow-hidden';
+          for (const dependency of params.data.endOfLifeDependencies) {
+            const chip = document.createElement('span');
+            chip.className = 'font-mono text-xs rounded-full px-2 leading-5 whitespace-nowrap text-white ' +
+              (dependency.status === 'ended' ? 'bg-red-600 dark:bg-red-500' : 'bg-amber-500 dark:bg-amber-600');
+            chip.textContent = dependency.version ? `${dependency.name} v${dependency.version}` : dependency.name;
+            chip.title = describeEndOfLife(dependency);
+            container.appendChild(chip);
+          }
+          if (!params.data.endOfLifeDependencies.length) container.textContent = DASH;
+          return container;
+        };
+
         const columnDefs = [
           { field: 'name', headerName: 'Repo', pinned: 'left', width: 220, cellRenderer: repoLinkRenderer },
           { field: 'language', headerName: 'Language', width: 120, valueFormatter: (params) => params.value ?? DASH },
@@ -310,6 +337,18 @@
           numberColumn('openIssues', 'Open issues'),
           vulnerabilityGroup('prod', 'Prod vulnerabilities'),
           vulnerabilityGroup('dev', 'Dev vulnerabilities'),
+          {
+            colId: 'endOfLifeDependencies',
+            headerName: 'End of life',
+            headerTooltip: 'Dependencies that are out of support or whose support ends within a year',
+            width: 260,
+            cellDataType: false,
+            valueGetter: (params) => params.data.endOfLifeDependencies.map(describeEndOfLife).join('; '),
+            tooltipValueGetter: (params) => params.value || null,
+            comparator: (valueA, valueB, nodeA, nodeB) =>
+              endOfLifeScore(nodeA.data.endOfLifeDependencies) - endOfLifeScore(nodeB.data.endOfLifeDependencies),
+            cellRenderer: endOfLifeRenderer,
+          },
           {
             colId: 'tags',
             headerName: 'Tags',
