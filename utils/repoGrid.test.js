@@ -18,6 +18,7 @@ const uiRepo = {
   updatedAtISO8601: "2026-02-02T00:00:00Z",
   mostRecentNonBotCommitAt: "6 Jun 2026",
   mostRecentNonBotCommitAtISO8601: "2026-06-06T00:00:00Z",
+  topCommitter: { name: "Rich Smith", login: "rich" },
   mostRecentPrOpenedAt: "3 Mar 2026",
   mostRecentPrOpenedAtISO8601: "2026-03-03T00:00:00Z",
   mostRecentIssueOpenedAt: "4 Apr 2026",
@@ -63,6 +64,8 @@ describe("mapRepoToGridRow", () => {
       devLow: 1,
       devTotal: 2,
       tags: ["d-plus", "internal"],
+      owner: "Rich Smith",
+      ownerLogin: "rich",
       responsibleTeam: null,
       hasRuntimeAlertOlderThan14Days: true,
       endOfLifeDependencies: [
@@ -107,7 +110,16 @@ describe("mapRepoToGridRow", () => {
     expect.strictEqual(row.visibility, null);
     expect.strictEqual(row.description, null);
     expect.strictEqual(row.openPrCount, null);
+    expect.strictEqual(row.owner, null);
+    expect.strictEqual(row.ownerLogin, null);
     expect.deepStrictEqual(row.endOfLifeDependencies, []);
+  });
+
+  it("uses a null owner login when the owner's commits aren't linked to a GitHub account", () => {
+    const row = mapRepoToGridRow({ ...uiRepo, topCommitter: { name: "Rich Smith", login: null } });
+
+    expect.strictEqual(row.owner, "Rich Smith");
+    expect.strictEqual(row.ownerLogin, null);
   });
 });
 

@@ -3,7 +3,7 @@ import expect from "node:assert";
 import { handleEvent } from "./commits.js";
 
 describe("handleEvent", () => {
-  it("should update the most recent non-bot commit in the database for the repository", async (t) => {
+  it("should update the most recent non-bot commit and top committer in the database for the repository", async (t) => {
     const octokit = {
       request: t.mock.fn(async () => ({
         data: [
@@ -13,7 +13,7 @@ describe("handleEvent", () => {
           },
           {
             author: { login: "foo", type: "User" },
-            commit: { author: { date: "2024-01-01T12:34:56Z" } },
+            commit: { author: { name: "Foo Bar", date: "2024-01-01T12:34:56Z" } },
           },
         ],
       })),
@@ -37,7 +37,7 @@ describe("handleEvent", () => {
     expect.deepStrictEqual(db.saveToRepository.mock.calls[0].arguments, [
       "dxw/repo",
       "commits",
-      { mostRecentNonBotCommitAt: new Date("2024-01-01T12:34:56Z") },
+      { mostRecentNonBotCommitAt: new Date("2024-01-01T12:34:56Z"), topCommitter: { name: "Foo Bar", login: "foo" } },
     ]);
   });
 });

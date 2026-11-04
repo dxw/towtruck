@@ -41,6 +41,7 @@ const repos = [
     },
     commits: {
       mostRecentNonBotCommitAt: '2024-08-20T10:00:00.000Z',
+      topCommitter: { name: 'Ada Lovelace', login: 'ada' },
     },
     dependabotAlerts: {
       totalOpenAlerts: 3,
@@ -86,6 +87,7 @@ const repos = [
     },
     commits: {
       mostRecentNonBotCommitAt: null,
+      topCommitter: null,
     },
     dependabotAlerts: {
       totalOpenAlerts: 1,
@@ -128,6 +130,7 @@ const repos = [
     },
     commits: {
       mostRecentNonBotCommitAt: '2023-11-15T10:00:00.000Z',
+      topCommitter: { name: 'Grace Hopper', login: null },
     },
     dependabotAlerts: {
       totalOpenAlerts: 0,

@@ -31,6 +31,8 @@
  * @property {number|null} devLow
  * @property {number|null} devTotal
  * @property {string[]} tags
+ * @property {string|null} owner - Name of the person with the most recent non-bot commits.
+ * @property {string|null} ownerLogin - GitHub username of the owner, if known.
  * @property {string|null} responsibleTeam
  * @property {boolean|null} hasRuntimeAlertOlderThan14Days
  * @property {GridEndOfLifeDependency[]} endOfLifeDependencies
@@ -97,6 +99,8 @@ export const mapRepoToGridRow = (repo) => {
     devLow: devAlerts?.low ?? null,
     devTotal: devAlerts?.total ?? null,
     tags: repo.topics ?? [],
+    owner: repo.topCommitter?.name ?? null,
+    ownerLogin: repo.topCommitter?.login ?? null,
     responsibleTeam: null,
     hasRuntimeAlertOlderThan14Days: repo.hasOpenRuntimeAlertOlderThan14Days ?? null,
     endOfLifeDependencies: mapEndOfLifeDependencies(repo.dependencies),

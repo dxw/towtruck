@@ -305,7 +305,7 @@ describe("fetchForRepo", () => {
           },
           {
             author: { login: "foo", type: "User" },
-            commit: { author: { date: "2024-01-01T12:34:56Z" } },
+            commit: { author: { name: "Foo Bar", date: "2024-01-01T12:34:56Z" } },
           },
         ],
       },
@@ -329,6 +329,7 @@ describe("fetchForRepo", () => {
 
     expect.deepStrictEqual(actual.commitInfo, {
       mostRecentNonBotCommitAt: new Date("2024-01-01T12:34:56Z"),
+      topCommitter: { name: "Foo Bar", login: "foo" },
     });
   });
 });

@@ -31,6 +31,7 @@ describe("mapRepoFromStorageToUi", () => {
         },
         commits: {
           mostRecentNonBotCommitAt: "2025-05-05T00:00:00Z",
+          topCommitter: { name: "Rich", login: "rich" },
         },
         dependencies: [],
       },
@@ -61,6 +62,7 @@ describe("mapRepoFromStorageToUi", () => {
         oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
         mostRecentNonBotCommitAt: formatDate("2025-05-05T00:00:00Z"),
         mostRecentNonBotCommitAtISO8601: "2025-05-05T00:00:00Z",
+        topCommitter: { name: "Rich", login: "rich" },
         languageColor: undefined,
       },
     ];
@@ -147,6 +149,7 @@ describe("mapRepoFromStorageToUi", () => {
         oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
         mostRecentNonBotCommitAt: null,
         mostRecentNonBotCommitAtISO8601: null,
+        topCommitter: null,
         languageColor: "rose",
       },
       {
@@ -173,6 +176,7 @@ describe("mapRepoFromStorageToUi", () => {
         oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
         mostRecentNonBotCommitAt: null,
         mostRecentNonBotCommitAtISO8601: null,
+        topCommitter: null,
         languageColor: "emerald",
       },
     ];

@@ -176,6 +176,7 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
       oldestOpenIssueOpenedAtISO8601: repo.issues.oldestOpenIssueOpenedAt,
       mostRecentNonBotCommitAt,
       mostRecentNonBotCommitAtISO8601,
+      topCommitter: repo.commits?.topCommitter ?? null,
       languageColor,
     };
   });

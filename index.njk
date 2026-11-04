@@ -299,6 +299,19 @@
           return link;
         };
 
+        const ownerRenderer = (params) => {
+          if (!params.value) return DASH;
+          if (!params.data.ownerLogin) return params.value;
+          const link = document.createElement('a');
+          link.href = `https://github.com/${encodeURIComponent(params.data.ownerLogin)}`;
+          link.target = '_blank';
+          link.rel = 'noopener';
+          link.textContent = params.value;
+          link.title = `@${params.data.ownerLogin}`;
+          link.className = 'hover:underline';
+          return link;
+        };
+
         const tagsRenderer = (params) => {
           const container = document.createElement('div');
           container.className = 'flex gap-1 items-center h-full overflow-hidden';
@@ -396,6 +409,13 @@
             filter: 'agTextColumnFilter',
             filterParams: { filterOptions: tagsFilterOptions, maxNumConditions: 50 },
             cellRenderer: tagsRenderer,
+          },
+          {
+            field: 'owner',
+            headerName: 'Likely owner',
+            headerTooltip: 'Person with the most of the last 100 non-bot commits on the default branch, with recent commits counting for more',
+            width: 180,
+            cellRenderer: ownerRenderer,
           },
           { field: 'responsibleTeam', headerName: 'Responsible team', width: 150, valueFormatter: (params) => params.value ?? DASH },
           {

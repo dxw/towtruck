@@ -113,6 +113,7 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Dev vulnerabilities",
     "End of life",
     "Tags",
+    "Likely owner",
     "Responsible team",
     "Runtime vulnerability > 14 days old",
   ]) {
@@ -136,6 +137,17 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
   };
   await expect(await visibilityFor("optionparser")).toHaveText("Public");
   await expect(await visibilityFor("php-missing")).toHaveText("Private");
+
+  const ownerFor = async (repoName) => {
+    const rowIndex = await grid.locator(".ag-row", { has: page.getByRole("link", { name: repoName }) }).getAttribute("row-index");
+    return grid.locator(`.ag-row[row-index='${rowIndex}'] [col-id='owner']`);
+  };
+  const govukBlogsOwner = await ownerFor("govuk-blogs");
+  await expect(govukBlogsOwner).toHaveText("Ada Lovelace");
+  await expect(govukBlogsOwner.getByRole("link", { name: "Ada Lovelace" })).toHaveAttribute("href", "https://github.com/ada");
+  await expect(await ownerFor("php-missing")).toHaveText("Grace Hopper");
+  await expect((await ownerFor("php-missing")).getByRole("link")).toHaveCount(0);
+  await expect(await ownerFor("optionparser")).toHaveText("\u2014");
 
   // Sorting by a column header reorders rows client-side
   const openIssuesHeader = grid.locator(".ag-header-cell[col-id='openIssues']");
