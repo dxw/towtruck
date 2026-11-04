@@ -96,6 +96,7 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
 
   for (const header of [
     "Repo",
+    "Description",
     "Language",
     "Open PRs",
     "Open bot PRs",
@@ -122,6 +123,9 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
   expect(repoNames).toEqual(expect.arrayContaining(["optionparser", "php-missing", "govuk-blogs"]));
 
   await expect(grid.getByRole("link", { name: "optionparser" })).toHaveAttribute("href", /github\.com/);
+  await expect(
+    grid.locator("[col-id='description'].ag-cell", { hasText: "Command-line option parser for PHP" })
+  ).toBeVisible();
 
   // Sorting by a column header reorders rows client-side
   const openIssuesHeader = grid.locator(".ag-header-cell[col-id='openIssues']");

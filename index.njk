@@ -301,6 +301,13 @@
 
         const columnDefs = [
           { field: 'name', headerName: 'Repo', pinned: 'left', width: 220, cellRenderer: repoLinkRenderer },
+          {
+            field: 'description',
+            headerName: 'Description',
+            width: 300,
+            valueFormatter: (params) => params.value ?? DASH,
+            tooltipValueGetter: (params) => params.value || null,
+          },
           { field: 'language', headerName: 'Language', width: 120, valueFormatter: (params) => params.value ?? DASH },
           numberColumn('openPrCount', 'Open PRs'),
           numberColumn('openBotPrCount', 'Open bot PRs'),

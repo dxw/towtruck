@@ -8,6 +8,7 @@
  * @typedef {Object} GridRow
  * @property {string} name
  * @property {string} htmlUrl
+ * @property {string|null} description
  * @property {string|null} language
  * @property {number|null} openPrCount
  * @property {number|null} openBotPrCount
@@ -72,6 +73,7 @@ export const mapRepoToGridRow = (repo) => {
   return {
     name: repo.name,
     htmlUrl: repo.htmlUrl,
+    description: repo.description || null,
     language: repo.language ?? null,
     openPrCount: repo.openPrCount ?? null,
     openBotPrCount: repo.openBotPrCount ?? null,

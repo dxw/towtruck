@@ -5,6 +5,7 @@ import { mapRepoToGridRow, serialiseGridRows } from "./repoGrid.js";
 const uiRepo = {
   name: "towtruck",
   htmlUrl: "https://github.com/dxw/towtruck",
+  description: "Keeping on top of dxw's repos",
   language: "JavaScript",
   topics: ["d-plus", "internal"],
   openPrCount: 3,
@@ -38,6 +39,7 @@ describe("mapRepoToGridRow", () => {
     expect.deepStrictEqual(mapRepoToGridRow(uiRepo), {
       name: "towtruck",
       htmlUrl: "https://github.com/dxw/towtruck",
+      description: "Keeping on top of dxw's repos",
       language: "JavaScript",
       openPrCount: 3,
       openBotPrCount: 2,
@@ -68,6 +70,10 @@ describe("mapRepoToGridRow", () => {
     });
   });
 
+  it("uses null for an empty description", () => {
+    expect.strictEqual(mapRepoToGridRow({ ...uiRepo, description: "" }).description, null);
+  });
+
   it("lists only dependencies that are out of support or reaching end of life soon", () => {
     const row = mapRepoToGridRow(uiRepo);
 
@@ -96,6 +102,7 @@ describe("mapRepoToGridRow", () => {
     expect.deepStrictEqual(row.mostRecentNonBotCommitAt, { iso: null, display: null });
     expect.deepStrictEqual(row.tags, []);
     expect.strictEqual(row.language, null);
+    expect.strictEqual(row.description, null);
     expect.strictEqual(row.openPrCount, null);
     expect.deepStrictEqual(row.endOfLifeDependencies, []);
   });
