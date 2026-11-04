@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { HAS_ALERTS, filterQuery, hasTag, urlFilterModel } from "./filterUrl.js";
 
 test("has dependency info", async ({ page, baseURL }) => {
   const response = await page.goto(baseURL);
@@ -144,12 +145,31 @@ const expectColumnNotFiltered = (page, colId) =>
   expect(page.getByTestId("repo-grid").locator(`.ag-header-cell[col-id='${colId}']`)).not.toHaveClass(/ag-header-cell-filtered/);
 
 test("applies the filters in the URL to the table", async ({ page, baseURL }) => {
-  await page.goto(`${baseURL}/dxw?tag=wordpress-theme`);
+  await page.goto(`${baseURL}/dxw?${filterQuery({ tags: hasTag("wordpress-theme") })}`);
 
   const grid = page.getByTestId("repo-grid");
   await expect(grid.locator("[col-id='name'].ag-cell")).toHaveText(["govuk-blogs"]);
   await expect(grid.getByRole("button", { name: "wordpress-theme" })).toHaveAttribute("aria-pressed", "true");
   await expectColumnFiltered(page, "tags");
+});
+
+test("keeps filters set from a column's menu in the URL", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const grid = page.getByTestId("repo-grid");
+  const repoNames = grid.locator("[col-id='name'].ag-cell");
+  await expect(repoNames).toHaveCount(3);
+
+  await grid.locator(".ag-header-cell[col-id='name']").hover();
+  await grid.locator(".ag-header-cell[col-id='name'] .ag-header-cell-filter-button").click();
+  await page.locator(".ag-filter").getByRole("textbox").first().fill("govuk-blogs");
+
+  await expect(repoNames).toHaveText(["govuk-blogs"]);
+  await expect.poll(() => urlFilterModel(page)).toEqual({ name: { filterType: "text", type: "contains", filter: "govuk-blogs" } });
+
+  await page.reload();
+  await expect(repoNames).toHaveText(["govuk-blogs"]);
+  await expectColumnFiltered(page, "name");
 });
 
 test("the alert buttons toggle a filter on the runtime vulnerability columns", async ({ page, baseURL }) => {
@@ -162,20 +182,20 @@ test("the alert buttons toggle a filter on the runtime vulnerability columns", a
 
   // None of the seeded test repos have runtime vulnerability counts, so nothing should be shown
   await anyAlerts.click();
-  await expect(page).toHaveURL(/alertFilter=anyAlerts/);
+  await expect.poll(() => urlFilterModel(page)).toEqual({ runtimeTotal: HAS_ALERTS });
   await expect(anyAlerts).toHaveAttribute("aria-pressed", "true");
   await expectColumnFiltered(page, "runtimeTotal");
   await expect(repoNames).toHaveCount(0);
 
   await criticalOnly.click();
-  await expect(page).toHaveURL(/alertFilter=criticalOnly/);
+  await expect.poll(() => urlFilterModel(page)).toEqual({ runtimeCritical: HAS_ALERTS });
   await expect(anyAlerts).toHaveAttribute("aria-pressed", "false");
   await expect(criticalOnly).toHaveAttribute("aria-pressed", "true");
   await expectColumnNotFiltered(page, "runtimeTotal");
   await expectColumnFiltered(page, "runtimeCritical");
 
   await criticalOnly.click();
-  await expect(page).not.toHaveURL(/alertFilter=/);
+  await expect(page).not.toHaveURL(/filter=/);
   await expectColumnNotFiltered(page, "runtimeCritical");
   await expect(repoNames).toHaveCount(3);
 });
@@ -189,36 +209,39 @@ test("clicking a tag in the table toggles the tag filter", async ({ page, baseUR
   await expect(repoNames).toHaveCount(3);
 
   await tag.click();
-  await expect(page).toHaveURL(/tag=wordpress-theme/);
+  await expect.poll(() => urlFilterModel(page)).toEqual({ tags: hasTag("wordpress-theme") });
   await expect(tag).toHaveAttribute("aria-pressed", "true");
   await expectColumnFiltered(page, "tags");
   await expect(repoNames).toHaveText(["govuk-blogs"]);
 
   await tag.click();
-  await expect(page).not.toHaveURL(/tag=/);
+  await expect(page).not.toHaveURL(/filter=/);
   await expectColumnNotFiltered(page, "tags");
   await expect(repoNames).toHaveCount(3);
 });
 
 test("the No tags button toggles filtering to repos without tags", async ({ page, baseURL }) => {
-  await page.goto(`${baseURL}/dxw?tag=wordpress-theme`);
+  await page.goto(`${baseURL}/dxw?${filterQuery({ tags: hasTag("wordpress-theme") })}`);
 
   const repoNames = page.getByTestId("repo-grid").locator("[col-id='name'].ag-cell");
   const untaggedFilter = page.getByRole("button", { name: "No tags" });
+  const noTags = { filterType: "text", type: "blank" };
   await expect(repoNames).toHaveText(["govuk-blogs"]);
 
   // Every seeded test repo has tags, so this shouldn't add any repos to the selected tag's
   await untaggedFilter.click();
-  await expect(page).toHaveURL(/tag=wordpress-theme%2C_untagged/);
+  await expect.poll(() => urlFilterModel(page)).toEqual({
+    tags: { filterType: "text", operator: "OR", conditions: [hasTag("wordpress-theme"), noTags] },
+  });
   await expect(untaggedFilter).toHaveAttribute("aria-pressed", "true");
   await expect(repoNames).toHaveText(["govuk-blogs"]);
 
   await page.getByTestId("repo-grid").getByRole("button", { name: "wordpress-theme" }).click();
-  await expect(page).toHaveURL(/tag=_untagged/);
+  await expect.poll(() => urlFilterModel(page)).toEqual({ tags: noTags });
   await expect(repoNames).toHaveCount(0);
 
   await untaggedFilter.click();
-  await expect(page).not.toHaveURL(/tag=/);
+  await expect(page).not.toHaveURL(/filter=/);
   await expect(untaggedFilter).toHaveAttribute("aria-pressed", "false");
   await expect(repoNames).toHaveCount(3);
 });

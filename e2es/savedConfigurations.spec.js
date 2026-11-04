@@ -1,6 +1,7 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
 import { fileURLToPath } from "url";
+import { modeFilter, urlFilterModel } from "./filterUrl.js";
 
 const authFile = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -45,7 +46,7 @@ test("saving a configuration keeps the table's filters and highlights it while t
   await page.locator('input[name="name"]').fill("Publishing config");
   await page.getByRole("button", { name: "Save" }).click();
 
-  await expect(page).toHaveURL(/mode=publishing/);
+  await expect.poll(() => urlFilterModel(page)).toEqual({ tags: modeFilter("publishing") });
   await expect(publishingFilter).toHaveAttribute("aria-pressed", "true");
   await expect(savedConfiguration).toHaveAttribute("aria-current", "true");
   await expect(clear).toBeVisible();
@@ -59,7 +60,7 @@ test("saving a configuration keeps the table's filters and highlights it while t
 
   await page.getByTitle("Delete").click();
   await expect(savedConfiguration).toHaveCount(0);
-  await expect(page).toHaveURL(/mode=publishing/);
+  await expect.poll(() => urlFilterModel(page)).toEqual({ tags: modeFilter("publishing") });
 
   await context.close();
 });

@@ -22,6 +22,13 @@ const initialiseDatabase = (filename, options) => {
     dbSchemaStatements.forEach((statement) => statement.run());
   })();
 
+  // Saved configurations used to store filters as alertFilter/tag/mode, which are no longer supported
+  db.prepare(`DELETE FROM towtruck_data WHERE scope = 'saved-configuration' AND (
+    json_extract(value, '$.query.alertFilter') IS NOT NULL
+    OR json_extract(value, '$.query.tag') IS NOT NULL
+    OR json_extract(value, '$.query.mode') IS NOT NULL
+  );`).run();
+
   return db;
 }
 

@@ -148,25 +148,16 @@
           return { filterType: 'text', operator: 'OR', conditions };
         };
 
-        const filtersFromUrl = () => {
-          const params = new URL(window.location.href).searchParams;
-          return {
-            alertFilter: params.get('alertFilter'),
-            tags: (params.get('tag') ?? '').split(',').filter(Boolean),
-            mode: params.get('mode'),
-          };
-        };
-
-        const filterModelFor = (filters) => {
-          const alertColumn = ALERT_FILTER_COLUMNS[filters.alertFilter];
-          return {
-            ...(alertColumn ? { [alertColumn]: HAS_ALERTS } : {}),
-            tags: tagsFilterModel(filters),
-          };
+        const filterModelFromUrl = () => {
+          try {
+            return JSON.parse(new URL(window.location.href).searchParams.get('filter')) ?? {};
+          } catch {
+            return {};
+          }
         };
 
         let grid;
-        let currentFilters = filtersFromUrl();
+        let currentFilters = { tags: [] };
 
         const readFilters = () => {
           const tagsModel = grid.getColumnFilterModel('tags');
@@ -216,10 +207,9 @@
           for (const button of document.querySelectorAll('[data-tag]')) button.ariaPressed = String(tags.includes(button.dataset.tag));
 
           const url = new URL(window.location.href);
-          for (const [key, value] of Object.entries({ alertFilter, tag: tags.join(','), mode })) {
-            if (value) url.searchParams.set(key, value);
-            else url.searchParams.delete(key);
-          }
+          const filterModel = grid.getFilterModel();
+          if (Object.keys(filterModel).length) url.searchParams.set('filter', JSON.stringify(filterModel));
+          else url.searchParams.delete('filter');
           window.history.replaceState(null, '', url);
 
           for (const input of document.querySelectorAll('form input[type=hidden]')) {
@@ -419,7 +409,7 @@
           theme,
           rowData,
           columnDefs,
-          initialState: { filter: { filterModel: filterModelFor(currentFilters) } },
+          initialState: { filter: { filterModel: filterModelFromUrl() } },
           onFilterChanged: syncFilters,
           defaultColDef: { sortable: true, filter: true, resizable: true, wrapHeaderText: true, autoHeaderHeight: true },
           pagination: true,

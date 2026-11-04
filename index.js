@@ -19,7 +19,8 @@ nunjucks.configure({
 });
 
 // Filters are applied client-side by the grid; these are kept in the URL so they can be saved.
-const CONFIGURATION_QUERY_KEYS = ["sortBy", "sortDirection", "tag", "alertFilter", "mode"];
+// `filter` holds the grid's filter model as JSON.
+const CONFIGURATION_QUERY_KEYS = ["sortBy", "sortDirection", "filter"];
 
 const pickConfigurationQuery = (source) =>
   Object.fromEntries(CONFIGURATION_QUERY_KEYS.filter((key) => source[key]).map((key) => [key, source[key]]));

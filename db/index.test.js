@@ -48,6 +48,18 @@ describe("TowtruckDatabase", () => {
 
       expect.deepStrictEqual(actual, { name: "test-repo" });
     });
+
+    it("deletes saved configurations that use the legacy filter params", () => {
+      new TowtruckDatabase(testDbPath);
+      const insert = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES ('saved-configuration', ?, 'config', ?);");
+      const legacyQueries = [{ alertFilter: "criticalOnly" }, { tag: "wordpress-theme" }, { mode: "publishing", sortBy: "name" }];
+      legacyQueries.forEach((query, index) => insert.run(`my-org/legacy-${index}`, JSON.stringify({ name: `Legacy ${index}`, query, userEmail: "alice@dxw.com" })));
+      insert.run("my-org/current", JSON.stringify({ name: "Current", query: { filter: "{}", sortBy: "name" }, userEmail: "alice@dxw.com" }));
+
+      const configs = new TowtruckDatabase(testDbPath).getAllSavedConfigurationsForOrg("my-org");
+
+      expect.deepStrictEqual(configs.map((config) => config.name), ["Current"]);
+    });
   });
 
   describe("saveToRepository", () => {
@@ -559,7 +571,7 @@ describe("TowtruckDatabase", () => {
     it("persists a configuration and returns it via getAllSavedConfigurationsForOrg", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const query = { sortBy: "openIssues", sortDirection: "desc", alertFilter: "criticalOnly" };
+      const query = { sortBy: "openIssues", sortDirection: "desc", filter: "{\"runtimeCritical\":{\"filterType\":\"number\",\"type\":\"greaterThan\",\"filter\":0}}" };
       db.saveConfiguration("my-org", "My Config", query, "alice@dxw.com");
 
       const configs = db.getAllSavedConfigurationsForOrg("my-org");
