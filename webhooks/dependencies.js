@@ -5,6 +5,7 @@ import {
 } from "../utils/endOfLifeDateApi/fetchAllDependencyEolInfo.js";
 import { EndOfLifeDateApiClient } from "../utils/endOfLifeDateApi/index.js";
 import { getDependenciesForRepo } from "../utils/renovate/dependencyDashboard.js";
+import { isPushToDefaultBranch } from "./isPushToDefaultBranch.js";
 
 /**
  * @typedef {import("./index.js").Event<T>} Event<T>
@@ -34,7 +35,7 @@ export const handleEvent = async ({ payload, octokit }, db, apiClient) => {
  */
 export const onPush = async (event) => {
   console.log(`Push to ${event.payload.repository.name}: ${event.payload.ref}`);
-  if (event.payload.ref === "refs/heads/main") {
+  if (isPushToDefaultBranch(event.payload)) {
     return await handleEvent(
       event,
       new TowtruckDatabase(),

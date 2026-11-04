@@ -1,5 +1,6 @@
 import { TowtruckDatabase } from "../db/index.js";
 import { getCommitsForRepo } from "../utils/githubApi/fetchCommits.js";
+import { isPushToDefaultBranch } from "./isPushToDefaultBranch.js";
 
 /**
  * @typedef {import("./index.js").Event<T>} Event<T>
@@ -24,7 +25,7 @@ export const handleEvent = async ({ payload, octokit }, db) => {
  * @param {Event<"push">} event
  */
 export const onPush = async (event) => {
-  if (event.payload.ref === `refs/heads/${event.payload.repository.default_branch}`) {
+  if (isPushToDefaultBranch(event.payload)) {
     return await handleEvent(event, new TowtruckDatabase());
   }
 };
