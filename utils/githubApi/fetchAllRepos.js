@@ -3,6 +3,7 @@ import { getDependenciesForRepo } from "../renovate/dependencyDashboard.js";
 import { getOpenPRsForRepo } from "./fetchOpenPrs.js";
 import { getOpenIssuesForRepo } from "./fetchOpenIssues.js";
 import { getDependabotAlertsForRepo } from "./fetchDependabotAlerts.js";
+import { getCommitsForRepo } from "./fetchCommits.js";
 
 /**
  * @typedef {import('../index.js').StoredRepo} StoredRepo
@@ -19,6 +20,7 @@ import { getDependabotAlertsForRepo } from "./fetchDependabotAlerts.js";
  * @property {Object} prInfo
  * @property {Object} issueInfo
  * @property {Object} alerts
+ * @property {Object} commitInfo
  */
 
 /**
@@ -49,8 +51,12 @@ export const fetchForRepo = async (repository, octokit) => {
       repository,
       octokit,
     }),
-  ]).then(([dependencies, prInfo, issueInfo, alerts]) => {
-    repo = { repo, dependencies, prInfo, issueInfo, alerts };
+    getCommitsForRepo({
+      repository,
+      octokit,
+    }),
+  ]).then(([dependencies, prInfo, issueInfo, alerts, commitInfo]) => {
+    repo = { repo, dependencies, prInfo, issueInfo, alerts, commitInfo };
   });
 
   return repo;
@@ -77,6 +83,7 @@ export const saveAllRepos = async (allRepos, db) => {
         db.saveToRepository(name, "pullRequests", repo.prInfo);
         db.saveToRepository(name, "issues", repo.issueInfo);
         db.saveToRepository(name, "dependabotAlerts", repo.alerts);
+        db.saveToRepository(name, "commits", repo.commitInfo);
       });
     });
 

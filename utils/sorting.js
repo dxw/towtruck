@@ -77,6 +77,9 @@ export const sortByType = (repos, sortDirection, sortBy) => {
     case "updatedAt":
       return sortByISO8601Timestamp(repos, sortDirection, "updatedAtISO8601");
 
+    case "mostRecentNonBotCommitAt":
+      return sortByISO8601Timestamp(repos, sortDirection, "mostRecentNonBotCommitAtISO8601");
+
     case "mostRecentPrOpenedAt":
       return sortByISO8601Timestamp(repos, sortDirection, "mostRecentPrOpenedAtISO8601");
 

@@ -14,6 +14,8 @@ const uiRepo = {
   oldestOpenPrOpenedAtISO8601: "2026-01-01T00:00:00Z",
   updatedAt: "2 Feb 2026",
   updatedAtISO8601: "2026-02-02T00:00:00Z",
+  mostRecentNonBotCommitAt: "6 Jun 2026",
+  mostRecentNonBotCommitAtISO8601: "2026-06-06T00:00:00Z",
   mostRecentPrOpenedAt: "3 Mar 2026",
   mostRecentPrOpenedAtISO8601: "2026-03-03T00:00:00Z",
   mostRecentIssueOpenedAt: "4 Apr 2026",
@@ -41,6 +43,7 @@ describe("mapRepoToGridRow", () => {
       openBotPrCount: 2,
       oldestOpenPrOpenedAt: { iso: "2026-01-01T00:00:00Z", display: "1 Jan 2026" },
       updatedAt: { iso: "2026-02-02T00:00:00Z", display: "2 Feb 2026" },
+      mostRecentNonBotCommitAt: { iso: "2026-06-06T00:00:00Z", display: "6 Jun 2026" },
       mostRecentPrOpenedAt: { iso: "2026-03-03T00:00:00Z", display: "3 Mar 2026" },
       mostRecentIssueOpenedAt: { iso: "2026-04-04T00:00:00Z", display: "4 Apr 2026" },
       oldestOpenIssueOpenedAt: { iso: "2025-05-05T00:00:00Z", display: "5 May 2025" },
@@ -90,6 +93,7 @@ describe("mapRepoToGridRow", () => {
     const row = mapRepoToGridRow({ name: "empty", htmlUrl: "https://github.com/dxw/empty" });
 
     expect.deepStrictEqual(row.oldestOpenPrOpenedAt, { iso: null, display: null });
+    expect.deepStrictEqual(row.mostRecentNonBotCommitAt, { iso: null, display: null });
     expect.deepStrictEqual(row.tags, []);
     expect.strictEqual(row.language, null);
     expect.strictEqual(row.openPrCount, null);

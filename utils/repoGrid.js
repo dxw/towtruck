@@ -13,6 +13,7 @@
  * @property {number|null} openBotPrCount
  * @property {GridDate} oldestOpenPrOpenedAt
  * @property {GridDate} updatedAt
+ * @property {GridDate} mostRecentNonBotCommitAt
  * @property {GridDate} mostRecentPrOpenedAt
  * @property {GridDate} mostRecentIssueOpenedAt
  * @property {GridDate} oldestOpenIssueOpenedAt
@@ -76,6 +77,7 @@ export const mapRepoToGridRow = (repo) => {
     openBotPrCount: repo.openBotPrCount ?? null,
     oldestOpenPrOpenedAt: gridDate(repo.oldestOpenPrOpenedAtISO8601, repo.oldestOpenPrOpenedAt),
     updatedAt: gridDate(repo.updatedAtISO8601, repo.updatedAt),
+    mostRecentNonBotCommitAt: gridDate(repo.mostRecentNonBotCommitAtISO8601, repo.mostRecentNonBotCommitAt),
     mostRecentPrOpenedAt: gridDate(repo.mostRecentPrOpenedAtISO8601, repo.mostRecentPrOpenedAt),
     mostRecentIssueOpenedAt: gridDate(repo.mostRecentIssueOpenedAtISO8601, repo.mostRecentIssueOpenedAt),
     oldestOpenIssueOpenedAt: gridDate(repo.oldestOpenIssueOpenedAtISO8601, repo.oldestOpenIssueOpenedAt),

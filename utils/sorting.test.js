@@ -200,6 +200,19 @@ describe("sortByType", () => {
     );
   });
 
+  it('sorts the repos by the date of the most recent non-bot commit if "mostRecentNonBotCommitAt" is provided', () => {
+    const reposToSort = [
+      { name: "Repo 1", mostRecentNonBotCommitAtISO8601: "2022-01-01T00:00:00Z" },
+      { name: "Repo 2", mostRecentNonBotCommitAtISO8601: null },
+      { name: "Repo 3", mostRecentNonBotCommitAtISO8601: "2023-01-01T00:00:00Z" },
+    ];
+
+    expect.deepEqual(
+      sortByType(reposToSort, "desc", "mostRecentNonBotCommitAt").map((repo) => repo.name),
+      ["Repo 3", "Repo 1", "Repo 2"]
+    );
+  });
+
   it('sorts the repos by the date they were last updated if "mostRecentIssueOpenedAt" is provided', () => {
     const reposToSort = [
       { name: "Repo 1", mostRecentIssueOpenedAtISO8601: "2022-01-01T00:00:00Z" },

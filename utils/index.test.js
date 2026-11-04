@@ -29,6 +29,9 @@ describe("mapRepoFromStorageToUi", () => {
           mostRecentIssueOpenedAt: "2023-03-03T00:00:00Z",
           oldestOpenIssueOpenedAt: "2024-04-04T00:00:00Z",
         },
+        commits: {
+          mostRecentNonBotCommitAt: "2025-05-05T00:00:00Z",
+        },
         dependencies: [],
       },
     };
@@ -56,6 +59,8 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
         oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
+        mostRecentNonBotCommitAt: formatDate("2025-05-05T00:00:00Z"),
+        mostRecentNonBotCommitAtISO8601: "2025-05-05T00:00:00Z",
         languageColor: undefined,
       },
     ];
@@ -140,6 +145,8 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
         oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
+        mostRecentNonBotCommitAt: null,
+        mostRecentNonBotCommitAtISO8601: null,
         languageColor: "rose",
       },
       {
@@ -164,6 +171,8 @@ describe("mapRepoFromStorageToUi", () => {
         mostRecentIssueOpenedAtISO8601: "2023-03-03T00:00:00Z",
         oldestOpenIssueOpenedAt: formatDate("2024-04-04T00:00:00Z"),
         oldestOpenIssueOpenedAtISO8601: "2024-04-04T00:00:00Z",
+        mostRecentNonBotCommitAt: null,
+        mostRecentNonBotCommitAtISO8601: null,
         languageColor: "emerald",
       },
     ];

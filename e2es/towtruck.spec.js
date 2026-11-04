@@ -51,6 +51,17 @@ test("has dependency info", async ({ page, baseURL }) => {
     },
     page
   );
+
+  await testSortingForColumn(
+    {
+      name: "Most recent non-bot commit",
+      ascValue: "mostRecentNonBotCommitAt",
+      descValue: "mostRecentNonBotCommitAt",
+      topAscending: "php-missing",
+      topDescending: "govuk-blogs",
+    },
+    page
+  );
 });
 
 const testSortingForColumn = async (
@@ -88,6 +99,7 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Open bot PRs",
     "Oldest open PR",
     "Updated at",
+    "Most recent non-bot commit",
     "Most recent PR",
     "Most recent issue",
     "Oldest open issue",
@@ -157,7 +169,7 @@ test("the No tags button toggles filtering to repos without tags", async ({ page
   await expect(repoNames).toHaveCount(countWithAlerts);
 });
 
-const DATE_COLUMN_IDS = ["oldestOpenPrOpenedAt", "updatedAt", "mostRecentPrOpenedAt", "mostRecentIssueOpenedAt", "oldestOpenIssueOpenedAt"];
+const DATE_COLUMN_IDS = ["oldestOpenPrOpenedAt", "updatedAt", "mostRecentNonBotCommitAt", "mostRecentPrOpenedAt", "mostRecentIssueOpenedAt", "oldestOpenIssueOpenedAt"];
 
 test("shows dates in the table as MMM YYYY", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw`);
@@ -189,6 +201,22 @@ test("right aligns the date columns", async ({ page, baseURL }) => {
       await expect(cell).toHaveClass(/ag-right-aligned-cell/);
     }
   }
+});
+
+test("shows the date of the most recent non-bot commit", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const grid = page.getByTestId("repo-grid");
+  await expect(grid.locator(".ag-root")).toBeVisible();
+  // The pinned repo column is rendered in a separate row element, so match the rows up by index
+  const commitDateFor = async (repoName) => {
+    const rowIndex = await grid.locator(".ag-row", { has: page.getByRole("link", { name: repoName }) }).getAttribute("row-index");
+    return grid.locator(`.ag-row[row-index='${rowIndex}'] [col-id='mostRecentNonBotCommitAt']`);
+  };
+
+  await expect(await commitDateFor("govuk-blogs")).toHaveText("Aug 2024");
+  await expect(await commitDateFor("php-missing")).toHaveText("Nov 2023");
+  await expect(await commitDateFor("optionparser")).toHaveText("\u2014");
 });
 
 test("shows a placeholder in the end of life column when no dependencies are affected", async ({ page, baseURL }) => {

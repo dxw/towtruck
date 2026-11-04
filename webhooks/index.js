@@ -3,6 +3,7 @@ import { OctokitApp } from "../octokitApp.js";
 import { onPullRequestClosed, onPullRequestOpened } from "./pullRequests.js";
 import { onIssueClosed, onIssueOpened } from "./issues.js";
 import { onIssueEdited, onPush } from "./dependencies.js";
+import { onPush as onPushForCommits } from "./commits.js";
 import { onDependabotAlert } from "./alerts.js";
 import { onRepository } from "./repository.js";
 
@@ -35,6 +36,7 @@ if (!OctokitApp.app) {
   registerWebhook("issues.closed", onIssueClosed);
 
   registerWebhook("push", onPush);
+  registerWebhook("push", onPushForCommits);
   registerWebhook("issues.edited", onIssueEdited);
 
   registerWebhook("dependabot_alert", onDependabotAlert);

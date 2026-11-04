@@ -285,6 +285,49 @@ describe("fetchForRepo", () => {
 
     expect.deepStrictEqual(actual.alerts, expected);
   });
+
+  it("should fetch the most recent non-bot commit", async (t) => {
+    const responses = {
+      "https://some.api/issues": {
+        data: [],
+      },
+      "https://some.api/pulls": {
+        data: [],
+      },
+      "https://some.api/commits?per_page=100": {
+        data: [
+          {
+            author: { login: "renovate[bot]", type: "Bot" },
+            commit: { author: { date: "2024-10-10T11:22:33Z" } },
+          },
+          {
+            author: { login: "foo", type: "User" },
+            commit: { author: { date: "2024-01-01T12:34:56Z" } },
+          },
+        ],
+      },
+    };
+
+    t.mock.method(octokit, "request", async (url) =>
+      Promise.resolve(responses[url]),
+    );
+
+    const repository = {
+      name: "repo",
+      owner: {
+        login: "dxw",
+      },
+      issues_url: "https://some.api/issues",
+      pulls_url: "https://some.api/pulls",
+      commits_url: "https://some.api/commits{/sha}",
+    };
+
+    const actual = await fetchForRepo(repository, octokit);
+
+    expect.deepStrictEqual(actual.commitInfo, {
+      mostRecentNonBotCommitAt: new Date("2024-01-01T12:34:56Z"),
+    });
+  });
 });
 
 describe("saveAllRepos", () => {
@@ -307,6 +350,9 @@ describe("saveAllRepos", () => {
       alerts: {
         totalOpenAlerts: 4,
       },
+      commitInfo: {
+        mostRecentNonBotCommitAt: "2024-01-01T00:00:00Z",
+      },
     };
 
     const repo2 = {
@@ -324,6 +370,9 @@ describe("saveAllRepos", () => {
       alerts: {
         totalOpenAlerts: 2,
       },
+      commitInfo: {
+        mostRecentNonBotCommitAt: "2024-02-01T00:00:00Z",
+      },
     };
 
     const allRepos = [repo1, repo2];
@@ -332,7 +381,7 @@ describe("saveAllRepos", () => {
 
     expect.strictEqual(db.transaction.mock.callCount(), 1);
 
-    expect.strictEqual(db.saveToRepository.mock.callCount(), 12);
+    expect.strictEqual(db.saveToRepository.mock.callCount(), 14);
 
     expect.deepStrictEqual(db.saveToRepository.mock.calls[0].arguments, [
       "dxw/repo1",
@@ -364,36 +413,46 @@ describe("saveAllRepos", () => {
       "dependabotAlerts",
       repo1.alerts,
     ]);
-
     expect.deepStrictEqual(db.saveToRepository.mock.calls[6].arguments, [
+      "dxw/repo1",
+      "commits",
+      repo1.commitInfo,
+    ]);
+
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[7].arguments, [
       "dxw/repo2",
       "main",
       repo2.repo,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[7].arguments, [
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[8].arguments, [
       "dxw/repo2",
       "owner",
       repo2.repo.owner,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[8].arguments, [
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[9].arguments, [
       "dxw/repo2",
       "dependencies",
       repo2.dependencies,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[9].arguments, [
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[10].arguments, [
       "dxw/repo2",
       "pullRequests",
       repo2.prInfo,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[10].arguments, [
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[11].arguments, [
       "dxw/repo2",
       "issues",
       repo2.issueInfo,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[11].arguments, [
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[12].arguments, [
       "dxw/repo2",
       "dependabotAlerts",
       repo2.alerts,
+    ]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[13].arguments, [
+      "dxw/repo2",
+      "commits",
+      repo2.commitInfo,
     ]);
   });
 });

@@ -38,6 +38,9 @@ const repos = [
       mostRecentIssueOpenedAt: '2024-04-04T12:34:56.000Z',
       oldestOpenIssueOpenedAt: '2021-01-01T12:34:56.000Z',
     },
+    commits: {
+      mostRecentNonBotCommitAt: '2024-08-20T10:00:00.000Z',
+    },
     dependabotAlerts: {
       totalOpenAlerts: 3,
       lowSeverityAlerts: 1,
@@ -79,6 +82,9 @@ const repos = [
       mostRecentIssueOpenedAt: '2024-04-04T12:34:56.000Z',
       oldestOpenIssueOpenedAt: '2021-01-01T12:34:56.000Z',
     },
+    commits: {
+      mostRecentNonBotCommitAt: null,
+    },
     dependabotAlerts: {
       totalOpenAlerts: 1,
       lowSeverityAlerts: 0,
@@ -117,6 +123,9 @@ const repos = [
       mostRecentIssueOpenedAt: '2024-04-04T12:34:56.000Z',
       oldestOpenIssueOpenedAt: '2021-01-01T12:34:56.000Z',
     },
+    commits: {
+      mostRecentNonBotCommitAt: '2023-11-15T10:00:00.000Z',
+    },
     dependabotAlerts: {
       totalOpenAlerts: 0,
       lowSeverityAlerts: 0,
@@ -139,6 +148,7 @@ for (const repo of repos) {
   db.saveToRepository(key, 'pullRequests', repo.pullRequests);
   db.saveToRepository(key, 'issues', repo.issues);
   db.saveToRepository(key, 'dependabotAlerts', repo.dependabotAlerts);
+  db.saveToRepository(key, 'commits', repo.commits);
   db.saveToRepository(key, 'dependencies', repo.dependencies);
 }
 

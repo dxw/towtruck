@@ -151,6 +151,9 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
     const mostRecentBotPrClosedAt = repo.pullRequests.mostRecentBotPrClosedAt && formatDate(repo.pullRequests.mostRecentBotPrClosedAt, dateStyle);
     const mostRecentIssueOpenedAt = repo.issues.mostRecentIssueOpenedAt && formatDate(repo.issues.mostRecentIssueOpenedAt, dateStyle);
     const oldestOpenIssueOpenedAt = repo.issues.oldestOpenIssueOpenedAt && formatDate(repo.issues.oldestOpenIssueOpenedAt, dateStyle);
+    // Repos stored before commit tracking was added have no commit data until they are next refreshed
+    const mostRecentNonBotCommitAtISO8601 = repo.commits?.mostRecentNonBotCommitAt ?? null;
+    const mostRecentNonBotCommitAt = mostRecentNonBotCommitAtISO8601 && formatDate(mostRecentNonBotCommitAtISO8601, dateStyle);
 
     const languageColor = hashToTailwindColor(repo.main.language);
 
@@ -171,6 +174,8 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
       mostRecentIssueOpenedAtISO8601: repo.issues.mostRecentIssueOpenedAt,
       oldestOpenIssueOpenedAt,
       oldestOpenIssueOpenedAtISO8601: repo.issues.oldestOpenIssueOpenedAt,
+      mostRecentNonBotCommitAt,
+      mostRecentNonBotCommitAtISO8601,
       languageColor,
     };
   });
