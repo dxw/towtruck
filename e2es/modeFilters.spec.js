@@ -29,6 +29,25 @@ test("the Only Publishing button toggles filtering to repos marked govpress", as
   await expect(grid.locator(".ag-header-cell[col-id='tags']")).not.toHaveClass(/ag-header-cell-filtered/);
 });
 
+test("the Only D+ button filters to repos tagged dxw-delivery-plus", async ({ page, baseURL }) => {
+  // None of the seeded test repos are D+ repos, so retag them in the served page
+  await page.route(`${baseURL}/dxw`, async (route) => {
+    const response = await route.fetch();
+    const body = (await response.text())
+      .replace('"tags":["govpress","wordpress-theme"]', '"tags":["dxw-delivery-plus"]')
+      .replace('"tags":["composer","govpress","packagist","php"]', '"tags":["delivery-plus","internal"]');
+    await route.fulfill({ response, body });
+  });
+  await page.goto(`${baseURL}/dxw`);
+
+  const repoNames = page.getByTestId("repo-grid").locator("[col-id='name'].ag-cell");
+  await expect(repoNames).toHaveCount(3);
+
+  await page.getByRole("button", { name: "Only D+" }).click();
+  await expect.poll(() => urlFilterModel(page)).toEqual({ tags: modeFilter("d-plus") });
+  await expect(repoNames).toHaveText(["govuk-blogs"]);
+});
+
 test("choosing a mode replaces the other mode and tag filters", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw?${filterQuery({
     tags: { filterType: "text", operator: "OR", conditions: [modeFilter("publishing"), hasTag("wordpress-theme")] },

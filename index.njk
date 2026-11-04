@@ -121,7 +121,7 @@
         const hasAnyTag = (tags, candidates) => candidates.some((tag) => tags.includes(tag));
 
         const MODES = {
-          'd-plus': { name: 'D+', test: (tags) => hasAnyTag(tags, ['d-plus', 'delivery-plus', 'internal']) && !tags.includes('govpress') },
+          'd-plus': { name: 'D+', test: (tags) => tags.includes('dxw-delivery-plus') },
           publishing: { name: 'Publishing', test: (tags) => tags.includes('govpress') },
           ops: { name: 'Ops', test: (tags) => hasAnyTag(tags, ['dalmatian', 'tech-ops']) },
         };
