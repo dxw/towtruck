@@ -194,6 +194,8 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
  * @property {string} name - The name of the repo Eg "dalmation".
  * @property {string} description - A brief description of the repo.
  * @property {string} html_url - The URL to the repo on GitHub for humans.
+ * @property {boolean} private - Whether the repo is private.
+ * @property {"public"|"private"|"internal"} [visibility] - The repo's visibility.
  * @property {string} pulls_url - The API url to get more info on pull requests for this repo.
  * @property {string} issues_url - The API url to get more info on issues for this repo.
  * @property {string} updated_at - The date the repo was last updated in ISO8601 format.
@@ -209,6 +211,7 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
  * @property {string} description - A brief description of the repo.
  * @property {string} htmlUrl - The URL to the repo on GitHub for humans.
  * @property {string} apiUrl - The URL to the repo on GitHub for computers.
+ * @property {"public"|"private"|"internal"|null} visibility - The repo's visibility, or null if GitHub didn't provide it.
  * @property {string} pullsUrl - The API url to get more info on pull requests for this repo.
  * @property {string} issuesUrl - The API url to get more info on issues for this repo.
  * @property {string} updatedAt - The date the repo was last updated in ISO8601 format.
@@ -225,6 +228,17 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
  */
 
 /**
+ * Some GitHub payloads only include the `private` flag, not `visibility`.
+ * @param {ApiRepo} repo
+ * @returns {"public"|"private"|"internal"|null}
+ */
+const mapVisibility = (repo) => {
+  if (repo.visibility) return repo.visibility;
+  if (typeof repo.private === "boolean") return repo.private ? "private" : "public";
+  return null;
+};
+
+/**
  * Maps from an API repo to a StoredRepo
  * @param {ApiRepo} repo
  * @returns {StoredRepo}
@@ -235,6 +249,7 @@ export const mapRepoFromApiForStorage = (repo) => ({
   description: repo.description,
   htmlUrl: repo.html_url,
   apiUrl: repo.url,
+  visibility: mapVisibility(repo),
   pullsUrl: repo.pulls_url,
   issuesUrl: repo.issues_url,
   updatedAt: repo.updated_at,

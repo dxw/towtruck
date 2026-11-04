@@ -7,6 +7,7 @@ const uiRepo = {
   htmlUrl: "https://github.com/dxw/towtruck",
   description: "Keeping on top of dxw's repos",
   language: "JavaScript",
+  visibility: "public",
   topics: ["d-plus", "internal"],
   openPrCount: 3,
   openBotPrCount: 2,
@@ -41,6 +42,7 @@ describe("mapRepoToGridRow", () => {
       htmlUrl: "https://github.com/dxw/towtruck",
       description: "Keeping on top of dxw's repos",
       language: "JavaScript",
+      visibility: "public",
       openPrCount: 3,
       openBotPrCount: 2,
       oldestOpenPrOpenedAt: { iso: "2026-01-01T00:00:00Z", display: "1 Jan 2026" },
@@ -102,6 +104,7 @@ describe("mapRepoToGridRow", () => {
     expect.deepStrictEqual(row.mostRecentNonBotCommitAt, { iso: null, display: null });
     expect.deepStrictEqual(row.tags, []);
     expect.strictEqual(row.language, null);
+    expect.strictEqual(row.visibility, null);
     expect.strictEqual(row.description, null);
     expect.strictEqual(row.openPrCount, null);
     expect.deepStrictEqual(row.endOfLifeDependencies, []);

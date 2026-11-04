@@ -99,6 +99,7 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Repo",
     "Description",
     "Language",
+    "Visibility",
     "Open PRs",
     "Open bot PRs",
     "Oldest open PR",
@@ -127,6 +128,14 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
   await expect(
     grid.locator("[col-id='description'].ag-cell", { hasText: "Command-line option parser for PHP" })
   ).toBeVisible();
+
+  // The pinned repo column is rendered in a separate row element, so match the rows up by index
+  const visibilityFor = async (repoName) => {
+    const rowIndex = await grid.locator(".ag-row", { has: page.getByRole("link", { name: repoName }) }).getAttribute("row-index");
+    return grid.locator(`.ag-row[row-index='${rowIndex}'] [col-id='visibility']`);
+  };
+  await expect(await visibilityFor("optionparser")).toHaveText("Public");
+  await expect(await visibilityFor("php-missing")).toHaveText("Private");
 
   // Sorting by a column header reorders rows client-side
   const openIssuesHeader = grid.locator(".ag-header-cell[col-id='openIssues']");

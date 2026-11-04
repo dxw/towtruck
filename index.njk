@@ -352,6 +352,18 @@
             tooltipValueGetter: (params) => params.value || null,
           },
           { field: 'language', headerName: 'Language', width: 120, valueFormatter: (params) => params.value ?? DASH },
+          {
+            colId: 'visibility',
+            headerName: 'Visibility',
+            width: 110,
+            cellDataType: false,
+            // Capitalised in the getter so filtering matches what's displayed
+            valueGetter: (params) => {
+              const value = params.data.visibility;
+              return value ? value[0].toUpperCase() + value.slice(1) : null;
+            },
+            valueFormatter: (params) => params.value ?? DASH,
+          },
           numberColumn('openPrCount', 'Open PRs'),
           numberColumn('openBotPrCount', 'Open bot PRs'),
           dateColumn('oldestOpenPrOpenedAt', 'Oldest open PR'),

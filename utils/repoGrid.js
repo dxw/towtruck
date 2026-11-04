@@ -10,6 +10,7 @@
  * @property {string} htmlUrl
  * @property {string|null} description
  * @property {string|null} language
+ * @property {"public"|"private"|"internal"|null} visibility
  * @property {number|null} openPrCount
  * @property {number|null} openBotPrCount
  * @property {GridDate} oldestOpenPrOpenedAt
@@ -75,6 +76,7 @@ export const mapRepoToGridRow = (repo) => {
     htmlUrl: repo.htmlUrl,
     description: repo.description || null,
     language: repo.language ?? null,
+    visibility: repo.visibility ?? null,
     openPrCount: repo.openPrCount ?? null,
     openBotPrCount: repo.openBotPrCount ?? null,
     oldestOpenPrOpenedAt: gridDate(repo.oldestOpenPrOpenedAtISO8601, repo.oldestOpenPrOpenedAt),

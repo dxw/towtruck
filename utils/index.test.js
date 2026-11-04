@@ -625,6 +625,7 @@ describe("mapRepoFromStorageToUi", () => {
           "Icinga plugin to fetch security vulnerabilities for a GitHub organization.",
         htmlUrl: "https://github.com/dxw/security-alert-notifier",
         apiUrl: "https://api.github.com/repos/dxw/security-alert-notifier",
+        visibility: "public",
         pullsUrl:
           "https://api.github.com/repos/dxw/security-alert-notifier/pulls{/number}",
         issuesUrl:
@@ -636,6 +637,20 @@ describe("mapRepoFromStorageToUi", () => {
       };
 
       expect.deepEqual(mapRepoFromApiForStorage(apiRepo), repoToSave);
+    });
+
+    it("falls back to the private flag when visibility is missing", () => {
+      const apiRepo = { name: "repo", owner: { login: "dxw" } };
+
+      expect.strictEqual(mapRepoFromApiForStorage({ ...apiRepo, private: true }).visibility, "private");
+      expect.strictEqual(mapRepoFromApiForStorage({ ...apiRepo, private: false }).visibility, "public");
+      expect.strictEqual(mapRepoFromApiForStorage(apiRepo).visibility, null);
+    });
+
+    it("keeps internal visibility", () => {
+      const apiRepo = { name: "repo", owner: { login: "dxw" }, private: true, visibility: "internal" };
+
+      expect.strictEqual(mapRepoFromApiForStorage(apiRepo).visibility, "internal");
     });
   });
 });
