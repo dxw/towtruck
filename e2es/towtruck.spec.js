@@ -68,18 +68,20 @@ const testSortingForColumn = async (
   { ascValue, descValue, topAscending, topDescending },
   page
 ) => {
-  const sortSelect = page.getByTestId("sort-controls").locator("select");
-
-  // Select ascending
-  const ascUrl = await sortSelect.locator(`option[value*="sortBy=${ascValue}"][value*="sortDirection=asc"]`).getAttribute("value");
-  await sortSelect.selectOption(ascUrl);
+  await page.goto(`/dxw?sortBy=${ascValue}&sortDirection=asc`);
   await assertFirstRow(topAscending, page);
 
-  // Select descending
-  const descUrl = await sortSelect.locator(`option[value*="sortBy=${descValue}"][value*="sortDirection=desc"]`).getAttribute("value");
-  await sortSelect.selectOption(descUrl);
+  await page.goto(`/dxw?sortBy=${descValue}&sortDirection=desc`);
   await assertFirstRow(topDescending, page);
 };
+
+test("does not show a sort dropdown in the filter bar", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  await expect(page.getByTestId("filter-row")).toBeVisible();
+  await expect(page.getByTestId("sort-controls")).toHaveCount(0);
+  await expect(page.getByTestId("filter-row").locator("select")).toHaveCount(0);
+});
 
 const assertFirstRow = async (expectedRepoName, page) => {
   const firstRowName = page.getByTestId("repo-grid").locator(".ag-row[row-index='0'] [col-id='name']");

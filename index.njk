@@ -36,10 +36,10 @@
           {% if dPlusMode or publishingMode or opsMode %}<span class="text-xs font-medium text-blue-600 dark:text-blue-400">Open bot PRs: {{ totalOpenBotPrs }}</span>{% endif %}
         </h2>
 
-        <!-- Controls box: filters, sorts, save, saved configurations -->
+        <!-- Controls box: filters, save, saved configurations -->
         <div class="mx-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-200 dark:divide-slate-700">
 
-          <!-- Alert filters + sort + save row -->
+          <!-- Alert filters + save row -->
           <div class="p-2 flex flex-wrap items-center gap-2" data-testid="filter-row">
             <!-- Critical alerts filter (toggles off when already active) -->
             {% if alertFilter === 'criticalOnly' %}
@@ -99,43 +99,6 @@
             <a href="{{ untaggedParams }}" data-testid="untagged-filter" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if untaggedActive %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
               No tags
             </a>
-
-            <!-- Sort dropdown -->
-            <div class="flex items-center gap-1" data-testid="sort-controls">
-              <label for="sort-select" class="text-xs text-slate-500 dark:text-slate-400 font-medium">Sort:</label>
-              <select id="sort-select" class="rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 text-sm px-2 py-1 focus:outline-none focus:ring-2 focus:ring-slate-400 dark:focus:ring-slate-500 cursor-pointer"
-                onchange="window.location.href=this.value">
-                {% set defaultParams = baseUrl %}
-                {% set defaultSep = "?" %}
-                {% if alertFilter %}{% set defaultParams = defaultParams + defaultSep + "alertFilter=" + alertFilter %}{% set defaultSep = "&" %}{% endif %}
-                {% if tag %}{% set defaultParams = defaultParams + defaultSep + "tag=" + tag %}{% endif %}
-                <option value="{{ defaultParams }}" {% if not sortBy %}selected{% endif %}>Default</option>
-                {% set sortOptions = [
-                  { name: "Critical alerts", id: "criticalSeverityAlerts" },
-                  { name: "Total alerts", id: "totalOpenAlerts" },
-                  { name: "Open issues", id: "openIssues" },
-                  { name: "Open bot PRs", id: "openBotPrCount" },
-                  { name: "Open PRs", id: "openPrCount" },
-                  { name: "Updated at", id: "updatedAt" },
-                  { name: "Most recent non-bot commit", id: "mostRecentNonBotCommitAt" },
-                  { name: "Most recent PR", id: "mostRecentPrOpenedAt" },
-                  { name: "Oldest open PR", id: "oldestOpenPrOpenedAt" },
-                  { name: "Last bot PR closed", id: "mostRecentBotPrClosedAt" },
-                  { name: "Most recent issue", id: "mostRecentIssueOpenedAt" },
-                  { name: "Oldest open issue", id: "oldestOpenIssueOpenedAt" }
-                ] %}
-                {% for opt in sortOptions %}
-                  {% set optParams = baseUrl + "?sortBy=" + opt.id + "&sortDirection=asc" %}
-                  {% if alertFilter %}{% set optParams = optParams + "&alertFilter=" + alertFilter %}{% endif %}
-                  {% if tag %}{% set optParams = optParams + "&tag=" + tag %}{% endif %}
-                  <option value="{{ optParams }}" {% if sortBy === opt.id and sortDirection === "asc" %}selected{% endif %}>{{ opt.name }} ↓</option>
-                  {% set optParamsDesc = baseUrl + "?sortBy=" + opt.id + "&sortDirection=desc" %}
-                  {% if alertFilter %}{% set optParamsDesc = optParamsDesc + "&alertFilter=" + alertFilter %}{% endif %}
-                  {% if tag %}{% set optParamsDesc = optParamsDesc + "&tag=" + tag %}{% endif %}
-                  <option value="{{ optParamsDesc }}" {% if sortBy === opt.id and sortDirection === "desc" %}selected{% endif %}>{{ opt.name }} ↑</option>
-                {% endfor %}
-              </select>
-            </div>
 
             <!-- Save new config -->
             <details class="group/save relative ml-auto">
