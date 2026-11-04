@@ -305,6 +305,29 @@ describe("TowtruckDatabase", () => {
     });
   });
 
+  describe("deleteRepository", () => {
+    it("removes all data for the given repository only", () => {
+      const db = new TowtruckDatabase(testDbPath);
+
+      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const selectStatement = new Database(testDbPath).prepare("SELECT scope, name, key FROM towtruck_data ORDER BY id;");
+
+      insertStatement.run("repository", "dxw/test-repo", "main", JSON.stringify({}));
+      insertStatement.run("repository", "dxw/test-repo", "dependencies", JSON.stringify([]));
+      insertStatement.run("repository", "dxw/another-repo", "main", JSON.stringify({}));
+      insertStatement.run("dependency", "dxw/test-repo", "some-data", JSON.stringify({}));
+
+      db.deleteRepository("dxw/test-repo");
+
+      const actual = selectStatement.all();
+
+      expect.deepStrictEqual(actual, [
+        { scope: "repository", name: "dxw/another-repo", key: "main" },
+        { scope: "dependency", name: "dxw/test-repo", key: "some-data" },
+      ]);
+    });
+  });
+
   describe("deleteAllRepositories", () => {
     it("removes the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);

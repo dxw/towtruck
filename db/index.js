@@ -41,6 +41,7 @@ export class TowtruckDatabase {
   #getAllForNameLikeStatement;
   #getAllForScopeStatement;
   #deleteAllForScopeStatement;
+  #deleteAllForNameStatement;
   #getAllConfigurationsForOrgStatement;
   #getAllConfigurationsForUserStatement;
 
@@ -53,6 +54,7 @@ export class TowtruckDatabase {
     this.#getAllForNameLikeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ? AND name LIKE ?;")
     this.#getAllForScopeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ?;");
     this.#deleteAllForScopeStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ?;");
+    this.#deleteAllForNameStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ? AND name = ?;");
     this.#getAllConfigurationsForOrgStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? ORDER BY id ASC;");
     this.#getAllConfigurationsForUserStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? AND json_extract(value, '$.userEmail') = ? ORDER BY id ASC;");
   }
@@ -110,6 +112,10 @@ export class TowtruckDatabase {
     return this.#deleteAllForScopeStatement.run(scope);
   }
 
+  #deleteAllForName(scope, name) {
+    return this.#deleteAllForNameStatement.run(scope, name);
+  }
+
   saveToRepository(name, key, data) {
     return this.#save("repository", name, key, data);
   }
@@ -128,6 +134,10 @@ export class TowtruckDatabase {
 
   getAllRepositoriesForOrg(org) {
     return this.#getAllForNameLike("repository", `${org}/%`);
+  }
+
+  deleteRepository(name) {
+    return this.#deleteAllForName("repository", name);
   }
 
   deleteAllRepositories() {

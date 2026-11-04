@@ -11,7 +11,10 @@ import { mapRepoFromApiForStorage } from "../utils/index.js";
  * @param {TowtruckDatabase} db
  */
 export const handleEvent = async ({ payload }, db) => {
-  if (payload.repository.archived) return;
+  if (payload.action === "deleted" || payload.repository.archived) {
+    db.deleteRepository(payload.repository.full_name);
+    return;
+  }
 
   let repo = mapRepoFromApiForStorage(payload.repository);
 
@@ -26,5 +29,5 @@ export const onRepository = async (event) => {
   console.log(
     `${event.payload.repository.name} updated: ${event.payload.action}`,
   );
-  handleEvent(event, new TowtruckDatabase());
+  return await handleEvent(event, new TowtruckDatabase());
 };

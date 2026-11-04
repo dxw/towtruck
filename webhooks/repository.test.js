@@ -4,6 +4,7 @@ import { handleEvent } from "./repository.js";
 
 const db = {
   saveToRepository: () => {},
+  deleteRepository: () => {},
 };
 
 const octokit = {
@@ -66,5 +67,60 @@ describe("handleEvent", () => {
       "main",
       expected,
     ]);
+  });
+
+  it("should remove the repository from the database when it is archived", async (t) => {
+    t.mock.method(db, "saveToRepository");
+    t.mock.method(db, "deleteRepository");
+
+    const event = {
+      payload: {
+        action: "archived",
+        repository: { name: "repo", full_name: "dxw/repo", archived: true },
+      },
+      octokit,
+    };
+
+    await handleEvent(event, db);
+
+    expect.strictEqual(db.saveToRepository.mock.callCount(), 0);
+    expect.strictEqual(db.deleteRepository.mock.callCount(), 1);
+    expect.deepStrictEqual(db.deleteRepository.mock.calls[0].arguments, ["dxw/repo"]);
+  });
+
+  it("should remove an already-archived repository from the database on any other event", async (t) => {
+    t.mock.method(db, "saveToRepository");
+    t.mock.method(db, "deleteRepository");
+
+    const event = {
+      payload: {
+        action: "edited",
+        repository: { name: "repo", full_name: "dxw/repo", archived: true },
+      },
+      octokit,
+    };
+
+    await handleEvent(event, db);
+
+    expect.strictEqual(db.saveToRepository.mock.callCount(), 0);
+    expect.deepStrictEqual(db.deleteRepository.mock.calls[0].arguments, ["dxw/repo"]);
+  });
+
+  it("should remove the repository from the database when it is deleted", async (t) => {
+    t.mock.method(db, "saveToRepository");
+    t.mock.method(db, "deleteRepository");
+
+    const event = {
+      payload: {
+        action: "deleted",
+        repository: { name: "repo", full_name: "dxw/repo", archived: false },
+      },
+      octokit,
+    };
+
+    await handleEvent(event, db);
+
+    expect.strictEqual(db.saveToRepository.mock.callCount(), 0);
+    expect.deepStrictEqual(db.deleteRepository.mock.calls[0].arguments, ["dxw/repo"]);
   });
 });
