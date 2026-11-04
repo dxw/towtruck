@@ -33,7 +33,12 @@ RUN touch .env \
   && echo "NODE_ENV=$NODE_ENV" >> .env \
   && echo "RUN_SEED_ON_START=true" >> .env
 
-RUN npm install
+# Build tools are needed to compile better-sqlite3 when no prebuilt binary is available
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends python3 make g++ \
+  && npm install \
+  && apt-get purge -y --auto-remove python3 make g++ \
+  && rm -rf /var/lib/apt/lists/*
 
 EXPOSE 3000
 CMD [ "sh", "-c", "exec npm run start" ]
