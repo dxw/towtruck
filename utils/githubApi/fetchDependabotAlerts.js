@@ -74,8 +74,8 @@ export const handleDependabotAlertsApiResponse = ({ data }) => {
 
   const hasOpenAlertOlderThan14Days = isOlderThan14Days(oldestOpenAlertCreatedAt);
 
-  const prodOpenAlerts = openAlerts.filter(isProdAlert);
-  const devOpenAlerts = openAlerts.filter((alert) => !isProdAlert(alert));
+  const runtimeOpenAlerts = openAlerts.filter(isRuntimeAlert);
+  const devOpenAlerts = openAlerts.filter((alert) => !isRuntimeAlert(alert));
 
   return {
     totalOpenAlerts,
@@ -87,19 +87,19 @@ export const handleDependabotAlertsApiResponse = ({ data }) => {
     otherOpenAlerts,
     otherOpenAlertsCreatedAt,
     hasOpenAlertOlderThan14Days,
-    prodAlerts: countAlertsBySeverity(prodOpenAlerts),
+    runtimeAlerts: countAlertsBySeverity(runtimeOpenAlerts),
     devAlerts: countAlertsBySeverity(devOpenAlerts),
-    hasOpenProdAlertOlderThan14Days: prodOpenAlerts.some((alert) => isOlderThan14Days(alert.created_at)),
+    hasOpenRuntimeAlertOlderThan14Days: runtimeOpenAlerts.some((alert) => isOlderThan14Days(alert.created_at)),
   };
 };
 
 /**
  * Dependabot reports `dependency.scope` as "runtime", "development" or null (unknown).
- * Unknown scopes are treated as production so they aren't under-reported.
+ * Unknown scopes are treated as runtime so they aren't under-reported.
  * @param {any} alert
  * @returns {boolean}
  */
-const isProdAlert = (alert) => alert.dependency?.scope !== "development";
+const isRuntimeAlert = (alert) => alert.dependency?.scope !== "development";
 
 /**
  * @typedef {Object} AlertCounts

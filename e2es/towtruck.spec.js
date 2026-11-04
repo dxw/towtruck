@@ -107,12 +107,12 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Most recent issue",
     "Oldest open issue",
     "Open issues",
-    "Prod vulnerabilities",
+    "Runtime vulnerabilities",
     "Dev vulnerabilities",
     "End of life",
     "Tags",
     "Responsible team",
-    "Prod vulnerability > 14 days old",
+    "Runtime vulnerability > 14 days old",
   ]) {
     await expect(grid.locator(".ag-header-cell-text, .ag-header-group-text", { hasText: header }).first()).toBeAttached();
   }

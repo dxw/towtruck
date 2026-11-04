@@ -19,11 +19,11 @@
  * @property {GridDate} mostRecentIssueOpenedAt
  * @property {GridDate} oldestOpenIssueOpenedAt
  * @property {number|null} openIssues
- * @property {number|null} prodCritical
- * @property {number|null} prodHigh
- * @property {number|null} prodMedium
- * @property {number|null} prodLow
- * @property {number|null} prodTotal
+ * @property {number|null} runtimeCritical
+ * @property {number|null} runtimeHigh
+ * @property {number|null} runtimeMedium
+ * @property {number|null} runtimeLow
+ * @property {number|null} runtimeTotal
  * @property {number|null} devCritical
  * @property {number|null} devHigh
  * @property {number|null} devMedium
@@ -31,7 +31,7 @@
  * @property {number|null} devTotal
  * @property {string[]} tags
  * @property {string|null} responsibleTeam
- * @property {boolean|null} hasProdAlertOlderThan14Days
+ * @property {boolean|null} hasRuntimeAlertOlderThan14Days
  * @property {GridEndOfLifeDependency[]} endOfLifeDependencies
  */
 
@@ -63,12 +63,12 @@ const mapEndOfLifeDependencies = (dependencies = []) =>
 
 /**
  * Maps a UI repo (from `mapRepoFromStorageToUi`) to a flat row for the AG Grid table.
- * Vulnerability fields are null when Dependabot is disabled or the prod/dev split hasn't been fetched yet.
+ * Vulnerability fields are null when Dependabot is disabled or the runtime/dev split hasn't been fetched yet.
  * @param {Object} repo
  * @returns {GridRow}
  */
 export const mapRepoToGridRow = (repo) => {
-  const { prodAlerts, devAlerts } = repo;
+  const { runtimeAlerts, devAlerts } = repo;
 
   return {
     name: repo.name,
@@ -84,11 +84,11 @@ export const mapRepoToGridRow = (repo) => {
     mostRecentIssueOpenedAt: gridDate(repo.mostRecentIssueOpenedAtISO8601, repo.mostRecentIssueOpenedAt),
     oldestOpenIssueOpenedAt: gridDate(repo.oldestOpenIssueOpenedAtISO8601, repo.oldestOpenIssueOpenedAt),
     openIssues: repo.openIssues ?? null,
-    prodCritical: prodAlerts?.critical ?? null,
-    prodHigh: prodAlerts?.high ?? null,
-    prodMedium: prodAlerts?.medium ?? null,
-    prodLow: prodAlerts?.low ?? null,
-    prodTotal: prodAlerts?.total ?? null,
+    runtimeCritical: runtimeAlerts?.critical ?? null,
+    runtimeHigh: runtimeAlerts?.high ?? null,
+    runtimeMedium: runtimeAlerts?.medium ?? null,
+    runtimeLow: runtimeAlerts?.low ?? null,
+    runtimeTotal: runtimeAlerts?.total ?? null,
     devCritical: devAlerts?.critical ?? null,
     devHigh: devAlerts?.high ?? null,
     devMedium: devAlerts?.medium ?? null,
@@ -96,7 +96,7 @@ export const mapRepoToGridRow = (repo) => {
     devTotal: devAlerts?.total ?? null,
     tags: repo.topics ?? [],
     responsibleTeam: null,
-    hasProdAlertOlderThan14Days: repo.hasOpenProdAlertOlderThan14Days ?? null,
+    hasRuntimeAlertOlderThan14Days: repo.hasOpenRuntimeAlertOlderThan14Days ?? null,
     endOfLifeDependencies: mapEndOfLifeDependencies(repo.dependencies),
   };
 };

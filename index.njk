@@ -55,7 +55,7 @@
               {% if tag %}{% set criticalParams = criticalParams + "&tag=" + tag %}{% endif %}
             {% endif %}
             <a href="{{ criticalParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'criticalOnly' %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              Prod critical only
+              Runtime critical only
             </a>
 
             <!-- Any alerts filter (toggles off when already active) -->
@@ -72,7 +72,7 @@
               {% if tag %}{% set anyAlertsParams = anyAlertsParams + "&tag=" + tag %}{% endif %}
             {% endif %}
             <a href="{{ anyAlertsParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'anyAlerts' %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              Any prod alerts
+              Any runtime alerts
             </a>
 
             <!-- Mode filters (toggle off when already active) -->
@@ -318,7 +318,7 @@
           dateColumn('mostRecentIssueOpenedAt', 'Most recent issue'),
           dateColumn('oldestOpenIssueOpenedAt', 'Oldest open issue'),
           numberColumn('openIssues', 'Open issues'),
-          vulnerabilityGroup('prod', 'Prod vulnerabilities'),
+          vulnerabilityGroup('runtime', 'Runtime vulnerabilities'),
           vulnerabilityGroup('dev', 'Dev vulnerabilities'),
           {
             colId: 'endOfLifeDependencies',
@@ -342,13 +342,13 @@
           },
           { field: 'responsibleTeam', headerName: 'Responsible team', width: 150, valueFormatter: (params) => params.value ?? DASH },
           {
-            colId: 'hasProdAlertOlderThan14Days',
-            headerName: 'Prod vulnerability > 14 days old',
-            headerTooltip: 'Has an open production vulnerability more than 14 days old',
+            colId: 'hasRuntimeAlertOlderThan14Days',
+            headerName: 'Runtime vulnerability > 14 days old',
+            headerTooltip: 'Has an open runtime vulnerability more than 14 days old',
             width: 150,
             cellDataType: false,
             valueGetter: (params) => {
-              const value = params.data.hasProdAlertOlderThan14Days;
+              const value = params.data.hasRuntimeAlertOlderThan14Days;
               if (value === null) return null;
               return value ? 'Yes' : 'No';
             },

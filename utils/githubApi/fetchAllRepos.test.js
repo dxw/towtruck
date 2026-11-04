@@ -276,9 +276,9 @@ describe("fetchForRepo", () => {
       otherOpenAlerts: [],
       otherOpenAlertsCreatedAt: [],
       hasOpenAlertOlderThan14Days: false,
-      prodAlerts: { critical: 1, high: 1, medium: 1, low: 1, total: 4 },
+      runtimeAlerts: { critical: 1, high: 1, medium: 1, low: 1, total: 4 },
       devAlerts: { critical: 0, high: 0, medium: 0, low: 0, total: 0 },
-      hasOpenProdAlertOlderThan14Days: false,
+      hasOpenRuntimeAlertOlderThan14Days: false,
     };
 
     const actual = await fetchForRepo(repository, octokit);

@@ -24,9 +24,9 @@ const uiRepo = {
   oldestOpenIssueOpenedAt: "5 May 2025",
   oldestOpenIssueOpenedAtISO8601: "2025-05-05T00:00:00Z",
   totalOpenAlerts: 6,
-  prodAlerts: { critical: 1, high: 2, medium: 0, low: 1, total: 4 },
+  runtimeAlerts: { critical: 1, high: 2, medium: 0, low: 1, total: 4 },
   devAlerts: { critical: 0, high: 0, medium: 1, low: 1, total: 2 },
-  hasOpenProdAlertOlderThan14Days: true,
+  hasOpenRuntimeAlertOlderThan14Days: true,
   dependencies: [
     { name: "node", version: "18.0.0", isOutOfSupport: true, isEndOfLifeSoon: false, endOfLifeDate: new Date("2025-04-30T00:00:00Z"), endOfLifeRelative: "7 months ago" },
     { name: "php", version: "8.2.0", isOutOfSupport: false, isEndOfLifeSoon: true, endOfLifeDate: new Date("2026-12-31T00:00:00Z"), endOfLifeRelative: "in about 2 months" },
@@ -50,11 +50,11 @@ describe("mapRepoToGridRow", () => {
       mostRecentIssueOpenedAt: { iso: "2026-04-04T00:00:00Z", display: "4 Apr 2026" },
       oldestOpenIssueOpenedAt: { iso: "2025-05-05T00:00:00Z", display: "5 May 2025" },
       openIssues: 5,
-      prodCritical: 1,
-      prodHigh: 2,
-      prodMedium: 0,
-      prodLow: 1,
-      prodTotal: 4,
+      runtimeCritical: 1,
+      runtimeHigh: 2,
+      runtimeMedium: 0,
+      runtimeLow: 1,
+      runtimeTotal: 4,
       devCritical: 0,
       devHigh: 0,
       devMedium: 1,
@@ -62,7 +62,7 @@ describe("mapRepoToGridRow", () => {
       devTotal: 2,
       tags: ["d-plus", "internal"],
       responsibleTeam: null,
-      hasProdAlertOlderThan14Days: true,
+      hasRuntimeAlertOlderThan14Days: true,
       endOfLifeDependencies: [
         { name: "node", version: "18.0.0", status: "ended", date: "2025-04-30T00:00:00.000Z", relative: "7 months ago" },
         { name: "php", version: "8.2.0", status: "endingSoon", date: "2026-12-31T00:00:00.000Z", relative: "in about 2 months" },
@@ -86,11 +86,11 @@ describe("mapRepoToGridRow", () => {
     expect.strictEqual(mapRepoToGridRow(repo).endOfLifeDependencies[0].version, null);
   });
 
-  it("uses nulls for vulnerability fields when Dependabot data has no prod/dev split", () => {
-    const repo = { ...uiRepo, prodAlerts: undefined, devAlerts: undefined, hasOpenProdAlertOlderThan14Days: undefined };
+  it("uses nulls for vulnerability fields when Dependabot data has no runtime/dev split", () => {
+    const repo = { ...uiRepo, runtimeAlerts: undefined, devAlerts: undefined, hasOpenRuntimeAlertOlderThan14Days: undefined };
     const row = mapRepoToGridRow(repo);
 
-    for (const field of ["prodCritical", "prodHigh", "prodMedium", "prodLow", "prodTotal", "devCritical", "devHigh", "devMedium", "devLow", "devTotal", "hasProdAlertOlderThan14Days"]) {
+    for (const field of ["runtimeCritical", "runtimeHigh", "runtimeMedium", "runtimeLow", "runtimeTotal", "devCritical", "devHigh", "devMedium", "devLow", "devTotal", "hasRuntimeAlertOlderThan14Days"]) {
       expect.strictEqual(row[field], null, field);
     }
   });
