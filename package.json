@@ -18,7 +18,7 @@
   "author": "dxw",
   "license": "MIT",
   "engines": {
-    "node": "24.x"
+    "node": "26.x"
   },
   "dependencies": {
     "@octokit/app": "^16.0.0",
@@ -34,7 +34,7 @@
     "@eslint/js": "10.0.1",
     "@playwright/test": "1.64.1",
     "@types/cookie-parser": "1.4.10",
-    "@types/node": "24.19.2",
+    "@types/node": "26.6.6",
     "chokidar": "3.6.0",
     "eslint": "10.13.0",
     "eslint-config-prettier": "10.1.8",
