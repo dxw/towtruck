@@ -25,7 +25,7 @@ test("save configuration button is on the filter row", async ({ page, baseURL })
   await page.goto(`${baseURL}/dxw`);
 
   const filterRow = page.getByTestId("filter-row");
-  await expect(filterRow.getByRole("link", { name: "Critical only" })).toBeVisible();
+  await expect(filterRow.getByRole("link", { name: "Prod critical only" })).toBeVisible();
   await expect(filterRow.getByText("Save configuration")).toBeVisible();
 });
 
