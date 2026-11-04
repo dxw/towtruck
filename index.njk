@@ -7,24 +7,16 @@
 {% endblock %}
 
 {% block content %}
-    {% set baseUrl = dPlusBaseUrl if dPlusMode else (publishingBaseUrl if publishingMode else (opsBaseUrl if opsMode else "/" + org)) %}
-
-    {% if dPlusMode %}
-    <div class="bg-purple-600 dark:bg-purple-700 border-b-2 border-purple-800 dark:border-purple-900 px-4 py-2 text-white font-semibold text-sm flex items-center gap-3">
-      <i class="bx bx-info-circle text-base"></i>
-      <span>This dashboard shows only repos marked D+, delivery-plus, or internal.</span>
-    </div>
-    {% elif publishingMode %}
-    <div class="bg-orange-600 dark:bg-orange-700 border-b-2 border-orange-800 dark:border-orange-900 px-4 py-2 text-white font-semibold text-sm flex items-center gap-3">
-      <i class="bx bx-info-circle text-base"></i>
-      <span>This dashboard shows only repos marked Publishing.</span>
-    </div>
-    {% elif opsMode %}
-    <div class="bg-cyan-600 dark:bg-cyan-700 border-b-2 border-cyan-800 dark:border-cyan-900 px-4 py-2 text-white font-semibold text-sm flex items-center gap-3">
-      <i class="bx bx-info-circle text-base"></i>
-      <span>This dashboard shows only repos marked dalmatian or tech-ops.</span>
-    </div>
-    {% endif %}
+    {% set toggleClasses = "inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700" %}
+    {% set slatePressedClasses = "aria-pressed:bg-slate-700 aria-pressed:text-white aria-pressed:border-slate-700 dark:aria-pressed:bg-slate-200 dark:aria-pressed:text-slate-900 dark:aria-pressed:border-slate-200" %}
+    {% set filterButtons = [
+      { label: "Runtime critical only", attribute: "data-alert-filter", value: "criticalOnly", pressedClasses: "aria-pressed:bg-red-700 aria-pressed:text-white aria-pressed:border-red-700 dark:aria-pressed:bg-red-600 dark:aria-pressed:border-red-600" },
+      { label: "Any runtime alerts", attribute: "data-alert-filter", value: "anyAlerts", pressedClasses: "aria-pressed:bg-yellow-600 aria-pressed:text-white aria-pressed:border-yellow-600 dark:aria-pressed:bg-yellow-500 dark:aria-pressed:border-yellow-500" },
+      { label: "Only D+", attribute: "data-mode", value: "d-plus", pressedClasses: slatePressedClasses },
+      { label: "Only Publishing", attribute: "data-mode", value: "publishing", pressedClasses: slatePressedClasses },
+      { label: "Only Ops", attribute: "data-mode", value: "ops", pressedClasses: slatePressedClasses },
+      { label: "No tags", attribute: "data-tag", value: "_untagged", pressedClasses: slatePressedClasses }
+    ] %}
 
     <div class="container mx-auto flex flex-col mt-3 space-y-3">
       <div class="bg-slate-100 dark:bg-slate-900 rounded-lg border-b-4 border-slate-300 dark:border-slate-950 space-y-2">
@@ -33,72 +25,18 @@
           <span class="text-xs font-medium text-slate-500 dark:text-slate-400">{{ totalRepos }} repos tracked</span>
           <span class="text-xs font-medium text-red-600 dark:text-red-400">Critical: {{ totalCriticalVulnerabilities }}</span>
           <span class="text-xs font-medium text-yellow-600 dark:text-yellow-400">Total: {{ totalVulnerabilities }}</span>
-          {% if dPlusMode or publishingMode or opsMode %}<span class="text-xs font-medium text-blue-600 dark:text-blue-400">Open bot PRs: {{ totalOpenBotPrs }}</span>{% endif %}
         </h2>
 
         <!-- Controls box: filters, save, saved configurations -->
         <div class="mx-4 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/50 divide-y divide-slate-200 dark:divide-slate-700">
 
-          <!-- Alert filters + save row -->
+          <!-- Filter toggles + save row. The grid script keeps aria-pressed in sync with its filters. -->
           <div class="p-2 flex flex-wrap items-center gap-2" data-testid="filter-row">
-            <!-- Critical alerts filter (toggles off when already active) -->
-            {% if alertFilter === 'criticalOnly' %}
-              {% set criticalParams = baseUrl %}
-              {% set criticalSep = "?" %}
-              {% if sortBy %}{% set criticalParams = criticalParams + criticalSep + "sortBy=" + sortBy %}{% set criticalSep = "&" %}{% endif %}
-              {% if sortDirection %}{% set criticalParams = criticalParams + criticalSep + "sortDirection=" + sortDirection %}{% set criticalSep = "&" %}{% endif %}
-              {% if tag %}{% set criticalParams = criticalParams + criticalSep + "tag=" + tag %}{% endif %}
-            {% else %}
-              {% set criticalParams = baseUrl + "?alertFilter=criticalOnly" %}
-              {% if sortBy %}{% set criticalParams = criticalParams + "&sortBy=" + sortBy %}{% endif %}
-              {% if sortDirection %}{% set criticalParams = criticalParams + "&sortDirection=" + sortDirection %}{% endif %}
-              {% if tag %}{% set criticalParams = criticalParams + "&tag=" + tag %}{% endif %}
-            {% endif %}
-            <a href="{{ criticalParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'criticalOnly' %}bg-red-700 text-white border-red-700 dark:bg-red-600 dark:border-red-600{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              Runtime critical only
-            </a>
-
-            <!-- Any alerts filter (toggles off when already active) -->
-            {% if alertFilter === 'anyAlerts' %}
-              {% set anyAlertsParams = baseUrl %}
-              {% set anyAlertsSep = "?" %}
-              {% if sortBy %}{% set anyAlertsParams = anyAlertsParams + anyAlertsSep + "sortBy=" + sortBy %}{% set anyAlertsSep = "&" %}{% endif %}
-              {% if sortDirection %}{% set anyAlertsParams = anyAlertsParams + anyAlertsSep + "sortDirection=" + sortDirection %}{% set anyAlertsSep = "&" %}{% endif %}
-              {% if tag %}{% set anyAlertsParams = anyAlertsParams + anyAlertsSep + "tag=" + tag %}{% endif %}
-            {% else %}
-              {% set anyAlertsParams = baseUrl + "?alertFilter=anyAlerts" %}
-              {% if sortBy %}{% set anyAlertsParams = anyAlertsParams + "&sortBy=" + sortBy %}{% endif %}
-              {% if sortDirection %}{% set anyAlertsParams = anyAlertsParams + "&sortDirection=" + sortDirection %}{% endif %}
-              {% if tag %}{% set anyAlertsParams = anyAlertsParams + "&tag=" + tag %}{% endif %}
-            {% endif %}
-            <a href="{{ anyAlertsParams }}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if alertFilter === 'anyAlerts' %}bg-yellow-600 text-white border-yellow-600 dark:bg-yellow-500 dark:border-yellow-500{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              Any runtime alerts
-            </a>
-
-            <!-- Mode filters (toggle off when already active) -->
-            {% set modeFilters = [
-              { name: "Only D+", path: "d-plus", active: dPlusMode },
-              { name: "Only Publishing", path: "publishing", active: publishingMode },
-              { name: "Only Ops", path: "ops", active: opsMode }
-            ] %}
-            {% for mode in modeFilters %}
-            <a href="/{{ org }}{% if not mode.active %}/{{ mode.path }}{% endif %}" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if mode.active %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              {{ mode.name }}
-            </a>
+            {% for button in filterButtons %}
+            <button type="button" {{ button.attribute }}="{{ button.value }}" aria-pressed="false" class="{{ toggleClasses }} {{ button.pressedClasses }}">
+              {{ button.label }}
+            </button>
             {% endfor %}
-
-            <!-- No tags filter (toggles off when already active) -->
-            {% set untaggedActive = untaggedTag in selectedTags %}
-            {% set untaggedTags = (selectedTags | reject("equalto", untaggedTag) | join(",")) if untaggedActive else untaggedTag %}
-            {% set untaggedParams = "/" + org %}
-            {% set untaggedSep = "?" %}
-            {% if untaggedTags %}{% set untaggedParams = untaggedParams + untaggedSep + "tag=" + untaggedTags %}{% set untaggedSep = "&" %}{% endif %}
-            {% if alertFilter %}{% set untaggedParams = untaggedParams + untaggedSep + "alertFilter=" + alertFilter %}{% set untaggedSep = "&" %}{% endif %}
-            {% if sortBy %}{% set untaggedParams = untaggedParams + untaggedSep + "sortBy=" + sortBy %}{% set untaggedSep = "&" %}{% endif %}
-            {% if sortDirection %}{% set untaggedParams = untaggedParams + untaggedSep + "sortDirection=" + sortDirection %}{% endif %}
-            <a href="{{ untaggedParams }}" data-testid="untagged-filter" class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors {% if untaggedActive %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700{% endif %}">
-              No tags
-            </a>
 
             <!-- Save new config -->
             <details class="group/save relative ml-auto">
@@ -108,10 +46,7 @@
               </summary>
               <div class="absolute right-0 z-10 mt-1 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-3">
                 <form method="POST" action="/{{ org }}/saved-configurations" class="flex items-center gap-2">
-                  <input type="hidden" name="sortBy" value="{{ sortBy }}" />
-                  <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
-                  <input type="hidden" name="tag" value="{{ tag }}" />
-                  <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
+                  {% for key in configurationQueryKeys %}<input type="hidden" name="{{ key }}" />{% endfor %}
                   <input type="text" name="name" placeholder="Name (optional)"
                     class="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-100 px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-slate-400 w-44"
                   />
@@ -125,20 +60,17 @@
           </div>
 
 
-          <!-- Saved configurations row -->
+          <!-- Saved configurations row. The grid script marks the configuration matching the current filters. -->
           {% if savedConfigurations and savedConfigurations.length %}
           <div class="p-2 flex flex-wrap items-center gap-2">
             {% for config in savedConfigurations %}
             <div class="flex items-center">
-              <a href="{{ config.applyUrl | safe }}" class="inline-flex items-center gap-1 rounded-l-full border px-2.5 py-0.5 text-xs font-medium transition-colors {% if config.id === activeConfigId %}bg-slate-700 text-white border-slate-700 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200{% else %}bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-600{% endif %}">
+              <a href="{{ config.applyUrl | safe }}" data-saved-configuration aria-current="false" class="inline-flex items-center gap-1 rounded-l-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-600 aria-[current=true]:bg-slate-700 aria-[current=true]:text-white aria-[current=true]:border-slate-700 dark:aria-[current=true]:bg-slate-200 dark:aria-[current=true]:text-slate-900 dark:aria-[current=true]:border-slate-200">
                 <i class="bx bx-bookmark text-xs"></i>
                 {{ config.name }}
               </a>
               <form method="POST" action="/{{ org }}/saved-configurations/{{ config.id }}/delete" class="inline">
-                <input type="hidden" name="sortBy" value="{{ sortBy }}" />
-                <input type="hidden" name="sortDirection" value="{{ sortDirection }}" />
-                <input type="hidden" name="tag" value="{{ tag }}" />
-                <input type="hidden" name="alertFilter" value="{{ alertFilter }}" />
+                {% for key in configurationQueryKeys %}<input type="hidden" name="{{ key }}" />{% endfor %}
                 <button type="submit" title="Delete" class="inline-flex items-center rounded-r-full border-t border-r border-b px-1.5 py-0.5 text-xs transition-colors bg-slate-200 text-slate-400 border-slate-400 hover:bg-red-100 hover:text-red-600 hover:border-red-400 dark:bg-slate-700 dark:text-slate-500 dark:border-slate-600 dark:hover:bg-red-950 dark:hover:text-red-400 dark:hover:border-red-800">
                   <i class="bx bx-x text-sm"></i>
                 </button>
@@ -146,12 +78,10 @@
             </div>
             {% endfor %}
 
-            {% if activeConfigId %}
-            <a href="{{ baseUrl }}" class="inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
+            <a href="/{{ org }}" data-clear-configuration hidden class="inline-flex [&[hidden]]:hidden items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
               <i class="bx bx-reset text-xs"></i>
               Clear
             </a>
-            {% endif %}
           </div>
           {% endif %}
 
@@ -161,8 +91,7 @@
         <!-- Repo table -->
         <div id="repo-table" class="mx-4 mb-4">
           <div id="repo-grid" class="w-full" style="height: 75vh" data-testid="repo-grid"
-            data-tag-links="{{ 'false' if (dPlusMode or publishingMode or opsMode) else 'true' }}"
-            data-selected-tags="{{ tag }}"></div>
+            data-configuration-query-keys="{{ configurationQueryKeys | join(',') }}"></div>
           <script type="application/json" id="repo-grid-data">{{ gridRows | safe }}</script>
         </div>
 
@@ -179,22 +108,137 @@
         const DASH = '\u2014';
         const gridElement = document.getElementById('repo-grid');
         const rowData = JSON.parse(document.getElementById('repo-grid-data').textContent);
-        const tagLinksEnabled = gridElement.dataset.tagLinks === 'true';
-        const selectedTags = (gridElement.dataset.selectedTags || '').split(',').filter(Boolean);
+        const configurationQueryKeys = gridElement.dataset.configurationQueryKeys.split(',');
 
-        // Clicking a tag toggles it in the server-side `tag` filter
-        const tagFilterUrl = (tag) => {
-          const tags = selectedTags.includes(tag)
-            ? selectedTags.filter((selectedTag) => selectedTag !== tag)
-            : [...selectedTags, tag];
-          const url = new URL(window.location.href);
-          if (tags.length) {
-            url.searchParams.set('tag', tags.join(','));
-          } else {
-            url.searchParams.delete('tag');
-          }
-          return url.toString();
+        // GitHub topics must start with a letter or number, so this can never clash with a real tag.
+        const UNTAGGED = '_untagged';
+        const splitTags = (value) => (value ? value.split(', ') : []);
+        const hasAnyTag = (tags, candidates) => candidates.some((tag) => tags.includes(tag));
+
+        const MODES = {
+          'd-plus': { name: 'D+', test: (tags) => hasAnyTag(tags, ['d-plus', 'delivery-plus', 'internal']) && !tags.includes('govpress') },
+          publishing: { name: 'Publishing', test: (tags) => tags.includes('govpress') },
+          ops: { name: 'Ops', test: (tags) => hasAnyTag(tags, ['dalmatian', 'tech-ops']) },
         };
+
+        const ALERT_FILTER_COLUMNS = { criticalOnly: 'runtimeCritical', anyAlerts: 'runtimeTotal' };
+        const HAS_ALERTS = { filterType: 'number', type: 'greaterThan', filter: 0 };
+        const isHasAlerts = (model) => model?.type === HAS_ALERTS.type && model.filter === HAS_ALERTS.filter;
+
+        const tagsFilterOptions = [
+          { displayKey: 'hasTag', displayName: 'Has tag', predicate: ([tag], value) => splitTags(value).includes(tag) },
+          ...Object.entries(MODES).map(([mode, { name, test }]) => ({
+            displayKey: mode,
+            displayName: `${name} repos`,
+            numberOfInputs: 0,
+            predicate: (_, value) => test(splitTags(value)),
+          })),
+          'contains', 'notContains', 'equals', 'notEqual', 'startsWith', 'endsWith', 'blank', 'notBlank',
+        ];
+
+        // The filter buttons and tag chips each add a condition to the tags column filter, combined with OR.
+        const tagsFilterModel = ({ tags, mode }) => {
+          const conditions = [
+            ...(mode in MODES ? [{ filterType: 'text', type: mode }] : []),
+            ...tags.map((tag) => (tag === UNTAGGED
+              ? { filterType: 'text', type: 'blank' }
+              : { filterType: 'text', type: 'hasTag', filter: tag })),
+          ];
+          if (conditions.length <= 1) return conditions[0] ?? null;
+          return { filterType: 'text', operator: 'OR', conditions };
+        };
+
+        const filtersFromUrl = () => {
+          const params = new URL(window.location.href).searchParams;
+          return {
+            alertFilter: params.get('alertFilter'),
+            tags: (params.get('tag') ?? '').split(',').filter(Boolean),
+            mode: params.get('mode'),
+          };
+        };
+
+        const filterModelFor = (filters) => {
+          const alertColumn = ALERT_FILTER_COLUMNS[filters.alertFilter];
+          return {
+            ...(alertColumn ? { [alertColumn]: HAS_ALERTS } : {}),
+            tags: tagsFilterModel(filters),
+          };
+        };
+
+        let grid;
+        let currentFilters = filtersFromUrl();
+
+        const readFilters = () => {
+          const tagsModel = grid.getColumnFilterModel('tags');
+          const conditions = tagsModel ? tagsModel.conditions ?? [tagsModel] : [];
+          return {
+            alertFilter: Object.keys(ALERT_FILTER_COLUMNS).find((key) => isHasAlerts(grid.getColumnFilterModel(ALERT_FILTER_COLUMNS[key]))),
+            tags: conditions.flatMap(({ type, filter }) => {
+              if (type === 'blank') return [UNTAGGED];
+              return type === 'hasTag' ? [filter] : [];
+            }),
+            mode: conditions.find(({ type }) => type in MODES)?.type,
+          };
+        };
+
+        const toggleAlertFilter = async (alertFilter) => {
+          const current = currentFilters.alertFilter;
+          if (current) await grid.setColumnFilterModel(ALERT_FILTER_COLUMNS[current], null);
+          if (current !== alertFilter) await grid.setColumnFilterModel(ALERT_FILTER_COLUMNS[alertFilter], HAS_ALERTS);
+          grid.onFilterChanged();
+        };
+
+        const setTagsFilter = async (filters) => {
+          await grid.setColumnFilterModel('tags', tagsFilterModel(filters));
+          grid.onFilterChanged();
+        };
+
+        // Tags and modes are mutually exclusive, so choosing one clears the other
+        const toggleTag = (tag) => {
+          const { tags } = currentFilters;
+          setTagsFilter({ tags: tags.includes(tag) ? tags.filter((selected) => selected !== tag) : [...tags, tag] });
+        };
+
+        const toggleMode = (mode) => setTagsFilter({ tags: [], mode: currentFilters.mode === mode ? null : mode });
+
+        const queryFor = (url) => {
+          const params = new URL(url, window.location.href).searchParams;
+          return configurationQueryKeys.map((key) => params.get(key) ?? '').join('&');
+        };
+
+        // Reflects the grid's filters in the filter buttons, the URL, and the saved configuration forms and links
+        const syncFilters = () => {
+          currentFilters = readFilters();
+          const { alertFilter, tags, mode } = currentFilters;
+
+          for (const button of document.querySelectorAll('[data-alert-filter]')) button.ariaPressed = String(button.dataset.alertFilter === alertFilter);
+          for (const button of document.querySelectorAll('[data-mode]')) button.ariaPressed = String(button.dataset.mode === mode);
+          for (const button of document.querySelectorAll('[data-tag]')) button.ariaPressed = String(tags.includes(button.dataset.tag));
+
+          const url = new URL(window.location.href);
+          for (const [key, value] of Object.entries({ alertFilter, tag: tags.join(','), mode })) {
+            if (value) url.searchParams.set(key, value);
+            else url.searchParams.delete(key);
+          }
+          window.history.replaceState(null, '', url);
+
+          for (const input of document.querySelectorAll('form input[type=hidden]')) {
+            input.value = url.searchParams.get(input.name) ?? '';
+          }
+
+          const savedConfigurationLinks = [...document.querySelectorAll('[data-saved-configuration]')];
+          for (const link of savedConfigurationLinks) link.ariaCurrent = String(queryFor(link.href) === queryFor(url));
+          const clearLink = document.querySelector('[data-clear-configuration]');
+          if (clearLink) clearLink.hidden = !savedConfigurationLinks.some((link) => link.ariaCurrent === 'true');
+        };
+
+        document.addEventListener('click', (event) => {
+          const button = event.target.closest('[data-alert-filter], [data-mode], [data-tag]');
+          if (!button) return;
+          if (button.dataset.alertFilter) toggleAlertFilter(button.dataset.alertFilter);
+          else if (button.dataset.mode) toggleMode(button.dataset.mode);
+          else toggleTag(button.dataset.tag);
+        });
 
         const compareDateToFilter = (filterDate, cellValue) => {
           if (!cellValue) return -1;
@@ -260,12 +304,12 @@
           const container = document.createElement('div');
           container.className = 'flex gap-1 items-center h-full overflow-hidden';
           for (const tag of params.data.tags) {
-            const isSelected = selectedTags.includes(tag);
-            const chip = document.createElement(tagLinksEnabled ? 'a' : 'span');
-            if (tagLinksEnabled) chip.href = tagFilterUrl(tag);
-            chip.className = 'text-xs rounded-full px-2 leading-5 transition-colors ' + (isSelected
-              ? 'text-white bg-slate-700 dark:text-slate-900 dark:bg-slate-200'
-              : 'bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300' + (tagLinksEnabled ? ' hover:bg-slate-300 dark:hover:bg-slate-800' : ''));
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.dataset.tag = tag;
+            chip.ariaPressed = String(currentFilters.tags.includes(tag));
+            chip.className = 'text-xs rounded-full px-2 leading-5 transition-colors bg-slate-200 text-slate-700 hover:bg-slate-300 dark:bg-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 '
+              + 'aria-pressed:text-white aria-pressed:bg-slate-700 dark:aria-pressed:text-slate-900 dark:aria-pressed:bg-slate-200';
             chip.textContent = tag;
             container.appendChild(chip);
           }
@@ -338,6 +382,8 @@
             width: 260,
             valueGetter: (params) => params.data.tags.join(', '),
             tooltipValueGetter: (params) => params.value || null,
+            filter: 'agTextColumnFilter',
+            filterParams: { filterOptions: tagsFilterOptions, maxNumConditions: 50 },
             cellRenderer: tagsRenderer,
           },
           { field: 'responsibleTeam', headerName: 'Responsible team', width: 150, valueFormatter: (params) => params.value ?? DASH },
@@ -369,10 +415,12 @@
             browserColorScheme: 'dark',
           }, 'dark');
 
-        agGrid.createGrid(gridElement, {
+        grid = agGrid.createGrid(gridElement, {
           theme,
           rowData,
           columnDefs,
+          initialState: { filter: { filterModel: filterModelFor(currentFilters) } },
+          onFilterChanged: syncFilters,
           defaultColDef: { sortable: true, filter: true, resizable: true, wrapHeaderText: true, autoHeaderHeight: true },
           pagination: true,
           paginationPageSize: 50,
@@ -380,6 +428,7 @@
           suppressColumnVirtualisation: true,
           overlayNoRowsTemplate: '<span class="italic text-slate-400">No repositories found.</span>',
         });
+        syncFilters();
       })();
     </script>
 {% endblock %}

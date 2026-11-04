@@ -25,8 +25,43 @@ test("save configuration button is on the filter row", async ({ page, baseURL })
   await page.goto(`${baseURL}/dxw`);
 
   const filterRow = page.getByTestId("filter-row");
-  await expect(filterRow.getByRole("link", { name: "Runtime critical only" })).toBeVisible();
+  await expect(filterRow.getByRole("button", { name: "Runtime critical only" })).toBeVisible();
   await expect(filterRow.getByText("Save configuration")).toBeVisible();
+});
+
+test("saving a configuration keeps the table's filters and highlights it while they match", async ({
+  browser,
+  baseURL,
+}) => {
+  // An empty storage state gives this page its own session, so other tests signing in can't change its user
+  const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  const page = await signInAs(`${Math.floor(Math.random() * 1e10)}@dxw.com`, context, baseURL);
+  const publishingFilter = page.getByRole("button", { name: "Only Publishing" });
+  const savedConfiguration = page.getByRole("link", { name: "Publishing config" });
+  const clear = page.getByRole("link", { name: "Clear" });
+
+  await publishingFilter.click();
+  await page.getByText("Save configuration").click();
+  await page.locator('input[name="name"]').fill("Publishing config");
+  await page.getByRole("button", { name: "Save" }).click();
+
+  await expect(page).toHaveURL(/mode=publishing/);
+  await expect(publishingFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(savedConfiguration).toHaveAttribute("aria-current", "true");
+  await expect(clear).toBeVisible();
+
+  await publishingFilter.click();
+  await expect(savedConfiguration).toHaveAttribute("aria-current", "false");
+  await expect(clear).toBeHidden();
+
+  await savedConfiguration.click();
+  await expect(publishingFilter).toHaveAttribute("aria-pressed", "true");
+
+  await page.getByTitle("Delete").click();
+  await expect(savedConfiguration).toHaveCount(0);
+  await expect(page).toHaveURL(/mode=publishing/);
+
+  await context.close();
 });
 
 test("saved configurations are only visible to the user who created them", async ({

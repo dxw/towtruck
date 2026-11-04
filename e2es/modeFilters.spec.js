@@ -1,0 +1,58 @@
+import { test, expect } from "@playwright/test";
+
+test("mode filters are shown alongside the other filters", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  for (const name of ["Only D+", "Only Publishing", "Only Ops"]) {
+    await expect(page.getByTestId("filter-row").getByRole("button", { name, exact: true })).toBeVisible();
+  }
+});
+
+test("the Only Publishing button toggles filtering to repos marked govpress", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const grid = page.getByTestId("repo-grid");
+  const repoNames = grid.locator("[col-id='name'].ag-cell");
+  const publishingFilter = page.getByRole("button", { name: "Only Publishing" });
+
+  await publishingFilter.click();
+  await expect(page).toHaveURL(/mode=publishing/);
+  await expect(publishingFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(grid.locator(".ag-header-cell[col-id='tags']")).toHaveClass(/ag-header-cell-filtered/);
+  // Every seeded test repo is marked govpress
+  await expect(repoNames).toHaveCount(3);
+
+  await publishingFilter.click();
+  await expect(page).not.toHaveURL(/mode=/);
+  await expect(publishingFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(grid.locator(".ag-header-cell[col-id='tags']")).not.toHaveClass(/ag-header-cell-filtered/);
+});
+
+test("choosing a mode replaces the other mode and tag filters", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw?mode=publishing&tag=wordpress-theme`);
+
+  const repoNames = page.getByTestId("repo-grid").locator("[col-id='name'].ag-cell");
+  const publishingFilter = page.getByRole("button", { name: "Only Publishing" });
+  const dPlusFilter = page.getByRole("button", { name: "Only D+" });
+  await expect(publishingFilter).toHaveAttribute("aria-pressed", "true");
+
+  // None of the seeded test repos are D+ repos
+  await dPlusFilter.click();
+  await expect(page).toHaveURL(/mode=d-plus/);
+  await expect(page).not.toHaveURL(/tag=/);
+  await expect(publishingFilter).toHaveAttribute("aria-pressed", "false");
+  await expect(dPlusFilter).toHaveAttribute("aria-pressed", "true");
+  await expect(repoNames).toHaveCount(0);
+});
+
+test("choosing a tag replaces the mode filter", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw?mode=publishing`);
+
+  const repoNames = page.getByTestId("repo-grid").locator("[col-id='name'].ag-cell");
+  await expect(repoNames).toHaveCount(3);
+
+  await page.getByTestId("repo-grid").getByRole("button", { name: "wordpress-theme" }).click();
+  await expect(page).not.toHaveURL(/mode=/);
+  await expect(page.getByRole("button", { name: "Only Publishing" })).toHaveAttribute("aria-pressed", "false");
+  await expect(repoNames).toHaveText(["govuk-blogs"]);
+});
