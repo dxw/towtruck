@@ -246,6 +246,25 @@ test("the No tags button toggles filtering to repos without tags", async ({ page
   await expect(repoNames).toHaveCount(3);
 });
 
+test("the Reset filters button clears every filter and is only shown while there are filters", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw?${filterQuery({
+    runtimeTotal: HAS_ALERTS,
+    tags: hasTag("wordpress-theme"),
+    name: { filterType: "text", type: "contains", filter: "govuk" },
+  })}`);
+
+  const repoNames = page.getByTestId("repo-grid").locator("[col-id='name'].ag-cell");
+  const resetFilters = page.getByTestId("filter-row").getByRole("button", { name: "Reset filters" });
+  await expect(repoNames).toHaveCount(0);
+
+  await resetFilters.click();
+  await expect(page).not.toHaveURL(/filter=/);
+  await expect(page.getByRole("button", { name: "Any runtime alerts" })).toHaveAttribute("aria-pressed", "false");
+  for (const colId of ["runtimeTotal", "tags", "name"]) await expectColumnNotFiltered(page, colId);
+  await expect(repoNames).toHaveCount(3);
+  await expect(resetFilters).toBeHidden();
+});
+
 const DATE_COLUMN_IDS = ["oldestOpenPrOpenedAt", "updatedAt", "mostRecentNonBotCommitAt", "mostRecentPrOpenedAt", "mostRecentIssueOpenedAt", "oldestOpenIssueOpenedAt"];
 
 test("shows dates in the table as MMM YYYY", async ({ page, baseURL }) => {

@@ -38,6 +38,11 @@
             </button>
             {% endfor %}
 
+            <button type="button" data-reset-filters hidden class="{{ toggleClasses }} gap-1 [&[hidden]]:hidden">
+              <i class="bx bx-reset"></i>
+              Reset filters
+            </button>
+
             <!-- Save new config -->
             <details class="group/save relative ml-auto">
               <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
@@ -208,9 +213,11 @@
 
           const url = new URL(window.location.href);
           const filterModel = grid.getFilterModel();
-          if (Object.keys(filterModel).length) url.searchParams.set('filter', JSON.stringify(filterModel));
+          const hasFilters = Object.keys(filterModel).length > 0;
+          if (hasFilters) url.searchParams.set('filter', JSON.stringify(filterModel));
           else url.searchParams.delete('filter');
           window.history.replaceState(null, '', url);
+          document.querySelector('[data-reset-filters]').hidden = !hasFilters;
 
           for (const input of document.querySelectorAll('form input[type=hidden]')) {
             input.value = url.searchParams.get(input.name) ?? '';
@@ -221,6 +228,8 @@
           const clearLink = document.querySelector('[data-clear-configuration]');
           if (clearLink) clearLink.hidden = !savedConfigurationLinks.some((link) => link.ariaCurrent === 'true');
         };
+
+        document.querySelector('[data-reset-filters]').addEventListener('click', () => grid.setFilterModel(null));
 
         document.addEventListener('click', (event) => {
           const button = event.target.closest('[data-alert-filter], [data-mode], [data-tag]');
