@@ -43,6 +43,12 @@
               Reset filters
             </button>
 
+            <button type="button" data-copy-table class="{{ toggleClasses }} gap-1 disabled:opacity-50">
+              <i class="bx bx-copy" aria-hidden="true"></i>
+              Copy table
+            </button>
+            <span data-copy-status role="status" class="text-xs text-slate-700 dark:text-slate-200"></span>
+
             <!-- Save new config -->
             <details class="group/save relative ml-auto">
               <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
@@ -230,6 +236,22 @@
         };
 
         document.querySelector('[data-reset-filters]').addEventListener('click', () => grid.setFilterModel(null));
+
+        const copyButton = document.querySelector('[data-copy-table]');
+        const copyStatus = document.querySelector('[data-copy-status]');
+        copyButton.addEventListener('click', async () => {
+          copyButton.disabled = true;
+          copyStatus.textContent = '';
+          try {
+            const text = grid.getDataAsCsv({ columnSeparator: '\t' });
+            await navigator.clipboard.writeText(text);
+            copyStatus.textContent = 'Table copied.';
+          } catch {
+            copyStatus.textContent = 'Could not copy table. Check clipboard permissions and try again.';
+          } finally {
+            copyButton.disabled = false;
+          }
+        });
 
         document.addEventListener('click', (event) => {
           const button = event.target.closest('[data-alert-filter], [data-mode], [data-tag]');
