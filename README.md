@@ -42,7 +42,7 @@ The first step is to register a new app as described [here](https://docs.github.
 - For **11**, no user authentication is currently required, so this step can be skipped.
 - Skip **12** as Towtruck does not use device flow authentication.
 - For **13** and **14**, there is no additional in-app setup performed by Towtruck, so these steps can be skipped.
-- Skip **15** as Towtruck does receive GitHub webhooks and should be configured to listen for them.
+- For **15**, leave **Active** selected: Towtruck needs GitHub webhooks to keep its stored data up to date.
 - For **16**, the webhook URL should be configured to `https://<base Towtruck URL>/api/github/webhooks`.
   Alternatively, for development, a [Smee.io](https://smee.io/) channel can be used.
 - For **17**, a strong, randomly-generated secret should be used.
@@ -63,7 +63,18 @@ Towtruck is still in early development so the exact set of needed permissions ha
 
 ##### Webhooks
 
-Towtruck is still in early development so the exact set of needed webhooks has not been finalised.
+Configure webhooks in the GitHub App's own settings, not its installation settings. For the dxw app, use https://github.com/organizations/dxw/settings/apps/dxw-towtruck.
+
+1. Under **General → Webhook**, ensure **Active** is selected.
+2. Set **Webhook URL** to `https://<base Towtruck URL>/api/github/webhooks` and **Webhook secret** to the same value as Towtruck's `WEBHOOK_SECRET` environment variable. Keep SSL verification enabled, then save the changes.
+3. Open **Permissions & events** and scroll to **Subscribe to events**. This section is only available when the webhook is active; the events offered also depend on the app's permissions.
+4. Subscribe to **Repository**, **Pull request**, **Issues**, **Push**, and **Dependabot alert**, then save the changes.
+
+The **Repository** subscription lets Towtruck remove repositories when they are archived or deleted. Towtruck reads its repository list from its local database, rather than checking GitHub each time the page loads. After a successful archive webhook, refresh the page to see the updated list.
+
+To troubleshoot updates, check **Advanced → Recent Deliveries** in the app settings for the event and its response. Towtruck logs repository events as `<repository name> updated: <action>`.
+
+Enabling webhooks does not replay events missed while they were inactive. To refresh existing stale entries, follow [Refreshing repository data](#refreshing-repository-data).
 
 
 #### Using the dxw Github App
@@ -90,3 +101,9 @@ Optionally, `DB_PATH` sets where the SQLite database is stored. It defaults to `
 
 Once all the other setup steps have been completed run `script/seed` or `script/bootstrap --seed` to seed the data. 
 This will call the Github API which is rate limit so take care not to to run the script too often. 
+
+#### Refreshing repository data
+
+To rebuild the repository list after missed webhook events, run `npm run seed:repos` in the environment whose data needs updating. For production, run it against the production database with the production GitHub App credentials, not on your local development machine.
+
+This deletes all stored repository data before fetching the current repositories from GitHub, excluding archived repositories. The list may be empty while the seed runs, and a failed fetch can leave it empty until a successful rerun. The seed makes additional GitHub API calls for each repository, so avoid running it frequently because of rate limits.
