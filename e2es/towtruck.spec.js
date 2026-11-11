@@ -100,6 +100,13 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Description",
     "Language",
     "Visibility",
+    "Runtime vulnerabilities",
+    "Dev vulnerabilities",
+    "End of life",
+    "Tags",
+    "Likely owner",
+    "Responsible team",
+    "Runtime vulnerability > 14 days old",
     "Open PRs",
     "Open bot PRs",
     "Oldest open PR",
@@ -109,16 +116,43 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Most recent issue",
     "Oldest open issue",
     "Open issues",
-    "Runtime vulnerabilities",
-    "Dev vulnerabilities",
-    "End of life",
-    "Tags",
-    "Likely owner",
-    "Responsible team",
-    "Runtime vulnerability > 14 days old",
   ]) {
     await expect(grid.locator(".ag-header-cell-text, .ag-header-group-text", { hasText: header }).first()).toBeAttached();
   }
+
+  const columnIds = await grid.locator(".ag-header-cell").evaluateAll(
+    (headers) => headers.map((header) => header.getAttribute("col-id"))
+  );
+  expect(columnIds).toEqual([
+    "name",
+    "description",
+    "language",
+    "visibility",
+    "runtimeCritical",
+    "runtimeHigh",
+    "runtimeMedium",
+    "runtimeLow",
+    "runtimeTotal",
+    "devCritical",
+    "devHigh",
+    "devMedium",
+    "devLow",
+    "devTotal",
+    "endOfLifeDependencies",
+    "tags",
+    "owner",
+    "responsibleTeam",
+    "hasRuntimeAlertOlderThan14Days",
+    "openPrCount",
+    "openBotPrCount",
+    "oldestOpenPrOpenedAt",
+    "updatedAt",
+    "mostRecentNonBotCommitAt",
+    "mostRecentPrOpenedAt",
+    "mostRecentIssueOpenedAt",
+    "oldestOpenIssueOpenedAt",
+    "openIssues",
+  ]);
 
   const repoNames = await page.locator("[col-id='name'].ag-cell").allTextContents();
   const totalRepos = Number((await page.getByText("repos tracked").textContent()).match(/\d+/)[0]);

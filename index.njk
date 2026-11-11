@@ -377,15 +377,6 @@
             },
             valueFormatter: (params) => params.value ?? DASH,
           },
-          numberColumn('openPrCount', 'Open PRs'),
-          numberColumn('openBotPrCount', 'Open bot PRs'),
-          dateColumn('oldestOpenPrOpenedAt', 'Oldest open PR'),
-          dateColumn('updatedAt', 'Updated at'),
-          dateColumn('mostRecentNonBotCommitAt', 'Most recent non-bot commit'),
-          dateColumn('mostRecentPrOpenedAt', 'Most recent PR'),
-          dateColumn('mostRecentIssueOpenedAt', 'Most recent issue'),
-          dateColumn('oldestOpenIssueOpenedAt', 'Oldest open issue'),
-          numberColumn('openIssues', 'Open issues'),
           vulnerabilityGroup('runtime', 'Runtime vulnerabilities'),
           vulnerabilityGroup('dev', 'Dev vulnerabilities'),
           {
@@ -432,6 +423,15 @@
             valueFormatter: (params) => params.value ?? DASH,
             cellStyle: (params) => (params.value === 'Yes' ? { color: '#dc2626', fontWeight: '700' } : null),
           },
+          numberColumn('openPrCount', 'Open PRs'),
+          numberColumn('openBotPrCount', 'Open bot PRs'),
+          dateColumn('oldestOpenPrOpenedAt', 'Oldest open PR'),
+          dateColumn('updatedAt', 'Updated at'),
+          dateColumn('mostRecentNonBotCommitAt', 'Most recent non-bot commit'),
+          dateColumn('mostRecentPrOpenedAt', 'Most recent PR'),
+          dateColumn('mostRecentIssueOpenedAt', 'Most recent issue'),
+          dateColumn('oldestOpenIssueOpenedAt', 'Oldest open issue'),
+          numberColumn('openIssues', 'Open issues'),
         ];
 
         const theme = agGrid.themeQuartz
