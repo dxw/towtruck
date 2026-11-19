@@ -103,6 +103,7 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Runtime vulnerabilities",
     "Dev vulnerabilities",
     "End of life",
+    "Framework & language versions",
     "Tags",
     "Likely owner",
     "Responsible team",
@@ -139,6 +140,7 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "devLow",
     "devTotal",
     "endOfLifeDependencies",
+    "technologyVersions",
     "tags",
     "owner",
     "responsibleTeam",
@@ -375,4 +377,11 @@ test("shows a placeholder in the end of life column when no dependencies are aff
 
   const endOfLifeCells = page.getByTestId("repo-grid").locator("[col-id='endOfLifeDependencies'].ag-cell");
   await expect(endOfLifeCells).toHaveText(["\u2014", "\u2014", "\u2014"]);
+});
+
+test("shows a placeholder when no framework or language versions are known", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw`);
+
+  const versionCells = page.getByTestId("repo-grid").locator("[col-id='technologyVersions'].ag-cell");
+  await expect(versionCells).toHaveText(["\u2014", "\u2014", "\u2014"]);
 });

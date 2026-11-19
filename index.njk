@@ -377,6 +377,21 @@
           return container;
         };
 
+        const formatTechnologyVersion = ({ name, version }) => `${name} v${version}`;
+
+        const technologyVersionsRenderer = (params) => {
+          if (!params.value) return DASH;
+          const container = document.createElement('div');
+          container.className = 'flex gap-1 items-center h-full overflow-hidden';
+          for (const technology of params.data.technologyVersions) {
+            const chip = document.createElement('span');
+            chip.className = 'font-mono text-xs rounded-full px-2 leading-5 whitespace-nowrap bg-slate-200 text-slate-700 dark:bg-slate-900 dark:text-slate-300';
+            chip.textContent = formatTechnologyVersion(technology);
+            container.appendChild(chip);
+          }
+          return container;
+        };
+
         const columnDefs = [
           { field: 'name', headerName: 'Repo', pinned: 'left', width: 220, cellRenderer: repoLinkRenderer },
           {
@@ -412,6 +427,16 @@
             comparator: (valueA, valueB, nodeA, nodeB) =>
               endOfLifeScore(nodeA.data.endOfLifeDependencies) - endOfLifeScore(nodeB.data.endOfLifeDependencies),
             cellRenderer: endOfLifeRenderer,
+          },
+          {
+            colId: 'technologyVersions',
+            headerName: 'Framework & language versions',
+            headerTooltip: 'Framework and language or runtime versions detected by Renovate in repository files',
+            width: 280,
+            cellDataType: false,
+            valueGetter: (params) => params.data.technologyVersions.map(formatTechnologyVersion).join('; '),
+            tooltipValueGetter: (params) => params.value || null,
+            cellRenderer: technologyVersionsRenderer,
           },
           {
             colId: 'tags',

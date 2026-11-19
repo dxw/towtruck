@@ -36,6 +36,7 @@
  * @property {string|null} responsibleTeam
  * @property {boolean|null} hasRuntimeAlertOlderThan14Days
  * @property {GridEndOfLifeDependency[]} endOfLifeDependencies
+ * @property {{name: string, version: string}[]} technologyVersions
  */
 
 /**
@@ -48,6 +49,34 @@
  */
 
 const gridDate = (iso, display) => ({ iso: iso ?? null, display: display ?? null });
+
+const technologyNames = new Map([
+  ["node", "Node.js"],
+  ["ruby", "Ruby"],
+  ["php", "PHP"],
+  ["python", "Python"],
+  ["rails", "Rails"],
+  ["express", "Express"],
+  ["wordpress", "WordPress"],
+  ["roots/wordpress", "WordPress"],
+  ["laravel/framework", "Laravel"],
+  ["django", "Django"],
+  ["next", "Next.js"],
+  ["react", "React"],
+  ["vue", "Vue"],
+  ["@angular/core", "Angular"],
+]);
+
+const mapTechnologyVersions = (dependencies = []) => {
+  const versions = new Map();
+  for (const dependency of dependencies) {
+    const name = technologyNames.get(dependency.name.toLowerCase());
+    if (name && dependency.version) {
+      versions.set(`${name} ${dependency.version}`, { name, version: dependency.version });
+    }
+  }
+  return [...versions.values()];
+};
 
 /**
  * @param {import("./index.js").UiDependency[]} [dependencies]
@@ -104,6 +133,7 @@ export const mapRepoToGridRow = (repo) => {
     responsibleTeam: null,
     hasRuntimeAlertOlderThan14Days: repo.hasOpenRuntimeAlertOlderThan14Days ?? null,
     endOfLifeDependencies: mapEndOfLifeDependencies(repo.dependencies),
+    technologyVersions: mapTechnologyVersions(repo.dependencies),
   };
 };
 

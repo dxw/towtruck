@@ -72,6 +72,11 @@ describe("mapRepoToGridRow", () => {
         { name: "node", version: "18.0.0", status: "ended", date: "2025-04-30T00:00:00.000Z", relative: "7 months ago" },
         { name: "php", version: "8.2.0", status: "endingSoon", date: "2026-12-31T00:00:00.000Z", relative: "in about 2 months" },
       ],
+      technologyVersions: [
+        { name: "Node.js", version: "18.0.0" },
+        { name: "PHP", version: "8.2.0" },
+        { name: "Express", version: "5.0.0" },
+      ],
     });
   });
 
@@ -89,6 +94,21 @@ describe("mapRepoToGridRow", () => {
     const repo = { ...uiRepo, dependencies: [{ name: "node", isOutOfSupport: true, isEndOfLifeSoon: false, endOfLifeDate: new Date("2025-04-30T00:00:00Z"), endOfLifeRelative: "7 months ago" }] };
 
     expect.strictEqual(mapRepoToGridRow(repo).endOfLifeDependencies[0].version, null);
+  });
+
+  it("ignores unrelated packages and missing versions without repeating identical technology versions", () => {
+    const dependencies = [
+      { name: "WordPress", version: "6.8" },
+      { name: "roots/wordpress", version: "6.8" },
+      { name: "php" },
+      { name: "lodash", version: "4.17.21" },
+      { name: "wordpress", version: "6.9" },
+    ];
+
+    expect.deepStrictEqual(mapRepoToGridRow({ ...uiRepo, dependencies }).technologyVersions, [
+      { name: "WordPress", version: "6.8" },
+      { name: "WordPress", version: "6.9" },
+    ]);
   });
 
   it("uses nulls for vulnerability fields when Dependabot data has no runtime/dev split", () => {
@@ -113,6 +133,7 @@ describe("mapRepoToGridRow", () => {
     expect.strictEqual(row.owner, null);
     expect.strictEqual(row.ownerLogin, null);
     expect.deepStrictEqual(row.endOfLifeDependencies, []);
+    expect.deepStrictEqual(row.technologyVersions, []);
   });
 
   it("uses a null owner login when the owner's commits aren't linked to a GitHub account", () => {
