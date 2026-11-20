@@ -9,3 +9,9 @@ export const filterQuery = (filterModel) => `filter=${encodeURIComponent(JSON.st
 
 /** The grid filter model held in the page's URL, or null when there isn't one */
 export const urlFilterModel = (page) => JSON.parse(new URL(page.url()).searchParams.get("filter"));
+
+/** The query string that hides the given grid columns */
+export const hiddenQuery = (colIds) => `hidden=${encodeURIComponent(colIds.join(","))}`;
+
+/** The column IDs hidden by the page's URL, or an empty array when there aren't any */
+export const urlHiddenColumns = (page) => new URL(page.url()).searchParams.get("hidden")?.split(",") ?? [];
