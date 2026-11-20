@@ -385,3 +385,14 @@ test("shows a placeholder when no framework or language versions are known", asy
   const versionCells = page.getByTestId("repo-grid").locator("[col-id='technologyVersions'].ag-cell");
   await expect(versionCells).toHaveText(["\u2014", "\u2014", "\u2014"]);
 });
+
+test("the alert buttons still filter when their columns are hidden", async ({ page, baseURL }) => {
+  await page.goto(`${baseURL}/dxw?hidden=runtimeTotal,runtimeCritical`);
+
+  const repoNames = page.getByTestId("repo-grid").locator("[col-id='name'].ag-cell");
+  await expect(repoNames).toHaveCount(3);
+
+  await page.getByRole("button", { name: "Any runtime alerts" }).click();
+  await expect(repoNames).toHaveCount(0);
+  await expect.poll(() => urlFilterModel(page)).toEqual({ runtimeTotal: HAS_ALERTS });
+});
