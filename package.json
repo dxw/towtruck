@@ -11,6 +11,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "seed": "npm run seed:repos && npm run seed:lifetimes",
     "seed:repos": "node --env-file=.env ./seed/repos.js",
     "seed:lifetimes": "node --env-file=.env ./seed/lifetimes.js"
