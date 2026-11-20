@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import path from "path";
 import { fileURLToPath } from "url";
-import { modeFilter, urlFilterModel } from "./filterUrl.js";
+import { modeFilter, urlFilterModel, urlHiddenColumns } from "./filterUrl.js";
 
 const authFile = path.join(
   path.dirname(fileURLToPath(import.meta.url)),
@@ -117,4 +117,55 @@ test("saved configurations are only visible to the user who created them", async
 
   await aliceContext.close();
   await bobContext.close();
+});
+
+const languageHeader = (page) => page.getByTestId("repo-grid").locator(".ag-header-cell[col-id='language']");
+
+const setLanguageVisible = async (page, visible) => {
+  await page.getByText("Columns", { exact: true }).click();
+  await page.locator("[data-column-chooser]").getByRole("checkbox", { name: "Language", exact: true }).setChecked(visible);
+  await page.getByText("Columns", { exact: true }).click();
+};
+
+const saveConfiguration = async (page, name) => {
+  await page.getByText("Save configuration").click();
+  await page.locator('input[name="name"]').fill(name);
+  await page.getByRole("button", { name: "Save" }).click();
+};
+
+test("saving a configuration keeps hidden columns and highlights it while they match", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  const page = await signInAs(`${Math.floor(Math.random() * 1e10)}@dxw.com`, context, baseURL);
+  const savedConfiguration = page.getByRole("link", { name: "No language" });
+
+  await setLanguageVisible(page, false);
+  await saveConfiguration(page, "No language");
+
+  await expect.poll(() => urlHiddenColumns(page)).toEqual(["language"]);
+  await expect(languageHeader(page)).toHaveCount(0);
+  await expect(savedConfiguration).toHaveAttribute("aria-current", "true");
+
+  await setLanguageVisible(page, true);
+  await expect(languageHeader(page)).toHaveCount(1);
+  await expect(savedConfiguration).toHaveAttribute("aria-current", "false");
+
+  await savedConfiguration.click();
+  await expect(languageHeader(page)).toHaveCount(0);
+
+  await context.close();
+});
+
+test("applying a configuration without hidden shows every column", async ({ browser, baseURL }) => {
+  const context = await browser.newContext({ storageState: { cookies: [], origins: [] } });
+  const page = await signInAs(`${Math.floor(Math.random() * 1e10)}@dxw.com`, context, baseURL);
+
+  await saveConfiguration(page, "Plain");
+  await setLanguageVisible(page, false);
+  await expect(languageHeader(page)).toHaveCount(0);
+
+  await page.getByRole("link", { name: "Plain" }).click();
+  await expect(languageHeader(page)).toHaveCount(1);
+  await expect(page).not.toHaveURL(/hidden=/);
+
+  await context.close();
 });
