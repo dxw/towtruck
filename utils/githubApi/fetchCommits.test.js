@@ -9,7 +9,10 @@ const humanCommit = (date, login = "rich", name = "Rich") => ({
 
 const unlinkedCommit = (name) => ({ author: null, commit: { author: { name, date: "2024-01-01T00:00:00Z" } } });
 
-const botCommit = () => ({ author: { login: "renovate[bot]", type: "Bot" }, commit: { author: { name: "renovate[bot]", date: "2024-01-01T00:00:00Z" } } });
+const botCommit = () => ({
+  author: { login: "renovate[bot]", type: "Bot" },
+  commit: { author: { name: "renovate[bot]", date: "2024-01-01T00:00:00Z" } },
+});
 
 describe("commitIsFromBot", () => {
   it("returns true for commits by a GitHub bot account", () => {
@@ -62,7 +65,11 @@ describe("findTopCommitter", () => {
   });
 
   it("groups commits not linked to a GitHub account by author name", () => {
-    const actual = findTopCommitter([humanCommit("2024-03-03T00:00:00Z", "rich", "Rich"), unlinkedCommit("Jo"), unlinkedCommit("Jo")]);
+    const actual = findTopCommitter([
+      humanCommit("2024-03-03T00:00:00Z", "rich", "Rich"),
+      unlinkedCommit("Jo"),
+      unlinkedCommit("Jo"),
+    ]);
 
     expect.deepStrictEqual(actual, { name: "Jo", login: null });
   });
@@ -107,7 +114,9 @@ describe("findTopCommitter", () => {
   });
 
   it("falls back to the GitHub username if the commit has no author name", () => {
-    const actual = findTopCommitter([{ author: { login: "rich", type: "User" }, commit: { author: { name: "", date: "2024-01-01T00:00:00Z" } } }]);
+    const actual = findTopCommitter([
+      { author: { login: "rich", type: "User" }, commit: { author: { name: "", date: "2024-01-01T00:00:00Z" } } },
+    ]);
 
     expect.deepStrictEqual(actual, { name: "rich", login: "rich" });
   });
@@ -177,21 +186,34 @@ describe("getCommitsForRepo", () => {
 
   it("requests further pages until it has seen 100 non-bot commits", async (t) => {
     const pages = {
-      "https://some.api/commits?per_page=100": [...Array.from({ length: 90 }, botCommit), ...Array.from({ length: 10 }, () => humanCommit("2024-03-03T00:00:00Z", "jo", "Jo"))],
-      "https://some.api/commits?per_page=100&page=2": [...Array.from({ length: 50 }, botCommit), ...Array.from({ length: 50 }, () => humanCommit("2024-02-02T00:00:00Z"))],
-      "https://some.api/commits?per_page=100&page=3": Array.from({ length: 100 }, () => humanCommit("2024-01-01T00:00:00Z", "sam", "Sam")),
-      "https://some.api/commits?per_page=100&page=4": Array.from({ length: 100 }, () => humanCommit("2023-01-01T00:00:00Z", "sam", "Sam")),
+      "https://some.api/commits?per_page=100": [
+        ...Array.from({ length: 90 }, botCommit),
+        ...Array.from({ length: 10 }, () => humanCommit("2024-03-03T00:00:00Z", "jo", "Jo")),
+      ],
+      "https://some.api/commits?per_page=100&page=2": [
+        ...Array.from({ length: 50 }, botCommit),
+        ...Array.from({ length: 50 }, () => humanCommit("2024-02-02T00:00:00Z")),
+      ],
+      "https://some.api/commits?per_page=100&page=3": Array.from({ length: 100 }, () =>
+        humanCommit("2024-01-01T00:00:00Z", "sam", "Sam"),
+      ),
+      "https://some.api/commits?per_page=100&page=4": Array.from({ length: 100 }, () =>
+        humanCommit("2023-01-01T00:00:00Z", "sam", "Sam"),
+      ),
     };
     const octokit = { request: t.mock.fn(async (url) => ({ data: pages[url] })) };
     const repository = { name: "repo", commits_url: "https://some.api/commits{/sha}" };
 
     const actual = await getCommitsForRepo({ octokit, repository });
 
-    expect.deepStrictEqual(octokit.request.mock.calls.map((call) => call.arguments[0]), [
-      "https://some.api/commits?per_page=100",
-      "https://some.api/commits?per_page=100&page=2",
-      "https://some.api/commits?per_page=100&page=3",
-    ]);
+    expect.deepStrictEqual(
+      octokit.request.mock.calls.map((call) => call.arguments[0]),
+      [
+        "https://some.api/commits?per_page=100",
+        "https://some.api/commits?per_page=100&page=2",
+        "https://some.api/commits?per_page=100&page=3",
+      ],
+    );
     // 10 from Jo + 50 from Rich + the first 40 from Sam
     expect.deepStrictEqual(actual.topCommitter, { name: "Rich", login: "rich" });
     expect.deepStrictEqual(actual.mostRecentNonBotCommitAt, new Date("2024-03-03T00:00:00Z"));

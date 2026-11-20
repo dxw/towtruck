@@ -26,8 +26,6 @@ export const handleEvent = async ({ payload }, db) => {
  * @param {Event<"repository">} event
  */
 export const onRepository = async (event) => {
-  console.log(
-    `${event.payload.repository.name} updated: ${event.payload.action}`,
-  );
+  console.log(`${event.payload.repository.name} updated: ${event.payload.action}`);
   return await handleEvent(event, new TowtruckDatabase());
 };

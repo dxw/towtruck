@@ -31,7 +31,7 @@ export const fetchAllDependencyLifetimes = async (db, apiClient) => {
         dependency,
         lifetimes: response,
       };
-    })
+    }),
   );
 
   return lifetimes.filter((lifetime) => lifetime !== undefined);
@@ -46,7 +46,7 @@ export const saveAllDependencyLifetimes = async (allLifetimes, db) => {
   try {
     console.info("Saving all dependency EOL info...");
     const saveAllLifetimes = db.transaction((lifetimes) => {
-      lifetimes.forEach((item) => db.saveToDependency(item.dependency, "lifetimes", item.lifetimes))
+      lifetimes.forEach((item) => db.saveToDependency(item.dependency, "lifetimes", item.lifetimes));
     });
 
     saveAllLifetimes(allLifetimes);

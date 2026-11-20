@@ -10,10 +10,7 @@ const seed = async () => {
 
   db.deleteAllDependencies();
 
-  const allLifetimes = await fetchAllDependencyLifetimes(
-    db,
-    new EndOfLifeDateApiClient(),
-  );
+  const allLifetimes = await fetchAllDependencyLifetimes(db, new EndOfLifeDateApiClient());
   await saveAllDependencyLifetimes(allLifetimes, db);
 };
 

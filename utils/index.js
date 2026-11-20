@@ -40,28 +40,28 @@ import { DEFAULT_DATE_STYLE, formatDate } from "./dateFormatting.js";
  */
 
 const stateColors = {
-  "upToDate": "sky",
-  "minorUpdateAvailable": "amber",
-  "majorUpdateAvailable": "orange",
-  "endOfLife": "red",
+  upToDate: "sky",
+  minorUpdateAvailable: "amber",
+  majorUpdateAvailable: "orange",
+  endOfLife: "red",
 };
 
 const defaultColor = "stone";
 
 const stateIcons = {
-  "upToDate": "bx-check-circle",
-  "minorUpdateAvailable": "bx-up-arrow-circle",
-  "majorUpdateAvailable": "bxs-up-arrow-circle",
-  "endOfLife": "bxs-x-circle",
+  upToDate: "bx-check-circle",
+  minorUpdateAvailable: "bx-up-arrow-circle",
+  majorUpdateAvailable: "bxs-up-arrow-circle",
+  endOfLife: "bxs-x-circle",
 };
 
 const defaultIcon = "bx-question-mark";
 
 /**
  * Maps the persisted dependency data from storage to a format suitable for the UI
- * @param {import("../model/Dependency").Dependency} dependency 
+ * @param {import("../model/Dependency").Dependency} dependency
  * @param {import("./endOfLifeDateApi/fetchAllDependencyEolInfo").DependencyLifetimes[]} persistedLifetimes
- * @returns {UiDependency} 
+ * @returns {UiDependency}
  */
 export const mapDependencyFromStorageToUi = (dependency, persistedLifetimes) => {
   const lifetimes = Object.entries(persistedLifetimes).find(([name]) => name === dependency.name)?.[1];
@@ -143,43 +143,51 @@ export const mapRepoFromStorageToUi = (persistedData, persistedLifetimes, dateSt
   const mappedRepos = Object.entries(persistedData)
     .filter(([, repo]) => repo.main && repo.main.name !== ".github")
     .map(([, repo]) => {
-    const newDate = formatDate(repo.main.updatedAt, dateStyle);
-    const dependencies = repo.dependencies.map((dependency) => mapDependencyFromStorageToUi(dependency, persistedLifetimes));
+      const newDate = formatDate(repo.main.updatedAt, dateStyle);
+      const dependencies = repo.dependencies.map((dependency) =>
+        mapDependencyFromStorageToUi(dependency, persistedLifetimes),
+      );
 
-    const mostRecentPrOpenedAt = repo.pullRequests.mostRecentPrOpenedAt && formatDate(repo.pullRequests.mostRecentPrOpenedAt, dateStyle);
-    const oldestOpenPrOpenedAt = repo.pullRequests.oldestOpenPrOpenedAt && formatDate(repo.pullRequests.oldestOpenPrOpenedAt, dateStyle);
-    const mostRecentBotPrClosedAt = repo.pullRequests.mostRecentBotPrClosedAt && formatDate(repo.pullRequests.mostRecentBotPrClosedAt, dateStyle);
-    const mostRecentIssueOpenedAt = repo.issues.mostRecentIssueOpenedAt && formatDate(repo.issues.mostRecentIssueOpenedAt, dateStyle);
-    const oldestOpenIssueOpenedAt = repo.issues.oldestOpenIssueOpenedAt && formatDate(repo.issues.oldestOpenIssueOpenedAt, dateStyle);
-    // Repos stored before commit tracking was added have no commit data until they are next refreshed
-    const mostRecentNonBotCommitAtISO8601 = repo.commits?.mostRecentNonBotCommitAt ?? null;
-    const mostRecentNonBotCommitAt = mostRecentNonBotCommitAtISO8601 && formatDate(mostRecentNonBotCommitAtISO8601, dateStyle);
+      const mostRecentPrOpenedAt =
+        repo.pullRequests.mostRecentPrOpenedAt && formatDate(repo.pullRequests.mostRecentPrOpenedAt, dateStyle);
+      const oldestOpenPrOpenedAt =
+        repo.pullRequests.oldestOpenPrOpenedAt && formatDate(repo.pullRequests.oldestOpenPrOpenedAt, dateStyle);
+      const mostRecentBotPrClosedAt =
+        repo.pullRequests.mostRecentBotPrClosedAt && formatDate(repo.pullRequests.mostRecentBotPrClosedAt, dateStyle);
+      const mostRecentIssueOpenedAt =
+        repo.issues.mostRecentIssueOpenedAt && formatDate(repo.issues.mostRecentIssueOpenedAt, dateStyle);
+      const oldestOpenIssueOpenedAt =
+        repo.issues.oldestOpenIssueOpenedAt && formatDate(repo.issues.oldestOpenIssueOpenedAt, dateStyle);
+      // Repos stored before commit tracking was added have no commit data until they are next refreshed
+      const mostRecentNonBotCommitAtISO8601 = repo.commits?.mostRecentNonBotCommitAt ?? null;
+      const mostRecentNonBotCommitAt =
+        mostRecentNonBotCommitAtISO8601 && formatDate(mostRecentNonBotCommitAtISO8601, dateStyle);
 
-    const languageColor = hashToTailwindColor(repo.main.language);
+      const languageColor = hashToTailwindColor(repo.main.language);
 
-    return {
-      ...repo.main,
-      ...repo.dependabotAlerts,
-      ...repo.pullRequests,
-      ...repo.issues,
-      updatedAt: newDate,
-      updatedAtISO8601: repo.main.updatedAt,
-      dependencies,
-      mostRecentPrOpenedAt,
-      mostRecentPrOpenedAtISO8601: repo.pullRequests.mostRecentPrOpenedAt,
-      oldestOpenPrOpenedAt,
-      oldestOpenPrOpenedAtISO8601: repo.pullRequests.oldestOpenPrOpenedAt,
-      mostRecentBotPrClosedAt,
-      mostRecentIssueOpenedAt,
-      mostRecentIssueOpenedAtISO8601: repo.issues.mostRecentIssueOpenedAt,
-      oldestOpenIssueOpenedAt,
-      oldestOpenIssueOpenedAtISO8601: repo.issues.oldestOpenIssueOpenedAt,
-      mostRecentNonBotCommitAt,
-      mostRecentNonBotCommitAtISO8601,
-      topCommitter: repo.commits?.topCommitter ?? null,
-      languageColor,
-    };
-  });
+      return {
+        ...repo.main,
+        ...repo.dependabotAlerts,
+        ...repo.pullRequests,
+        ...repo.issues,
+        updatedAt: newDate,
+        updatedAtISO8601: repo.main.updatedAt,
+        dependencies,
+        mostRecentPrOpenedAt,
+        mostRecentPrOpenedAtISO8601: repo.pullRequests.mostRecentPrOpenedAt,
+        oldestOpenPrOpenedAt,
+        oldestOpenPrOpenedAtISO8601: repo.pullRequests.oldestOpenPrOpenedAt,
+        mostRecentBotPrClosedAt,
+        mostRecentIssueOpenedAt,
+        mostRecentIssueOpenedAtISO8601: repo.issues.mostRecentIssueOpenedAt,
+        oldestOpenIssueOpenedAt,
+        oldestOpenIssueOpenedAtISO8601: repo.issues.oldestOpenIssueOpenedAt,
+        mostRecentNonBotCommitAt,
+        mostRecentNonBotCommitAtISO8601,
+        topCommitter: repo.commits?.topCommitter ?? null,
+        languageColor,
+      };
+    });
 
   const totalRepos = mappedRepos.length;
   const org = Object.entries(persistedData)[0]?.[1]?.owner ?? "";
@@ -271,4 +279,3 @@ export const getOrgs = (persistedData) => {
   }
   return [...orgs].sort();
 };
-

@@ -76,7 +76,7 @@ export const saveAllRepos = async (allRepos, db) => {
         const owner = repo.repo.owner;
 
         const name = `${owner}/${repoName}`;
-        
+
         db.saveToRepository(name, "main", repo.repo);
         db.saveToRepository(name, "owner", owner);
         db.saveToRepository(name, "dependencies", repo.dependencies);

@@ -100,8 +100,8 @@ describe("handleDependabotAlertsApiResponse", () => {
   describe("hasOpenAlertOlderThan14Days", () => {
     it("returns true when there is an open alert older than 14 days", (t) => {
       const now = new Date("2026-07-01T00:00:00Z");
-      const fifteenDaysAgo = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000)).toISOString();
-      const oneDayAgo = new Date(now.getTime() - (1 * 24 * 60 * 60 * 1000)).toISOString();
+      const fifteenDaysAgo = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000).toISOString();
+      const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString();
 
       const alert1 = {
         state: "open",
@@ -119,10 +119,12 @@ describe("handleDependabotAlertsApiResponse", () => {
 
       expect.strictEqual(actual.hasOpenAlertOlderThan14Days, true);
       expect.strictEqual(actual.oldestOpenAlertCreatedAt, fifteenDaysAgo);
-      expect.deepStrictEqual(actual.otherOpenAlerts, [{
-        createdAt: oneDayAgo,
-        severity: "high",
-      }]);
+      expect.deepStrictEqual(actual.otherOpenAlerts, [
+        {
+          createdAt: oneDayAgo,
+          severity: "high",
+        },
+      ]);
       expect.deepStrictEqual(actual.otherOpenAlertsCreatedAt, [oneDayAgo]);
 
       dateNowSpy.mock.restore();
@@ -130,7 +132,7 @@ describe("handleDependabotAlertsApiResponse", () => {
 
     it("returns false when all open alerts are 14 days old or newer", (t) => {
       const now = new Date("2026-07-01T00:00:00Z");
-      const fourteenDaysAgo = new Date(now.getTime() - (14 * 24 * 60 * 60 * 1000)).toISOString();
+      const fourteenDaysAgo = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000).toISOString();
 
       const alert = {
         state: "open",
@@ -188,17 +190,22 @@ describe("handleDependabotAlertsApiResponse", () => {
         { createdAt: "2026-06-15T00:00:00Z", severity: "critical" },
         { createdAt: "2026-06-20T00:00:00Z", severity: "low" },
       ]);
-      expect.deepStrictEqual(actual.otherOpenAlertsCreatedAt, [
-        "2026-06-15T00:00:00Z",
-        "2026-06-20T00:00:00Z",
-      ]);
+      expect.deepStrictEqual(actual.otherOpenAlertsCreatedAt, ["2026-06-15T00:00:00Z", "2026-06-20T00:00:00Z"]);
     });
   });
 
   describe("runtimeAlerts and devAlerts", () => {
     it("splits open alerts by dependency scope and severity", () => {
-      const runtime = (severity, state = "open") => ({ state, dependency: { scope: "runtime" }, security_vulnerability: { severity } });
-      const development = (severity, state = "open") => ({ state, dependency: { scope: "development" }, security_vulnerability: { severity } });
+      const runtime = (severity, state = "open") => ({
+        state,
+        dependency: { scope: "runtime" },
+        security_vulnerability: { severity },
+      });
+      const development = (severity, state = "open") => ({
+        state,
+        dependency: { scope: "development" },
+        security_vulnerability: { severity },
+      });
 
       const actual = handleDependabotAlertsApiResponse({
         data: [
@@ -232,15 +239,25 @@ describe("handleDependabotAlertsApiResponse", () => {
 
   describe("hasOpenRuntimeAlertOlderThan14Days", () => {
     const now = new Date("2026-07-01T00:00:00Z");
-    const fifteenDaysAgo = new Date(now.getTime() - (15 * 24 * 60 * 60 * 1000)).toISOString();
-    const oneDayAgo = new Date(now.getTime() - (1 * 24 * 60 * 60 * 1000)).toISOString();
+    const fifteenDaysAgo = new Date(now.getTime() - 15 * 24 * 60 * 60 * 1000).toISOString();
+    const oneDayAgo = new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString();
 
     it("returns true when an open runtime alert is older than 14 days", (t) => {
       t.mock.method(Date, "now", () => now.getTime());
       const actual = handleDependabotAlertsApiResponse({
         data: [
-          { state: "open", created_at: oneDayAgo, dependency: { scope: "runtime" }, security_vulnerability: { severity: "low" } },
-          { state: "open", created_at: fifteenDaysAgo, dependency: { scope: "runtime" }, security_vulnerability: { severity: "high" } },
+          {
+            state: "open",
+            created_at: oneDayAgo,
+            dependency: { scope: "runtime" },
+            security_vulnerability: { severity: "low" },
+          },
+          {
+            state: "open",
+            created_at: fifteenDaysAgo,
+            dependency: { scope: "runtime" },
+            security_vulnerability: { severity: "high" },
+          },
         ],
       });
 
@@ -251,9 +268,24 @@ describe("handleDependabotAlertsApiResponse", () => {
       t.mock.method(Date, "now", () => now.getTime());
       const actual = handleDependabotAlertsApiResponse({
         data: [
-          { state: "open", created_at: fifteenDaysAgo, dependency: { scope: "development" }, security_vulnerability: { severity: "critical" } },
-          { state: "fixed", created_at: fifteenDaysAgo, dependency: { scope: "runtime" }, security_vulnerability: { severity: "critical" } },
-          { state: "open", created_at: oneDayAgo, dependency: { scope: "runtime" }, security_vulnerability: { severity: "low" } },
+          {
+            state: "open",
+            created_at: fifteenDaysAgo,
+            dependency: { scope: "development" },
+            security_vulnerability: { severity: "critical" },
+          },
+          {
+            state: "fixed",
+            created_at: fifteenDaysAgo,
+            dependency: { scope: "runtime" },
+            security_vulnerability: { severity: "critical" },
+          },
+          {
+            state: "open",
+            created_at: oneDayAgo,
+            dependency: { scope: "runtime" },
+            security_vulnerability: { severity: "low" },
+          },
         ],
       });
 

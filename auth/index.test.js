@@ -48,7 +48,9 @@ describe("requireAuth", () => {
 
   const makeRes = () => {
     const res = { redirectedTo: null };
-    res.redirect = (url) => { res.redirectedTo = url; };
+    res.redirect = (url) => {
+      res.redirectedTo = url;
+    };
     return res;
   };
 
@@ -56,7 +58,9 @@ describe("requireAuth", () => {
     const req = makeReq({ email: "user@dxw.com" });
     const res = makeRes();
     let nextCalled = false;
-    const next = () => { nextCalled = true; };
+    const next = () => {
+      nextCalled = true;
+    };
 
     requireAuth(req, res, next);
 
@@ -89,7 +93,9 @@ describe("registerAuthRoutes", () => {
   const makeApp = () => {
     const routes = {};
     return {
-      get: (path, handler) => { routes[path] = handler; },
+      get: (path, handler) => {
+        routes[path] = handler;
+      },
       routes,
     };
   };
@@ -107,7 +113,12 @@ describe("registerAuthRoutes", () => {
           destroy: (cb) => cb(),
         },
       };
-      const res = { redirectedTo: null, redirect: (url) => { res.redirectedTo = url; } };
+      const res = {
+        redirectedTo: null,
+        redirect: (url) => {
+          res.redirectedTo = url;
+        },
+      };
 
       await app.routes["/auth/logout"](req, res);
 
@@ -127,8 +138,13 @@ describe("registerAuthRoutes", () => {
       const res = {
         statusCode: null,
         body: null,
-        status(code) { this.statusCode = code; return this; },
-        send(body) { this.body = body; },
+        status(code) {
+          this.statusCode = code;
+          return this;
+        },
+        send(body) {
+          this.body = body;
+        },
       };
 
       await app.routes["/auth/callback"](req, res);
@@ -144,4 +160,3 @@ describe("registerAuthRoutes", () => {
     });
   });
 });
-

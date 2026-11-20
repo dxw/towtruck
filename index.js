@@ -29,7 +29,8 @@ const httpServer = express();
 
 httpServer.use(cookieParser());
 
-const sessionSecret = process.env.SESSION_SECRET ?? (process.env.NODE_ENV !== "production" ? "dev-session-secret" : undefined);
+const sessionSecret =
+  process.env.SESSION_SECRET ?? (process.env.NODE_ENV !== "production" ? "dev-session-secret" : undefined);
 
 if (!sessionSecret) {
   console.error("FATAL: SESSION_SECRET environment variable is required in production.");
@@ -85,7 +86,9 @@ httpServer.get("/:org", requireAuth, (request, response) => {
 
   // Resolve date format: query param takes precedence.
   // Only persist the default date style in the cookie; MM/DD/YYYY must be explicitly passed each navigation.
-  const dateFormat = normalizeDateStyle(request.query.dateFormat ?? (request.cookies?.dateFormat === DEFAULT_DATE_STYLE ? DEFAULT_DATE_STYLE : undefined));
+  const dateFormat = normalizeDateStyle(
+    request.query.dateFormat ?? (request.cookies?.dateFormat === DEFAULT_DATE_STYLE ? DEFAULT_DATE_STYLE : undefined),
+  );
   if (request.cookies?.dateFormat !== dateFormat) {
     response.cookie("dateFormat", dateFormat, { httpOnly: false, sameSite: "lax" });
   }
@@ -113,8 +116,6 @@ httpServer.get("/:org", requireAuth, (request, response) => {
 
   return response.end(template);
 });
-
-
 
 httpServer.post("/:org/saved-configurations", requireAuth, (request, response) => {
   const { org } = request.params;
@@ -170,4 +171,3 @@ httpServer.listen(PORT, (listeningError) => {
     console.info("Seed on start is disabled (RUN_SEED_ON_START=%s)", process.env.RUN_SEED_ON_START);
   }
 });
-

@@ -47,14 +47,13 @@ const getDetectedDependencies = (issue) => {
   }
 
   return match[0];
-}
+};
 
 const parseDependenciesFromDashboard = (issue) =>
   getDetectedDependencies(issue)
     ?.split(LINE_SEPARATOR_REGEX)
     ?.map(parseDependencyFromLine)
-    ?.filter((dependency) => dependency !== null)
-    ?? [];
+    ?.filter((dependency) => dependency !== null) ?? [];
 
 const parseDependencyFromLine = (line) => {
   const match = line.match(DEPENDENCY_NAME_AND_VERSION_REGEX);
@@ -67,9 +66,7 @@ const parseDependencyFromLine = (line) => {
 };
 
 export const handleIssuesApiResponse = (response) => {
-  const dependencyDashboardIssue = response.data.find(
-    issueIsRenovateDependencyDashboard
-  );
+  const dependencyDashboardIssue = response.data.find(issueIsRenovateDependencyDashboard);
 
   if (!dependencyDashboardIssue) {
     return [];
@@ -80,14 +77,15 @@ export const handleIssuesApiResponse = (response) => {
 
 export const getDependenciesForRepo = ({ octokit, repository }) => {
   const issuesUrl = repository.issues_url.replace("{/number}", "");
-  return octokit.request(issuesUrl, {
-    creator: "renovate[bot]",
-    state: "open",
-    per_page: 100,
-  })
-  .then(handleIssuesApiResponse)
-  .catch((error) => {
-    console.warn(`[${repository.name}] Dependencies: ${error.message}`);
-    return [];
-  });
+  return octokit
+    .request(issuesUrl, {
+      creator: "renovate[bot]",
+      state: "open",
+      per_page: 100,
+    })
+    .then(handleIssuesApiResponse)
+    .catch((error) => {
+      console.warn(`[${repository.name}] Dependencies: ${error.message}`);
+      return [];
+    });
 };

@@ -15,10 +15,7 @@ export const createDestinationDirectory = async () => {
 export const seedTestData = async () => {
   console.info("Seeding test data...");
   // Stale WAL files from a previous run would otherwise be replayed on top of the fresh copy.
-  await Promise.all([
-    rm(`${dbPath}-wal`, { force: true }),
-    rm(`${dbPath}-shm`, { force: true }),
-  ]);
+  await Promise.all([rm(`${dbPath}-wal`, { force: true }), rm(`${dbPath}-shm`, { force: true })]);
   await copyFile("./e2es/testData/towtruck.db", dbPath);
 };
 
