@@ -22,6 +22,12 @@ nunjucks.configure({
 // `filter` holds the grid's filter model as JSON.
 const CONFIGURATION_QUERY_KEYS = ["sortBy", "sortDirection", "filter"];
 
+// Route params are URL-decoded, so the org has to be re-encoded before it goes back into a path
+const orgUrl = (org, query = {}) => {
+  const qs = new URLSearchParams(query).toString();
+  return `/${encodeURIComponent(org)}${qs ? `?${qs}` : ""}`;
+};
+
 const pickConfigurationQuery = (source) =>
   Object.fromEntries(CONFIGURATION_QUERY_KEYS.filter((key) => source[key]).map((key) => [key, source[key]]));
 
@@ -95,11 +101,9 @@ httpServer.get("/:org", requireAuth, (request, response) => {
   const { sortDirection, sortBy } = request.query;
   const sortedRepos = sortByType(reposForUi.repos, sortDirection, sortBy);
 
-  const savedConfigurations = db.getAllSavedConfigurationsForUser(org, request.session.user.email).map((config) => {
-    const params = new URLSearchParams(config.query || {});
-    const qs = params.toString();
-    return { ...config, applyUrl: qs ? `/${org}?${qs}` : `/${org}` };
-  });
+  const savedConfigurations = db
+    .getAllSavedConfigurationsForUser(org, request.session.user.email)
+    .map((config) => ({ ...config, applyUrl: orgUrl(org, config.query || {}) }));
 
   const template = nunjucks.render("index.njk", {
     gridRows: serialiseGridRows(sortedRepos),
@@ -124,7 +128,7 @@ httpServer.post("/:org/saved-configurations", requireAuth, (request, response) =
   const db = new TowtruckDatabase();
   db.saveConfiguration(org, name || `Config ${new Date().toLocaleString()}`, query, request.session.user.email);
 
-  return response.redirect(`/${org}?${new URLSearchParams(query).toString()}`);
+  return response.redirect(orgUrl(org, query));
 });
 
 httpServer.post("/:org/saved-configurations/:id/delete", requireAuth, (request, response) => {
@@ -133,8 +137,7 @@ httpServer.post("/:org/saved-configurations/:id/delete", requireAuth, (request, 
   const db = new TowtruckDatabase();
   db.deleteSavedConfiguration(org, id, request.session.user.email);
 
-  const qs = new URLSearchParams(pickConfigurationQuery(request.body)).toString();
-  return response.redirect(qs ? `/${org}?${qs}` : `/${org}`);
+  return response.redirect(orgUrl(org, pickConfigurationQuery(request.body)));
 });
 
 import { spawn } from "node:child_process";
