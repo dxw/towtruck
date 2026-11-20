@@ -43,7 +43,7 @@ export class EndOfLifeDateApiClient {
   /**
    * Gets information about a specific cycle of a given product.
    * @param {string} product
-   * @param {number|string} cycle 
+   * @param {number|string} cycle
    * @returns {Promise<Cycle?>}
    */
   async getCycle(product, cycle) {
@@ -65,17 +65,18 @@ export class EndOfLifeDateApiClient {
 
 /**
  * Finds the release cycle for the given dependency version from the specified list of release cycles
- * @param {Dependency} dependency 
- * @param {Cycle[]} cycles 
+ * @param {Dependency} dependency
+ * @param {Cycle[]} cycles
  * @returns {Cycle}
  */
-const findDependencyCycle = (dependency, cycles) => cycles.find((cycle) => cycle.cycle === dependency.major?.toString())
-  ?? cycles.find((cycle) => cycle.cycle === dependency.major?.toString() + "." + dependency.minor?.toString())
-  ?? cycles.find((cycle) => cycle.codename?.toLowerCase()?.includes(dependency.tag?.toLowerCase()));
+const findDependencyCycle = (dependency, cycles) =>
+  cycles.find((cycle) => cycle.cycle === dependency.major?.toString()) ??
+  cycles.find((cycle) => cycle.cycle === dependency.major?.toString() + "." + dependency.minor?.toString()) ??
+  cycles.find((cycle) => cycle.codename?.toLowerCase()?.includes(dependency.tag?.toLowerCase()));
 
 /**
- * 
- * @param {Cycle} cycle 
+ *
+ * @param {Cycle} cycle
  * @returns {Date}
  */
 const getEolDate = (cycle) => {
@@ -88,8 +89,8 @@ const getEolDate = (cycle) => {
 
 /**
  * Gets the state of the given dependency according to the specified list of release cycles
- * @param {Dependency} dependency 
- * @param {Cycle[]} cycles 
+ * @param {Dependency} dependency
+ * @param {Cycle[]} cycles
  * @returns {DependencyState}
  */
 export const getDependencyState = (dependency, cycles) => {
@@ -98,7 +99,7 @@ export const getDependencyState = (dependency, cycles) => {
   if (!cycle) return "unknown";
 
   const eolDate = getEolDate(cycle);
-  if (eolDate && (eolDate < Date.now())) return "endOfLife";
+  if (eolDate && eolDate < Date.now()) return "endOfLife";
 
   if (cycle !== cycles[0]) return "majorUpdateAvailable";
 
@@ -109,8 +110,8 @@ export const getDependencyState = (dependency, cycles) => {
 
 /**
  * Gets the end-of-life date of the given dependency according to the specified list of release cycles
- * @param {Dependency} dependency 
- * @param {Cycle[]} cycles 
+ * @param {Dependency} dependency
+ * @param {Cycle[]} cycles
  * @returns {Date}
  */
 export const getDependencyEndOfLifeDate = (dependency, cycles) => {

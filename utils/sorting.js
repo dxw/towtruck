@@ -25,8 +25,8 @@ export const sortByNumericValue = (repos, sortDirection, key) => {
 
 /**
  * Compares two strings in lexicographical order.
- * @param {string?} first 
- * @param {string?} second 
+ * @param {string?} first
+ * @param {string?} second
  * @returns {number}
  */
 const lexicographicalSort = (first, second, ascending) => {
@@ -35,20 +35,20 @@ const lexicographicalSort = (first, second, ascending) => {
 
   if (ascending) return first.localeCompare(second);
   return second.localeCompare(first);
-}
+};
 
 /**
  * Sorts repos by a timestamp value in ISO 8601 (`YYYY-MM-DDThh:mm:ssZ`) format
- * @param {UiRepo[]} repos 
- * @param {SortDirection} sortDirection 
- * @param {string} key 
+ * @param {UiRepo[]} repos
+ * @param {SortDirection} sortDirection
+ * @param {string} key
  * @returns {UiRepo[]}
  */
 export const sortByISO8601Timestamp = (repos, sortDirection, key) => {
   if (!sortDirection) return repos;
 
   return repos.sort((a, b) => lexicographicalSort(a[key], b[key], sortDirection === "asc"));
-}
+};
 
 /**
  * Sorts repositories based on the specified type and direction.

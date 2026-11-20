@@ -3,10 +3,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import { modeFilter, urlFilterModel } from "./filterUrl.js";
 
-const authFile = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  ".auth/user.json"
-);
+const authFile = path.join(path.dirname(fileURLToPath(import.meta.url)), ".auth/user.json");
 
 /**
  * Signs in as the given email using the test session endpoint and navigates
@@ -65,10 +62,7 @@ test("saving a configuration keeps the table's filters and highlights it while t
   await context.close();
 });
 
-test("saved configurations are only visible to the user who created them", async ({
-  browser,
-  baseURL,
-}) => {
+test("saved configurations are only visible to the user who created them", async ({ browser, baseURL }) => {
   const user1 = `${Math.floor(Math.random() * 1e10)}`;
   const user2 = `${Math.floor(Math.random() * 1e10)}`;
 

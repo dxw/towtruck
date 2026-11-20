@@ -27,9 +27,7 @@ describe("fetchForRepo", () => {
       },
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
 
     const repository = {
       name: "repo",
@@ -86,9 +84,7 @@ describe("fetchForRepo", () => {
       },
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
 
     const repository = {
       name: "repo",
@@ -99,10 +95,7 @@ describe("fetchForRepo", () => {
       pulls_url: "https://some.api/pulls",
     };
 
-    const expected = [
-      new Dependency("foobar", "1.2.3"),
-      new Dependency("libquux", "0.1.1-alpha"),
-    ];
+    const expected = [new Dependency("foobar", "1.2.3"), new Dependency("libquux", "0.1.1-alpha")];
 
     const actual = await fetchForRepo(repository, octokit);
 
@@ -137,9 +130,7 @@ describe("fetchForRepo", () => {
       },
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
 
     const repository = {
       name: "repo",
@@ -195,9 +186,7 @@ describe("fetchForRepo", () => {
       },
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
 
     const repository = {
       name: "repo",
@@ -256,9 +245,7 @@ describe("fetchForRepo", () => {
       },
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
 
     const repository = {
       name: "repo",
@@ -311,9 +298,7 @@ describe("fetchForRepo", () => {
       },
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
 
     const repository = {
       name: "repo",
@@ -387,76 +372,36 @@ describe("saveAllRepos", () => {
 
     expect.strictEqual(db.saveToRepository.mock.callCount(), 14);
 
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[0].arguments, [
-      "dxw/repo1",
-      "main",
-      repo1.repo,
-    ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[1].arguments, [
-      "dxw/repo1",
-      "owner",
-      repo1.repo.owner,
-    ]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[0].arguments, ["dxw/repo1", "main", repo1.repo]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[1].arguments, ["dxw/repo1", "owner", repo1.repo.owner]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[2].arguments, [
       "dxw/repo1",
       "dependencies",
       repo1.dependencies,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[3].arguments, [
-      "dxw/repo1",
-      "pullRequests",
-      repo1.prInfo,
-    ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[4].arguments, [
-      "dxw/repo1",
-      "issues",
-      repo1.issueInfo,
-    ]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[3].arguments, ["dxw/repo1", "pullRequests", repo1.prInfo]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[4].arguments, ["dxw/repo1", "issues", repo1.issueInfo]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[5].arguments, [
       "dxw/repo1",
       "dependabotAlerts",
       repo1.alerts,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[6].arguments, [
-      "dxw/repo1",
-      "commits",
-      repo1.commitInfo,
-    ]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[6].arguments, ["dxw/repo1", "commits", repo1.commitInfo]);
 
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[7].arguments, [
-      "dxw/repo2",
-      "main",
-      repo2.repo,
-    ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[8].arguments, [
-      "dxw/repo2",
-      "owner",
-      repo2.repo.owner,
-    ]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[7].arguments, ["dxw/repo2", "main", repo2.repo]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[8].arguments, ["dxw/repo2", "owner", repo2.repo.owner]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[9].arguments, [
       "dxw/repo2",
       "dependencies",
       repo2.dependencies,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[10].arguments, [
-      "dxw/repo2",
-      "pullRequests",
-      repo2.prInfo,
-    ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[11].arguments, [
-      "dxw/repo2",
-      "issues",
-      repo2.issueInfo,
-    ]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[10].arguments, ["dxw/repo2", "pullRequests", repo2.prInfo]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[11].arguments, ["dxw/repo2", "issues", repo2.issueInfo]);
     expect.deepStrictEqual(db.saveToRepository.mock.calls[12].arguments, [
       "dxw/repo2",
       "dependabotAlerts",
       repo2.alerts,
     ]);
-    expect.deepStrictEqual(db.saveToRepository.mock.calls[13].arguments, [
-      "dxw/repo2",
-      "commits",
-      repo2.commitInfo,
-    ]);
+    expect.deepStrictEqual(db.saveToRepository.mock.calls[13].arguments, ["dxw/repo2", "commits", repo2.commitInfo]);
   });
 });

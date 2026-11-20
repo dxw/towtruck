@@ -52,4 +52,3 @@ export const normalizeDateStyle = (value) => {
   if (value === "MM/DD/YYYY") return "MM/DD/YYYY";
   return DEFAULT_DATE_STYLE;
 };
-

@@ -53,9 +53,7 @@ describe("handleEvent", () => {
       },
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
     t.mock.method(db, "saveToRepository");
     t.mock.method(db, "getAllRepositories", () => repositories);
 
@@ -68,10 +66,7 @@ describe("handleEvent", () => {
       octokit,
     };
 
-    const expected = [
-      new Dependency("foobar", "1.2.3"),
-      new Dependency("libquux", "0.1.1-alpha"),
-    ];
+    const expected = [new Dependency("foobar", "1.2.3"), new Dependency("libquux", "0.1.1-alpha")];
 
     await handleEvent(event, db, apiClient);
 
@@ -126,9 +121,7 @@ describe("handleEvent", () => {
       ],
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
     t.mock.method(db, "transaction");
     t.mock.method(db, "saveToDependency");
     t.mock.method(db, "getAllRepositories", () => repositories);

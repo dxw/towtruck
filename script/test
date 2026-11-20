@@ -11,6 +11,10 @@ echo "==> Linting the code"
 
 npm run lint
 
+echo "==> Checking formatting"
+
+npm run format:check
+
 echo "==> Running the tests"
 
 npm test

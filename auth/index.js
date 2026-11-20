@@ -90,7 +90,6 @@ export const registerAuthRoutes = (app, oidcConfig) => {
         return res.status(400).send("Invalid session state. Please try logging in again.");
       }
 
-
       const tokens = await openidClient.authorizationCodeGrant(
         oidcConfig,
         new URL(`${process.env.BASE_URL}${req.originalUrl}`),
@@ -162,4 +161,3 @@ export const registerDevAuthRoutes = (app) => {
     return res.status(201).json({ email });
   });
 };
-

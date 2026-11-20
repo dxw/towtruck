@@ -6,5 +6,4 @@
  * @param {PushPayload} payload
  * @returns {boolean}
  */
-export const isPushToDefaultBranch = (payload) =>
-  payload.ref === `refs/heads/${payload.repository.default_branch}`;
+export const isPushToDefaultBranch = (payload) => payload.ref === `refs/heads/${payload.repository.default_branch}`;

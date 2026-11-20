@@ -17,7 +17,6 @@ Accepted
 - A decision on a database and a database structure at this point could constrain future development
 - The data used in the application is read-only
 
-
 ## Decision
 
 We will store the data the application needs in JSON.

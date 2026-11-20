@@ -162,10 +162,7 @@ const expectedDependencies = [
 describe("Dependency", () => {
   describe("constructor", () => {
     it("should set the name and version ", () => {
-      for (const [input, expected] of inputDependencies.map((e, i) => [
-        e,
-        expectedDependencies[i],
-      ])) {
+      for (const [input, expected] of inputDependencies.map((e, i) => [e, expectedDependencies[i]])) {
         const result = new Dependency(input.name, input.version);
 
         expect.deepEqual(result, expected);

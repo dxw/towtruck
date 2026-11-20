@@ -1,8 +1,5 @@
 import { TowtruckDatabase } from "../db/index.js";
-import {
-  fetchForRepo,
-  saveAllRepos,
-} from "../utils/githubApi/fetchAllRepos.js";
+import { fetchForRepo, saveAllRepos } from "../utils/githubApi/fetchAllRepos.js";
 import { OctokitApp } from "../octokitApp.js";
 
 /**

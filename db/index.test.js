@@ -17,26 +17,28 @@ const deleteFile = async (path) => {
 
     throw e;
   }
-}
+};
 
 describe("TowtruckDatabase", () => {
   before(async () => await mkdir(dirname(testDbPath), { recursive: true }));
 
   afterEach(async () => {
-    await Promise.all([
-      deleteFile(testDbPath),
-      deleteFile(`${testDbPath}-wal`),
-      deleteFile(`${testDbPath}-shm`),
-    ]);
+    await Promise.all([deleteFile(testDbPath), deleteFile(`${testDbPath}-wal`), deleteFile(`${testDbPath}-shm`)]);
   });
 
   describe("constructor", () => {
     it("ensures database is set up correctly", () => {
       const log = [];
-      new TowtruckDatabase(testDbPath, { verbose: (str) => log.push(str)});
+      new TowtruckDatabase(testDbPath, { verbose: (str) => log.push(str) });
 
-      expect(log.find(str => str === "PRAGMA journal_mode = WAL"), "Journal mode should be set to WAL.");
-      expect(log.find(str => str.includes("CREATE TABLE IF NOT EXISTS towtruck_data")), "A `towtruck_data` table schema should be defined.");
+      expect(
+        log.find((str) => str === "PRAGMA journal_mode = WAL"),
+        "Journal mode should be set to WAL.",
+      );
+      expect(
+        log.find((str) => str.includes("CREATE TABLE IF NOT EXISTS towtruck_data")),
+        "A `towtruck_data` table schema should be defined.",
+      );
     });
 
     it("uses the DB_PATH environment variable when no filename is given", (t) => {
@@ -51,14 +53,31 @@ describe("TowtruckDatabase", () => {
 
     it("deletes saved configurations that use the legacy filter params", () => {
       new TowtruckDatabase(testDbPath);
-      const insert = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES ('saved-configuration', ?, 'config', ?);");
-      const legacyQueries = [{ alertFilter: "criticalOnly" }, { tag: "wordpress-theme" }, { mode: "publishing", sortBy: "name" }];
-      legacyQueries.forEach((query, index) => insert.run(`my-org/legacy-${index}`, JSON.stringify({ name: `Legacy ${index}`, query, userEmail: "alice@dxw.com" })));
-      insert.run("my-org/current", JSON.stringify({ name: "Current", query: { filter: "{}", sortBy: "name" }, userEmail: "alice@dxw.com" }));
+      const insert = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES ('saved-configuration', ?, 'config', ?);",
+      );
+      const legacyQueries = [
+        { alertFilter: "criticalOnly" },
+        { tag: "wordpress-theme" },
+        { mode: "publishing", sortBy: "name" },
+      ];
+      legacyQueries.forEach((query, index) =>
+        insert.run(
+          `my-org/legacy-${index}`,
+          JSON.stringify({ name: `Legacy ${index}`, query, userEmail: "alice@dxw.com" }),
+        ),
+      );
+      insert.run(
+        "my-org/current",
+        JSON.stringify({ name: "Current", query: { filter: "{}", sortBy: "name" }, userEmail: "alice@dxw.com" }),
+      );
 
       const configs = new TowtruckDatabase(testDbPath).getAllSavedConfigurationsForOrg("my-org");
 
-      expect.deepStrictEqual(configs.map((config) => config.name), ["Current"]);
+      expect.deepStrictEqual(
+        configs.map((config) => config.name),
+        ["Current"],
+      );
     });
   });
 
@@ -84,7 +103,9 @@ describe("TowtruckDatabase", () => {
       };
 
       const result = db.saveToRepository("test-repo", "some-data", data);
-      const actual = new Database(testDbPath).prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;").get(result.lastInsertRowid);
+      const actual = new Database(testDbPath)
+        .prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;")
+        .get(result.lastInsertRowid);
 
       expect.deepStrictEqual(actual, expected);
     });
@@ -92,7 +113,9 @@ describe("TowtruckDatabase", () => {
     it("updates the row if the data already exists", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
       const original = insertStatement.run("repository", "test-repo", "some-data", JSON.stringify({}));
 
       const data = {
@@ -113,7 +136,9 @@ describe("TowtruckDatabase", () => {
       };
 
       db.saveToRepository("test-repo", "some-data", data);
-      const actual = new Database(testDbPath).prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;").get(original.lastInsertRowid);
+      const actual = new Database(testDbPath)
+        .prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;")
+        .get(original.lastInsertRowid);
 
       expect.deepStrictEqual(actual, expected);
     });
@@ -123,7 +148,9 @@ describe("TowtruckDatabase", () => {
     it("retrieves the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
 
       const expected = {
         array: [1, 2, 3],
@@ -157,7 +184,9 @@ describe("TowtruckDatabase", () => {
     it("retrieves the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
 
       const someData = {
         array: [1, 2, 3],
@@ -202,7 +231,9 @@ describe("TowtruckDatabase", () => {
     it("retrieves the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
 
       const testRepoSomeData = {
         array: [1, 2, 3],
@@ -254,7 +285,9 @@ describe("TowtruckDatabase", () => {
     it("retrieves the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
 
       const testRepoSomeData = {
         array: [1, 2, 3],
@@ -296,7 +329,9 @@ describe("TowtruckDatabase", () => {
     it("returns an empty object when no repositories exist for the given org", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
       insertStatement.run("repository", "another-org/test-repo", "some-data", JSON.stringify({}));
 
       const actual = db.getAllRepositoriesForOrg("org");
@@ -309,8 +344,12 @@ describe("TowtruckDatabase", () => {
     it("removes all data for the given repository only", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
-      const selectStatement = new Database(testDbPath).prepare("SELECT scope, name, key FROM towtruck_data ORDER BY id;");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
+      const selectStatement = new Database(testDbPath).prepare(
+        "SELECT scope, name, key FROM towtruck_data ORDER BY id;",
+      );
 
       insertStatement.run("repository", "dxw/test-repo", "main", JSON.stringify({}));
       insertStatement.run("repository", "dxw/test-repo", "dependencies", JSON.stringify([]));
@@ -332,8 +371,12 @@ describe("TowtruckDatabase", () => {
     it("removes the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
-      const selectStatement = new Database(testDbPath).prepare("SELECT COUNT(*) FROM towtruck_data WHERE scope = 'repository';");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
+      const selectStatement = new Database(testDbPath).prepare(
+        "SELECT COUNT(*) FROM towtruck_data WHERE scope = 'repository';",
+      );
 
       const testRepoSomeData = {
         array: [1, 2, 3],
@@ -387,7 +430,9 @@ describe("TowtruckDatabase", () => {
       };
 
       const result = db.saveToDependency("test-dep", "some-data", data);
-      const actual = new Database(testDbPath).prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;").get(result.lastInsertRowid);
+      const actual = new Database(testDbPath)
+        .prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;")
+        .get(result.lastInsertRowid);
 
       expect.deepStrictEqual(actual, expected);
     });
@@ -395,7 +440,9 @@ describe("TowtruckDatabase", () => {
     it("updates the row if the data already exists", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
       const original = insertStatement.run("dependency", "test-dep", "some-data", JSON.stringify({}));
 
       const data = {
@@ -416,7 +463,9 @@ describe("TowtruckDatabase", () => {
       };
 
       db.saveToDependency("test-dep", "some-data", data);
-      const actual = new Database(testDbPath).prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;").get(original.lastInsertRowid);
+      const actual = new Database(testDbPath)
+        .prepare("SELECT * FROM towtruck_data WHERE ROWID = ?;")
+        .get(original.lastInsertRowid);
 
       expect.deepStrictEqual(actual, expected);
     });
@@ -426,7 +475,9 @@ describe("TowtruckDatabase", () => {
     it("retrieves the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
 
       const expected = {
         array: [1, 2, 3],
@@ -460,7 +511,9 @@ describe("TowtruckDatabase", () => {
     it("retrieves the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
 
       const someData = {
         array: [1, 2, 3],
@@ -505,7 +558,9 @@ describe("TowtruckDatabase", () => {
     it("retrieves the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
 
       const testDepSomeData = {
         array: [1, 2, 3],
@@ -557,8 +612,12 @@ describe("TowtruckDatabase", () => {
     it("removes the expected data from the table", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const insertStatement = new Database(testDbPath).prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);");
-      const selectStatement = new Database(testDbPath).prepare("SELECT COUNT(*) FROM towtruck_data WHERE scope = 'dependency';");
+      const insertStatement = new Database(testDbPath).prepare(
+        "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?);",
+      );
+      const selectStatement = new Database(testDbPath).prepare(
+        "SELECT COUNT(*) FROM towtruck_data WHERE scope = 'dependency';",
+      );
 
       const testDepSomeData = {
         array: [1, 2, 3],
@@ -594,7 +653,11 @@ describe("TowtruckDatabase", () => {
     it("persists a configuration and returns it via getAllSavedConfigurationsForOrg", () => {
       const db = new TowtruckDatabase(testDbPath);
 
-      const query = { sortBy: "openIssues", sortDirection: "desc", filter: "{\"runtimeCritical\":{\"filterType\":\"number\",\"type\":\"greaterThan\",\"filter\":0}}" };
+      const query = {
+        sortBy: "openIssues",
+        sortDirection: "desc",
+        filter: '{"runtimeCritical":{"filterType":"number","type":"greaterThan","filter":0}}',
+      };
       db.saveConfiguration("my-org", "My Config", query, "alice@dxw.com");
 
       const configs = db.getAllSavedConfigurationsForOrg("my-org");
@@ -722,7 +785,10 @@ describe("TowtruckDatabase", () => {
 
       db.saveSession("sid-1", { user: { email: "alice@dxw.com" } }, 1234);
 
-      expect.deepStrictEqual(db.getSession("sid-1"), { session: { user: { email: "alice@dxw.com" } }, expiresAt: 1234 });
+      expect.deepStrictEqual(db.getSession("sid-1"), {
+        session: { user: { email: "alice@dxw.com" } },
+        expiresAt: 1234,
+      });
     });
 
     it("returns undefined for an unknown session", () => {

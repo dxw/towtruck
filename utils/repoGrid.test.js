@@ -30,9 +30,30 @@ const uiRepo = {
   devAlerts: { critical: 0, high: 0, medium: 1, low: 1, total: 2 },
   hasOpenRuntimeAlertOlderThan14Days: true,
   dependencies: [
-    { name: "node", version: "18.0.0", isOutOfSupport: true, isEndOfLifeSoon: false, endOfLifeDate: new Date("2025-04-30T00:00:00Z"), endOfLifeRelative: "7 months ago" },
-    { name: "php", version: "8.2.0", isOutOfSupport: false, isEndOfLifeSoon: true, endOfLifeDate: new Date("2026-12-31T00:00:00Z"), endOfLifeRelative: "in about 2 months" },
-    { name: "express", version: "5.0.0", isOutOfSupport: false, isEndOfLifeSoon: false, endOfLifeDate: null, endOfLifeRelative: null },
+    {
+      name: "node",
+      version: "18.0.0",
+      isOutOfSupport: true,
+      isEndOfLifeSoon: false,
+      endOfLifeDate: new Date("2025-04-30T00:00:00Z"),
+      endOfLifeRelative: "7 months ago",
+    },
+    {
+      name: "php",
+      version: "8.2.0",
+      isOutOfSupport: false,
+      isEndOfLifeSoon: true,
+      endOfLifeDate: new Date("2026-12-31T00:00:00Z"),
+      endOfLifeRelative: "in about 2 months",
+    },
+    {
+      name: "express",
+      version: "5.0.0",
+      isOutOfSupport: false,
+      isEndOfLifeSoon: false,
+      endOfLifeDate: null,
+      endOfLifeRelative: null,
+    },
   ],
 };
 
@@ -69,8 +90,20 @@ describe("mapRepoToGridRow", () => {
       responsibleTeam: null,
       hasRuntimeAlertOlderThan14Days: true,
       endOfLifeDependencies: [
-        { name: "node", version: "18.0.0", status: "ended", date: "2025-04-30T00:00:00.000Z", relative: "7 months ago" },
-        { name: "php", version: "8.2.0", status: "endingSoon", date: "2026-12-31T00:00:00.000Z", relative: "in about 2 months" },
+        {
+          name: "node",
+          version: "18.0.0",
+          status: "ended",
+          date: "2025-04-30T00:00:00.000Z",
+          relative: "7 months ago",
+        },
+        {
+          name: "php",
+          version: "8.2.0",
+          status: "endingSoon",
+          date: "2026-12-31T00:00:00.000Z",
+          relative: "in about 2 months",
+        },
       ],
       technologyVersions: [
         { name: "Node.js", version: "18.0.0" },
@@ -87,11 +120,25 @@ describe("mapRepoToGridRow", () => {
   it("lists only dependencies that are out of support or reaching end of life soon", () => {
     const row = mapRepoToGridRow(uiRepo);
 
-    expect.deepStrictEqual(row.endOfLifeDependencies.map((dependency) => dependency.name), ["node", "php"]);
+    expect.deepStrictEqual(
+      row.endOfLifeDependencies.map((dependency) => dependency.name),
+      ["node", "php"],
+    );
   });
 
   it("uses null for a missing dependency version", () => {
-    const repo = { ...uiRepo, dependencies: [{ name: "node", isOutOfSupport: true, isEndOfLifeSoon: false, endOfLifeDate: new Date("2025-04-30T00:00:00Z"), endOfLifeRelative: "7 months ago" }] };
+    const repo = {
+      ...uiRepo,
+      dependencies: [
+        {
+          name: "node",
+          isOutOfSupport: true,
+          isEndOfLifeSoon: false,
+          endOfLifeDate: new Date("2025-04-30T00:00:00Z"),
+          endOfLifeRelative: "7 months ago",
+        },
+      ],
+    };
 
     expect.strictEqual(mapRepoToGridRow(repo).endOfLifeDependencies[0].version, null);
   });
@@ -112,10 +159,27 @@ describe("mapRepoToGridRow", () => {
   });
 
   it("uses nulls for vulnerability fields when Dependabot data has no runtime/dev split", () => {
-    const repo = { ...uiRepo, runtimeAlerts: undefined, devAlerts: undefined, hasOpenRuntimeAlertOlderThan14Days: undefined };
+    const repo = {
+      ...uiRepo,
+      runtimeAlerts: undefined,
+      devAlerts: undefined,
+      hasOpenRuntimeAlertOlderThan14Days: undefined,
+    };
     const row = mapRepoToGridRow(repo);
 
-    for (const field of ["runtimeCritical", "runtimeHigh", "runtimeMedium", "runtimeLow", "runtimeTotal", "devCritical", "devHigh", "devMedium", "devLow", "devTotal", "hasRuntimeAlertOlderThan14Days"]) {
+    for (const field of [
+      "runtimeCritical",
+      "runtimeHigh",
+      "runtimeMedium",
+      "runtimeLow",
+      "runtimeTotal",
+      "devCritical",
+      "devHigh",
+      "devMedium",
+      "devLow",
+      "devTotal",
+      "hasRuntimeAlertOlderThan14Days",
+    ]) {
       expect.strictEqual(row[field], null, field);
     }
   });

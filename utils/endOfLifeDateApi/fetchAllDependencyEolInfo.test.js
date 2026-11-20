@@ -1,9 +1,6 @@
 import { describe, it } from "node:test";
 import expect from "node:assert";
-import {
-  fetchAllDependencyLifetimes,
-  saveAllDependencyLifetimes,
-} from "./fetchAllDependencyEolInfo.js";
+import { fetchAllDependencyLifetimes, saveAllDependencyLifetimes } from "./fetchAllDependencyEolInfo.js";
 
 const db = {
   getAllRepositories: () => ({}),

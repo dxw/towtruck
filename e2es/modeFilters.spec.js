@@ -49,9 +49,11 @@ test("the Only D+ button filters to repos tagged dxw-delivery-plus", async ({ pa
 });
 
 test("choosing a mode replaces the other mode and tag filters", async ({ page, baseURL }) => {
-  await page.goto(`${baseURL}/dxw?${filterQuery({
-    tags: { filterType: "text", operator: "OR", conditions: [modeFilter("publishing"), hasTag("wordpress-theme")] },
-  })}`);
+  await page.goto(
+    `${baseURL}/dxw?${filterQuery({
+      tags: { filterType: "text", operator: "OR", conditions: [modeFilter("publishing"), hasTag("wordpress-theme")] },
+    })}`,
+  );
 
   const repoNames = page.getByTestId("repo-grid").locator("[col-id='name'].ag-cell");
   const publishingFilter = page.getByRole("button", { name: "Only Publishing" });

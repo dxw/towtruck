@@ -9,12 +9,12 @@ const dbSchemaSql = [
     key TEXT NOT NULL,
     value JSONB,
     UNIQUE (scope, name, key)
-  );`
+  );`,
 ];
 
 const initialiseDatabase = (filename, options) => {
   const db = new Database(filename, options);
-  db.pragma('journal_mode = WAL');
+  db.pragma("journal_mode = WAL");
 
   const dbSchemaStatements = dbSchemaSql.map((sql) => db.prepare(sql));
 
@@ -23,14 +23,16 @@ const initialiseDatabase = (filename, options) => {
   })();
 
   // Saved configurations used to store filters as alertFilter/tag/mode, which are no longer supported
-  db.prepare(`DELETE FROM towtruck_data WHERE scope = 'saved-configuration' AND (
+  db.prepare(
+    `DELETE FROM towtruck_data WHERE scope = 'saved-configuration' AND (
     json_extract(value, '$.query.alertFilter') IS NOT NULL
     OR json_extract(value, '$.query.tag') IS NOT NULL
     OR json_extract(value, '$.query.mode') IS NOT NULL
-  );`).run();
+  );`,
+  ).run();
 
   return db;
-}
+};
 
 export class TowtruckDatabase {
   #db;
@@ -48,15 +50,25 @@ export class TowtruckDatabase {
   constructor(filename = process.env.DB_PATH ?? "./data/towtruck.db", options) {
     this.#db = initialiseDatabase(filename, options);
 
-    this.#saveStatement = this.#db.prepare("INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?) ON CONFLICT DO UPDATE SET value = excluded.value;");
+    this.#saveStatement = this.#db.prepare(
+      "INSERT INTO towtruck_data (scope, name, key, value) VALUES (?, ?, ?, ?) ON CONFLICT DO UPDATE SET value = excluded.value;",
+    );
     this.#getStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = ? AND name = ? AND key = ?;");
-    this.#getAllForNameStatement = this.#db.prepare("SELECT key, value FROM towtruck_data WHERE scope = ? AND name = ?;");
-    this.#getAllForNameLikeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ? AND name LIKE ?;")
+    this.#getAllForNameStatement = this.#db.prepare(
+      "SELECT key, value FROM towtruck_data WHERE scope = ? AND name = ?;",
+    );
+    this.#getAllForNameLikeStatement = this.#db.prepare(
+      "SELECT name, key, value FROM towtruck_data WHERE scope = ? AND name LIKE ?;",
+    );
     this.#getAllForScopeStatement = this.#db.prepare("SELECT name, key, value FROM towtruck_data WHERE scope = ?;");
     this.#deleteAllForScopeStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ?;");
     this.#deleteAllForNameStatement = this.#db.prepare("DELETE FROM towtruck_data WHERE scope = ? AND name = ?;");
-    this.#getAllConfigurationsForOrgStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? ORDER BY id ASC;");
-    this.#getAllConfigurationsForUserStatement = this.#db.prepare("SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? AND json_extract(value, '$.userEmail') = ? ORDER BY id ASC;");
+    this.#getAllConfigurationsForOrgStatement = this.#db.prepare(
+      "SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? ORDER BY id ASC;",
+    );
+    this.#getAllConfigurationsForUserStatement = this.#db.prepare(
+      "SELECT value FROM towtruck_data WHERE scope = 'saved-configuration' AND name LIKE ? AND json_extract(value, '$.userEmail') = ? ORDER BY id ASC;",
+    );
   }
 
   #save(scope, name, key, data) {
@@ -73,7 +85,7 @@ export class TowtruckDatabase {
     const rows = this.#getAllForNameStatement.all(scope, name);
 
     const result = {};
-    rows.forEach((row) => result[row.key] = JSON.parse(row.value));
+    rows.forEach((row) => (result[row.key] = JSON.parse(row.value)));
 
     return result;
   }
@@ -166,7 +178,14 @@ export class TowtruckDatabase {
 
   saveConfiguration(org, name, query, userEmail) {
     const id = randomUUID();
-    return this.#save("saved-configuration", `${org}/${id}`, "config", { id, name, org, query, userEmail, createdAt: new Date().toISOString() });
+    return this.#save("saved-configuration", `${org}/${id}`, "config", {
+      id,
+      name,
+      org,
+      query,
+      userEmail,
+      createdAt: new Date().toISOString(),
+    });
   }
 
   getAllSavedConfigurationsForOrg(org) {
@@ -181,7 +200,9 @@ export class TowtruckDatabase {
 
   deleteSavedConfiguration(org, id, userEmail) {
     const rawDb = this.#db;
-    const stmt = rawDb.prepare("DELETE FROM towtruck_data WHERE scope = 'saved-configuration' AND name = ? AND json_extract(value, '$.userEmail') = ?;");
+    const stmt = rawDb.prepare(
+      "DELETE FROM towtruck_data WHERE scope = 'saved-configuration' AND name = ? AND json_extract(value, '$.userEmail') = ?;",
+    );
     return stmt.run(`${org}/${id}`, userEmail);
   }
 
@@ -206,4 +227,4 @@ export class TowtruckDatabase {
   transaction(fn) {
     return this.#db.transaction(fn);
   }
-};
+}
