@@ -49,6 +49,21 @@
             </button>
             <span data-copy-status role="status" class="text-xs text-slate-700 dark:text-slate-200"></span>
 
+            <!-- Column chooser. The grid script fills in a checkbox per column and keeps them in sync with the grid. -->
+            <details data-column-chooser class="relative">
+              <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden {{ toggleClasses }} gap-1">
+                <i class="bx bx-columns" aria-hidden="true"></i>
+                Columns
+              </summary>
+              <div class="absolute left-0 z-10 mt-1 w-64 max-h-[60vh] overflow-y-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg shadow-lg p-3 space-y-2">
+                <div data-column-list class="space-y-1 text-sm"></div>
+                <button type="button" data-show-all-columns class="inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium transition-colors bg-slate-700 text-white border-slate-700 hover:bg-slate-600 dark:bg-slate-200 dark:text-slate-900 dark:border-slate-200 dark:hover:bg-slate-300">
+                  <i class="bx bx-show" aria-hidden="true"></i>
+                  Show all
+                </button>
+              </div>
+            </details>
+
             <!-- Save new config -->
             <details class="group/save relative ml-auto">
               <summary class="list-none cursor-pointer [&::-webkit-details-marker]:hidden inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium transition-colors bg-slate-200 text-slate-700 border-slate-400 hover:bg-slate-300 dark:bg-slate-800 dark:text-slate-200 dark:border-slate-600 dark:hover:bg-slate-700">
@@ -208,22 +223,18 @@
           return configurationQueryKeys.map((key) => params.get(key) ?? '').join('&');
         };
 
-        // Reflects the grid's filters in the filter buttons, the URL, and the saved configuration forms and links
-        const syncFilters = () => {
-          currentFilters = readFilters();
-          const { alertFilter, tags, mode } = currentFilters;
+        const hiddenColumnIds = () => hideableColumnIds.filter((id) => !grid.getColumn(id).isVisible());
 
-          for (const button of document.querySelectorAll('[data-alert-filter]')) button.ariaPressed = String(button.dataset.alertFilter === alertFilter);
-          for (const button of document.querySelectorAll('[data-mode]')) button.ariaPressed = String(button.dataset.mode === mode);
-          for (const button of document.querySelectorAll('[data-tag]')) button.ariaPressed = String(tags.includes(button.dataset.tag));
-
+        // Reflects the grid's filters and hidden columns in the URL, and the saved configuration forms and links
+        const syncUrl = () => {
           const url = new URL(window.location.href);
           const filterModel = grid.getFilterModel();
-          const hasFilters = Object.keys(filterModel).length > 0;
-          if (hasFilters) url.searchParams.set('filter', JSON.stringify(filterModel));
+          if (Object.keys(filterModel).length > 0) url.searchParams.set('filter', JSON.stringify(filterModel));
           else url.searchParams.delete('filter');
+          const hidden = hiddenColumnIds();
+          if (hidden.length > 0) url.searchParams.set('hidden', hidden.join(','));
+          else url.searchParams.delete('hidden');
           window.history.replaceState(null, '', url);
-          document.querySelector('[data-reset-filters]').hidden = !hasFilters;
 
           for (const input of document.querySelectorAll('form input[type=hidden]')) {
             input.value = url.searchParams.get(input.name) ?? '';
@@ -233,6 +244,26 @@
           for (const link of savedConfigurationLinks) link.ariaCurrent = String(queryFor(link.href) === queryFor(url));
           const clearLink = document.querySelector('[data-clear-configuration]');
           if (clearLink) clearLink.hidden = !savedConfigurationLinks.some((link) => link.ariaCurrent === 'true');
+        };
+
+        // Reflects the grid's filters in the filter buttons
+        const syncFilters = () => {
+          currentFilters = readFilters();
+          const { alertFilter, tags, mode } = currentFilters;
+
+          for (const button of document.querySelectorAll('[data-alert-filter]')) button.ariaPressed = String(button.dataset.alertFilter === alertFilter);
+          for (const button of document.querySelectorAll('[data-mode]')) button.ariaPressed = String(button.dataset.mode === mode);
+          for (const button of document.querySelectorAll('[data-tag]')) button.ariaPressed = String(tags.includes(button.dataset.tag));
+          document.querySelector('[data-reset-filters]').hidden = Object.keys(grid.getFilterModel()).length === 0;
+
+          syncUrl();
+        };
+
+        const syncColumns = () => {
+          for (const checkbox of document.querySelectorAll('[data-column-toggle]')) {
+            checkbox.checked = grid.getColumn(checkbox.dataset.columnToggle).isVisible();
+          }
+          syncUrl();
         };
 
         document.querySelector('[data-reset-filters]').addEventListener('click', () => grid.setFilterModel(null));
@@ -481,6 +512,54 @@
           numberColumn('openIssues', 'Open issues'),
         ];
 
+        const ALWAYS_VISIBLE = ['name'];
+        const columnId = (def) => def.colId ?? def.field;
+
+        const columnChoices = columnDefs.flatMap((def) => (def.children
+          ? def.children.map((child) => ({ id: columnId(child), headerName: child.headerName, group: def.headerName }))
+          : [{ id: columnId(def), headerName: def.headerName }]))
+          .filter(({ id }) => !ALWAYS_VISIBLE.includes(id));
+        const hideableColumnIds = columnChoices.map(({ id }) => id);
+
+        // Unknown or unhideable IDs are dropped so a stale or hand-edited link can't break the grid
+        const hiddenColumnsFromUrl = () => {
+          const requested = (new URL(window.location.href).searchParams.get('hidden') ?? '').split(',');
+          return hideableColumnIds.filter((id) => requested.includes(id));
+        };
+
+        // Hiding through initialState.columnVisibility would also reset Repo's pinning, so hide through the column definitions
+        const withHiddenColumns = (defs, hidden) => defs.map((def) => (def.children
+          ? { ...def, children: withHiddenColumns(def.children, hidden) }
+          : { ...def, initialHide: hidden.includes(columnId(def)) }));
+
+        const columnList = document.querySelector('[data-column-list]');
+        let currentGroup;
+        for (const { id, headerName, group } of columnChoices) {
+          if (group && group !== currentGroup) {
+            const heading = document.createElement('p');
+            heading.className = 'pt-1 text-xs font-semibold text-slate-500 dark:text-slate-400';
+            heading.textContent = group;
+            columnList.appendChild(heading);
+          }
+          currentGroup = group;
+
+          const label = document.createElement('label');
+          label.className = `flex items-center gap-2 cursor-pointer ${group ? 'pl-3' : ''}`;
+          const checkbox = document.createElement('input');
+          checkbox.type = 'checkbox';
+          checkbox.dataset.columnToggle = id;
+          checkbox.className = 'accent-slate-700 dark:accent-slate-300';
+          if (group) checkbox.ariaLabel = `${group} ${headerName}`;
+          label.append(checkbox, headerName);
+          columnList.appendChild(label);
+        }
+
+        columnList.addEventListener('change', (event) => {
+          const { columnToggle } = event.target.dataset;
+          if (columnToggle) grid.setColumnsVisible([columnToggle], event.target.checked);
+        });
+        document.querySelector('[data-show-all-columns]').addEventListener('click', () => grid.setColumnsVisible(hideableColumnIds, true));
+
         const theme = agGrid.themeQuartz
           .withParams({ fontFamily: 'inherit', fontSize: 13, headerFontWeight: 600, wrapperBorderRadius: 8 })
           .withParams({ accentColor: '#475569', browserColorScheme: 'light' }, 'light')
@@ -496,9 +575,10 @@
         grid = agGrid.createGrid(gridElement, {
           theme,
           rowData,
-          columnDefs,
+          columnDefs: withHiddenColumns(columnDefs, hiddenColumnsFromUrl()),
           initialState: { filter: { filterModel: filterModelFromUrl() } },
           onFilterChanged: syncFilters,
+          onColumnVisible: syncColumns,
           defaultColDef: { sortable: true, filter: true, resizable: true, wrapHeaderText: true, autoHeaderHeight: true },
           pagination: true,
           paginationPageSize: 50,
@@ -507,6 +587,7 @@
           overlayNoRowsTemplate: '<span class="italic text-slate-400">No repositories found.</span>',
         });
         syncFilters();
+        syncColumns();
       })();
     </script>
 {% endblock %}

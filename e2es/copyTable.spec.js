@@ -129,3 +129,13 @@ test("reports when clipboard access is unavailable", async ({ page }) => {
   await expect(page.getByRole("status")).toHaveText("Could not copy table. Check clipboard permissions and try again.");
   await expect(button).toBeEnabled();
 });
+
+test("copies only visible columns", async ({ page }) => {
+  await page.goto("/dxw?hidden=language,description");
+  await expect(page.locator("[col-id='name'].ag-cell")).toHaveCount(3);
+
+  const [, headerLine] = (await copyTable(page)).split("\r\n");
+  expect(headerLine).toMatch(/^"Repo"\t"Visibility"/);
+  expect(headerLine).not.toContain('"Language"');
+  expect(headerLine).not.toContain('"Description"');
+});

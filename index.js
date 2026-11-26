@@ -18,9 +18,9 @@ nunjucks.configure({
   watch: process.env.NODE_ENV !== "production" && process.env.NODE_ENV !== "test",
 });
 
-// Filters are applied client-side by the grid; these are kept in the URL so they can be saved.
-// `filter` holds the grid's filter model as JSON.
-const CONFIGURATION_QUERY_KEYS = ["sortBy", "sortDirection", "filter"];
+// Filters and column visibility are applied client-side by the grid; these are kept in the URL so they can be saved.
+// `filter` holds the grid's filter model as JSON, and `hidden` a comma-separated list of hidden column IDs.
+const CONFIGURATION_QUERY_KEYS = ["sortBy", "sortDirection", "filter", "hidden"];
 
 // Route params are URL-decoded, so the org has to be re-encoded before it goes back into a path
 const orgUrl = (org, query = {}) => {
