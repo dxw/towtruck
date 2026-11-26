@@ -12,7 +12,7 @@ const buildApp = () => {
     return null;
   }
 
-  const privateKey = Buffer.from(PRIVATE_KEY, 'base64').toString('ascii');
+  const privateKey = Buffer.from(PRIVATE_KEY, "base64").toString("ascii");
   const redirectUrl = `${REDIRECT_URL_BASE}/api/github/oauth/callback`;
 
   return new App({
@@ -22,7 +22,7 @@ const buildApp = () => {
       clientId: CLIENT_ID,
       clientSecret: CLIENT_SECRET,
       redirectUrl,
-      clientType: "github-app"
+      clientType: "github-app",
     },
     webhooks: {
       secret: WEBHOOK_SECRET,

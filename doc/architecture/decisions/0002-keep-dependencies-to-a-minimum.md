@@ -11,7 +11,7 @@ Accepted
 This project should make maintaining dxw's repos easier.
 It becomes self defeating if it needs a lot of maintainence.
 Javascript's depedency ecosystem often needs a lot of maintainence.
-To begin with the application is a simple dashboard.   
+To begin with the application is a simple dashboard.
 
 ## Decision
 

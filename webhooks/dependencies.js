@@ -36,11 +36,7 @@ export const handleEvent = async ({ payload, octokit }, db, apiClient) => {
 export const onPush = async (event) => {
   console.log(`Push to ${event.payload.repository.name}: ${event.payload.ref}`);
   if (isPushToDefaultBranch(event.payload)) {
-    return await handleEvent(
-      event,
-      new TowtruckDatabase(),
-      new EndOfLifeDateApiClient(),
-    );
+    return await handleEvent(event, new TowtruckDatabase(), new EndOfLifeDateApiClient());
   }
 };
 
@@ -52,14 +48,7 @@ export const onIssueEdited = async (event) => {
   console.log(
     `Issue #${event.payload.issue.number} updated in ${event.payload.repository.name}: ${event.payload.issue.title}`,
   );
-  if (
-    event.payload.issue.user.login === "renovate[bot]" &&
-    event.payload.issue.pull_request === undefined
-  ) {
-    return await handleEvent(
-      event,
-      new TowtruckDatabase(),
-      new EndOfLifeDateApiClient(),
-    );
+  if (event.payload.issue.user.login === "renovate[bot]" && event.payload.issue.pull_request === undefined) {
+    return await handleEvent(event, new TowtruckDatabase(), new EndOfLifeDateApiClient());
   }
 };

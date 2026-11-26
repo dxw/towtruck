@@ -10,10 +10,7 @@ describe("getDependencyState", () => {
 
     const result = getDependencyState(dependency, cycles);
 
-    expect.strictEqual(
-      result,
-      "unknown",
-    );
+    expect.strictEqual(result, "unknown");
   });
 
   it("should return 'endOfLife' when the dependency is for a cycle whose end-of-life date is in the past", () => {
@@ -31,10 +28,7 @@ describe("getDependencyState", () => {
 
     const result = getDependencyState(dependency, cycles);
 
-    expect.strictEqual(
-      result,
-      "endOfLife",
-    );
+    expect.strictEqual(result, "endOfLife");
   });
 
   it("should return 'majorUpdateAvailable' when the dependency is for a cycle that's not the most recent cycle", () => {
@@ -52,10 +46,7 @@ describe("getDependencyState", () => {
 
     const result = getDependencyState(dependency, cycles);
 
-    expect.strictEqual(
-      result,
-      "majorUpdateAvailable",
-    );
+    expect.strictEqual(result, "majorUpdateAvailable");
   });
 
   it("should return 'minorUpdateAvailable' when the dependency is for the latest cycle but the latest version string does not match", () => {
@@ -70,15 +61,12 @@ describe("getDependencyState", () => {
         cycle: "2",
         latest: "2.99.99",
         eol: "9999-01-01",
-      }
+      },
     ];
 
     const result = getDependencyState(dependency, cycles);
 
-    expect.strictEqual(
-      result,
-      "minorUpdateAvailable",
-    );
+    expect.strictEqual(result, "minorUpdateAvailable");
   });
 
   it("should return 'upToDate' when the dependency is for the latest available version", () => {
@@ -93,16 +81,13 @@ describe("getDependencyState", () => {
         cycle: "2",
         latest: "2.99.99",
         eol: "9999-01-01",
-      }
+      },
     ];
 
     const result = getDependencyState(dependency, cycles);
 
-    expect.strictEqual(
-      result,
-      "upToDate",
-    );
-  })
+    expect.strictEqual(result, "upToDate");
+  });
 });
 
 describe("getDependencyEndOfLifeDate", () => {
@@ -112,10 +97,7 @@ describe("getDependencyEndOfLifeDate", () => {
 
     const result = getDependencyEndOfLifeDate(dependency, cycles);
 
-    expect.strictEqual(
-      result,
-      undefined,
-    );
+    expect.strictEqual(result, undefined);
   });
 
   it("should return the end-of-life date from the correct cycle", () => {
@@ -133,9 +115,6 @@ describe("getDependencyEndOfLifeDate", () => {
 
     const result = getDependencyEndOfLifeDate(dependency, cycles);
 
-    expect.deepStrictEqual(
-      result,
-      new Date("2024-01-01"),
-    );
+    expect.deepStrictEqual(result, new Date("2024-01-01"));
   });
 });

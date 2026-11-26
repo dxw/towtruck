@@ -6,19 +6,20 @@
  */
 export const getOpenIssuesForRepo = async ({ octokit, repository }) => {
   return octokit
-    .request(repository.issues_url).then(handleIssuesApiResponse)
+    .request(repository.issues_url)
+    .then(handleIssuesApiResponse)
     .catch((error) => {
       console.warn(`[${repository.name}] Issues: ${error.message}`);
       return {};
-    });;;
+    });
 };
 
 const issueIsPullRequest = (issue) => issue.pull_request !== undefined;
-const issueIsBotIssue = (issue) => issue.user.login === "renovate[bot]"
+const issueIsBotIssue = (issue) => issue.user.login === "renovate[bot]";
 
 /**
  * Transforms the response from the repo issues endpoint into data relevant to Towtruck.
- * @param {any} {data} 
+ * @param {any} {data}
  * @returns
  */
 export const handleIssuesApiResponse = ({ data }) => {

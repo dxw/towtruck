@@ -32,7 +32,10 @@ export const getCommitsForRepo = async ({ octokit, repository }) => {
       const commitsUrl = repository.commits_url.replace("{/sha}", "");
       const { data } = await octokit.request(`${commitsUrl}?per_page=${PER_PAGE}${pageQuery}`);
       commits.push(...data);
-      if (data.length < PER_PAGE || commits.filter((commit) => !commitIsFromBot(commit)).length >= NON_BOT_COMMIT_SAMPLE_SIZE) {
+      if (
+        data.length < PER_PAGE ||
+        commits.filter((commit) => !commitIsFromBot(commit)).length >= NON_BOT_COMMIT_SAMPLE_SIZE
+      ) {
         break;
       }
     } catch (error) {

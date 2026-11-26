@@ -17,7 +17,7 @@ test("has dependency info", async ({ page, baseURL }) => {
       topAscending: "govuk-blogs",
       topDescending: "optionparser",
     },
-    page
+    page,
   );
 
   await testSortingForColumn(
@@ -28,7 +28,7 @@ test("has dependency info", async ({ page, baseURL }) => {
       topAscending: "optionparser",
       topDescending: "govuk-blogs",
     },
-    page
+    page,
   );
 
   await testSortingForColumn(
@@ -39,7 +39,7 @@ test("has dependency info", async ({ page, baseURL }) => {
       topAscending: "optionparser",
       topDescending: "php-missing",
     },
-    page
+    page,
   );
 
   await testSortingForColumn(
@@ -50,7 +50,7 @@ test("has dependency info", async ({ page, baseURL }) => {
       topAscending: "optionparser",
       topDescending: "govuk-blogs",
     },
-    page
+    page,
   );
 
   await testSortingForColumn(
@@ -61,14 +61,11 @@ test("has dependency info", async ({ page, baseURL }) => {
       topAscending: "php-missing",
       topDescending: "govuk-blogs",
     },
-    page
+    page,
   );
 });
 
-const testSortingForColumn = async (
-  { ascValue, descValue, topAscending, topDescending },
-  page
-) => {
+const testSortingForColumn = async ({ ascValue, descValue, topAscending, topDescending }, page) => {
   await page.goto(`/dxw?sortBy=${ascValue}&sortDirection=asc`);
   await assertFirstRow(topAscending, page);
 
@@ -118,12 +115,14 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
     "Oldest open issue",
     "Open issues",
   ]) {
-    await expect(grid.locator(".ag-header-cell-text, .ag-header-group-text", { hasText: header }).first()).toBeAttached();
+    await expect(
+      grid.locator(".ag-header-cell-text, .ag-header-group-text", { hasText: header }).first(),
+    ).toBeAttached();
   }
 
-  const columnIds = await grid.locator(".ag-header-cell").evaluateAll(
-    (headers) => headers.map((header) => header.getAttribute("col-id"))
-  );
+  const columnIds = await grid
+    .locator(".ag-header-cell")
+    .evaluateAll((headers) => headers.map((header) => header.getAttribute("col-id")));
   expect(columnIds).toEqual([
     "name",
     "description",
@@ -163,24 +162,31 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
 
   await expect(grid.getByRole("link", { name: "optionparser" })).toHaveAttribute("href", /github\.com/);
   await expect(
-    grid.locator("[col-id='description'].ag-cell", { hasText: "Command-line option parser for PHP" })
+    grid.locator("[col-id='description'].ag-cell", { hasText: "Command-line option parser for PHP" }),
   ).toBeVisible();
 
   // The pinned repo column is rendered in a separate row element, so match the rows up by index
   const visibilityFor = async (repoName) => {
-    const rowIndex = await grid.locator(".ag-row", { has: page.getByRole("link", { name: repoName }) }).getAttribute("row-index");
+    const rowIndex = await grid
+      .locator(".ag-row", { has: page.getByRole("link", { name: repoName }) })
+      .getAttribute("row-index");
     return grid.locator(`.ag-row[row-index='${rowIndex}'] [col-id='visibility']`);
   };
   await expect(await visibilityFor("optionparser")).toHaveText("Public");
   await expect(await visibilityFor("php-missing")).toHaveText("Private");
 
   const ownerFor = async (repoName) => {
-    const rowIndex = await grid.locator(".ag-row", { has: page.getByRole("link", { name: repoName }) }).getAttribute("row-index");
+    const rowIndex = await grid
+      .locator(".ag-row", { has: page.getByRole("link", { name: repoName }) })
+      .getAttribute("row-index");
     return grid.locator(`.ag-row[row-index='${rowIndex}'] [col-id='owner']`);
   };
   const govukBlogsOwner = await ownerFor("govuk-blogs");
   await expect(govukBlogsOwner).toHaveText("Ada Lovelace");
-  await expect(govukBlogsOwner.getByRole("link", { name: "Ada Lovelace" })).toHaveAttribute("href", "https://github.com/ada");
+  await expect(govukBlogsOwner.getByRole("link", { name: "Ada Lovelace" })).toHaveAttribute(
+    "href",
+    "https://github.com/ada",
+  );
   await expect(await ownerFor("php-missing")).toHaveText("Grace Hopper");
   await expect((await ownerFor("php-missing")).getByRole("link")).toHaveCount(0);
   await expect(await ownerFor("optionparser")).toHaveText("\u2014");
@@ -196,10 +202,14 @@ test("shows every repo in an AG Grid table with the expected columns", async ({ 
 });
 
 const expectColumnFiltered = (page, colId) =>
-  expect(page.getByTestId("repo-grid").locator(`.ag-header-cell[col-id='${colId}']`)).toHaveClass(/ag-header-cell-filtered/);
+  expect(page.getByTestId("repo-grid").locator(`.ag-header-cell[col-id='${colId}']`)).toHaveClass(
+    /ag-header-cell-filtered/,
+  );
 
 const expectColumnNotFiltered = (page, colId) =>
-  expect(page.getByTestId("repo-grid").locator(`.ag-header-cell[col-id='${colId}']`)).not.toHaveClass(/ag-header-cell-filtered/);
+  expect(page.getByTestId("repo-grid").locator(`.ag-header-cell[col-id='${colId}']`)).not.toHaveClass(
+    /ag-header-cell-filtered/,
+  );
 
 test("applies the filters in the URL to the table", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw?${filterQuery({ tags: hasTag("wordpress-theme") })}`);
@@ -222,7 +232,9 @@ test("keeps filters set from a column's menu in the URL", async ({ page, baseURL
   await page.locator(".ag-filter").getByRole("textbox").first().fill("govuk-blogs");
 
   await expect(repoNames).toHaveText(["govuk-blogs"]);
-  await expect.poll(() => urlFilterModel(page)).toEqual({ name: { filterType: "text", type: "contains", filter: "govuk-blogs" } });
+  await expect
+    .poll(() => urlFilterModel(page))
+    .toEqual({ name: { filterType: "text", type: "contains", filter: "govuk-blogs" } });
 
   await page.reload();
   await expect(repoNames).toHaveText(["govuk-blogs"]);
@@ -287,9 +299,11 @@ test("the No tags button toggles filtering to repos without tags", async ({ page
 
   // Every seeded test repo has tags, so this shouldn't add any repos to the selected tag's
   await untaggedFilter.click();
-  await expect.poll(() => urlFilterModel(page)).toEqual({
-    tags: { filterType: "text", operator: "OR", conditions: [hasTag("wordpress-theme"), noTags] },
-  });
+  await expect
+    .poll(() => urlFilterModel(page))
+    .toEqual({
+      tags: { filterType: "text", operator: "OR", conditions: [hasTag("wordpress-theme"), noTags] },
+    });
   await expect(untaggedFilter).toHaveAttribute("aria-pressed", "true");
   await expect(repoNames).toHaveText(["govuk-blogs"]);
 
@@ -303,12 +317,17 @@ test("the No tags button toggles filtering to repos without tags", async ({ page
   await expect(repoNames).toHaveCount(3);
 });
 
-test("the Reset filters button clears every filter and is only shown while there are filters", async ({ page, baseURL }) => {
-  await page.goto(`${baseURL}/dxw?${filterQuery({
-    runtimeTotal: HAS_ALERTS,
-    tags: hasTag("wordpress-theme"),
-    name: { filterType: "text", type: "contains", filter: "govuk" },
-  })}`);
+test("the Reset filters button clears every filter and is only shown while there are filters", async ({
+  page,
+  baseURL,
+}) => {
+  await page.goto(
+    `${baseURL}/dxw?${filterQuery({
+      runtimeTotal: HAS_ALERTS,
+      tags: hasTag("wordpress-theme"),
+      name: { filterType: "text", type: "contains", filter: "govuk" },
+    })}`,
+  );
 
   const repoNames = page.getByTestId("repo-grid").locator("[col-id='name'].ag-cell");
   const resetFilters = page.getByTestId("filter-row").getByRole("button", { name: "Reset filters" });
@@ -322,7 +341,14 @@ test("the Reset filters button clears every filter and is only shown while there
   await expect(resetFilters).toBeHidden();
 });
 
-const DATE_COLUMN_IDS = ["oldestOpenPrOpenedAt", "updatedAt", "mostRecentNonBotCommitAt", "mostRecentPrOpenedAt", "mostRecentIssueOpenedAt", "oldestOpenIssueOpenedAt"];
+const DATE_COLUMN_IDS = [
+  "oldestOpenPrOpenedAt",
+  "updatedAt",
+  "mostRecentNonBotCommitAt",
+  "mostRecentPrOpenedAt",
+  "mostRecentIssueOpenedAt",
+  "oldestOpenIssueOpenedAt",
+];
 
 test("shows dates in the table as MMM YYYY", async ({ page, baseURL }) => {
   await page.goto(`${baseURL}/dxw`);
@@ -363,7 +389,9 @@ test("shows the date of the most recent non-bot commit", async ({ page, baseURL 
   await expect(grid.locator(".ag-root")).toBeVisible();
   // The pinned repo column is rendered in a separate row element, so match the rows up by index
   const commitDateFor = async (repoName) => {
-    const rowIndex = await grid.locator(".ag-row", { has: page.getByRole("link", { name: repoName }) }).getAttribute("row-index");
+    const rowIndex = await grid
+      .locator(".ag-row", { has: page.getByRole("link", { name: repoName }) })
+      .getAttribute("row-index");
     return grid.locator(`.ag-row[row-index='${rowIndex}'] [col-id='mostRecentNonBotCommitAt']`);
   };
 

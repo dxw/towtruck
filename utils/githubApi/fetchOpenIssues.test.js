@@ -26,7 +26,7 @@ describe("handleIssuesApiResponse", () => {
       expect.deepEqual(actual.mostRecentIssueOpenedAt, new Date(openIssue.created_at));
     });
 
-    it ("returns the latest value of created_at among all elements in the list", () => {
+    it("returns the latest value of created_at among all elements in the list", () => {
       const issue1 = { created_at: "2024-01-01T12:34:56Z", user: { login: "dan" } };
       const issue2 = { created_at: "2024-02-02T12:34:56Z", user: { login: "dan" } };
 
@@ -44,7 +44,7 @@ describe("handleIssuesApiResponse", () => {
     });
 
     it("returns null if there are no open issues", () => {
-      const closedIssue = { created_at: "2024-01-01T12:34:56Z", state: "closed", user: { login: "dan" } }
+      const closedIssue = { created_at: "2024-01-01T12:34:56Z", state: "closed", user: { login: "dan" } };
       const actual = handleIssuesApiResponse({ data: [closedIssue] });
 
       expect.deepEqual(actual.oldestOpenIssueOpenedAt, null);
@@ -59,14 +59,19 @@ describe("handleIssuesApiResponse", () => {
     });
 
     it("ignores issues that are pull requests", () => {
-      const pullRequest = { created_at: "2023-01-01T12:34:56Z", state: "open", user: { login: "dan" }, pull_request: {} };
+      const pullRequest = {
+        created_at: "2023-01-01T12:34:56Z",
+        state: "open",
+        user: { login: "dan" },
+        pull_request: {},
+      };
       const openIssue = { created_at: "2024-01-01T12:34:56Z", state: "open", user: { login: "dan" } };
       const actual = handleIssuesApiResponse({ data: [pullRequest, openIssue] });
 
       expect.deepEqual(actual.oldestOpenIssueOpenedAt, new Date(openIssue.created_at));
     });
 
-    it ("returns the earliest value of created_at among all elements in the list with a state of 'open'", () => {
+    it("returns the earliest value of created_at among all elements in the list with a state of 'open'", () => {
       const closedIssue = { created_at: "2023-12-31T12:34:56Z", state: "closed", user: { login: "dan" } };
       const openIssue1 = { created_at: "2024-01-01T12:34:56Z", state: "open", user: { login: "dan" } };
       const openIssue2 = { created_at: "2024-02-02T12:34:56Z", state: "open", user: { login: "dan" } };

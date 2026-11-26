@@ -98,14 +98,11 @@ describe("sortByType", () => {
       { name: "Repo 3", criticalSeverityAlerts: 5 },
     ];
 
-    expect.deepEqual(
-      sortByType(reposToSort, "asc", "criticalSeverityAlerts"),
-      [
-        { name: "Repo 2", criticalSeverityAlerts: 0 },
-        { name: "Repo 1", criticalSeverityAlerts: 2 },
-        { name: "Repo 3", criticalSeverityAlerts: 5 },
-      ]
-    );
+    expect.deepEqual(sortByType(reposToSort, "asc", "criticalSeverityAlerts"), [
+      { name: "Repo 2", criticalSeverityAlerts: 0 },
+      { name: "Repo 1", criticalSeverityAlerts: 2 },
+      { name: "Repo 3", criticalSeverityAlerts: 5 },
+    ]);
   });
 
   it("sorts the repos by number of total open alerts", () => {
@@ -115,14 +112,11 @@ describe("sortByType", () => {
       { name: "Repo 3", totalOpenAlerts: 7 },
     ];
 
-    expect.deepEqual(
-      sortByType(reposToSort, "desc", "totalOpenAlerts"),
-      [
-        { name: "Repo 3", totalOpenAlerts: 7 },
-        { name: "Repo 1", totalOpenAlerts: 3 },
-        { name: "Repo 2", totalOpenAlerts: 1 },
-      ]
-    );
+    expect.deepEqual(sortByType(reposToSort, "desc", "totalOpenAlerts"), [
+      { name: "Repo 3", totalOpenAlerts: 7 },
+      { name: "Repo 1", totalOpenAlerts: 3 },
+      { name: "Repo 2", totalOpenAlerts: 1 },
+    ]);
   });
 
   it("sorts the repos by number of open PRs", () => {
@@ -134,7 +128,7 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "asc", "openPrCount"),
-      sortByNumericValue(reposToSort, "asc", "openPrCount")
+      sortByNumericValue(reposToSort, "asc", "openPrCount"),
     );
   });
 
@@ -147,7 +141,7 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "asc", "openIssues"),
-      sortByNumericValue(reposToSort, "asc", "openIssues")
+      sortByNumericValue(reposToSort, "asc", "openIssues"),
     );
   });
 
@@ -170,7 +164,7 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "asc", "updatedAt"),
-      sortByISO8601Timestamp(reposToSort, "asc", "updatedAtISO8601")
+      sortByISO8601Timestamp(reposToSort, "asc", "updatedAtISO8601"),
     );
   });
 
@@ -183,7 +177,7 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "asc", "mostRecentPrOpenedAt"),
-      sortByISO8601Timestamp(reposToSort, "asc", "mostRecentPrOpenedAtISO8601")
+      sortByISO8601Timestamp(reposToSort, "asc", "mostRecentPrOpenedAtISO8601"),
     );
   });
 
@@ -196,7 +190,7 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "asc", "oldestOpenPrOpenedAt"),
-      sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenPrOpenedAtISO8601")
+      sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenPrOpenedAtISO8601"),
     );
   });
 
@@ -209,7 +203,7 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "desc", "mostRecentNonBotCommitAt").map((repo) => repo.name),
-      ["Repo 3", "Repo 1", "Repo 2"]
+      ["Repo 3", "Repo 1", "Repo 2"],
     );
   });
 
@@ -222,7 +216,7 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "asc", "mostRecentIssueOpenedAt"),
-      sortByISO8601Timestamp(reposToSort, "asc", "mostRecentIssueOpenedAtISO8601")
+      sortByISO8601Timestamp(reposToSort, "asc", "mostRecentIssueOpenedAtISO8601"),
     );
   });
 
@@ -235,7 +229,7 @@ describe("sortByType", () => {
 
     expect.deepEqual(
       sortByType(reposToSort, "asc", "oldestOpenIssueOpenedAt"),
-      sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenIssueOpenedAtISO8601")
+      sortByISO8601Timestamp(reposToSort, "asc", "oldestOpenIssueOpenedAtISO8601"),
     );
   });
 });

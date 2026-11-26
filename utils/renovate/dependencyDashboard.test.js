@@ -25,17 +25,18 @@ describe("handleIssuesApiResponse", () => {
           user: {
             login: "renovate[bot]",
           },
-          body: '# Dependency Dashboard\n'
-            + 'Here\'s some things in the preamble that should not be picked up:\n'
-            + '`fake-dependency`, `another-fake-dependency`\n'
-            + '\n'
-            + '## Detected dependencies\n'
-            + '- `libquux v4.1.1.rc4`\n'
-            + '- `@xyzzy/utils "~> 22.04 Questing Quokka"`\n'
-            + '\n'
-            + 'Here\'s some more:\n'
-            + '- `baz-framework ^0.1`\n'
-            + '---',
+          body:
+            "# Dependency Dashboard\n" +
+            "Here's some things in the preamble that should not be picked up:\n" +
+            "`fake-dependency`, `another-fake-dependency`\n" +
+            "\n" +
+            "## Detected dependencies\n" +
+            "- `libquux v4.1.1.rc4`\n" +
+            '- `@xyzzy/utils "~> 22.04 Questing Quokka"`\n' +
+            "\n" +
+            "Here's some more:\n" +
+            "- `baz-framework ^0.1`\n" +
+            "---",
         },
       ],
     };
@@ -46,10 +47,7 @@ describe("handleIssuesApiResponse", () => {
       new Dependency("baz-framework", "^0.1"),
     ];
 
-    expect.deepEqual(
-      handleIssuesApiResponse(issuesApiResponse),
-      expectedDependencies
-    );
+    expect.deepEqual(handleIssuesApiResponse(issuesApiResponse), expectedDependencies);
   });
 
   it("should return an empty list when there's no Renovate Dependency Dashboard", async () => {
@@ -74,10 +72,7 @@ describe("handleIssuesApiResponse", () => {
 
     const expectedDependencies = [];
 
-    expect.deepEqual(
-      handleIssuesApiResponse(issuesApiResponse),
-      expectedDependencies
-    );
+    expect.deepEqual(handleIssuesApiResponse(issuesApiResponse), expectedDependencies);
   });
 
   it("should extract dependencies from the new Renovate Dashboard format with HTML details blocks", async () => {
@@ -87,47 +82,48 @@ describe("handleIssuesApiResponse", () => {
           user: {
             login: "renovate[bot]",
           },
-          body: '# Dependency Dashboard\n'
-            + 'This issue lists Renovate updates and detected dependencies.\n'
-            + '\n'
-            + '## Detected Dependencies\n'
-            + '\n'
-            + '<details><summary>npm (1)</summary>\n'
-            + '<blockquote>\n'
-            + '<details><summary>package.json (3)</summary>\n'
-            + '\n'
-            + ' - `@octokit/app ^16.0.0`\n'
-            + ' - `express ^5.0.0`\n'
-            + ' - `chokidar 3.6.0`\n'
-            + '\n'
-            + '</details>\n'
-            + '</blockquote>\n'
-            + '</details>\n'
-            + '\n'
-            + '<details><summary>github-actions (1)</summary>\n'
-            + '<blockquote>\n'
-            + '<details><summary>.github/workflows/test.yml (2)</summary>\n'
-            + '\n'
-            + ' - `actions/checkout v7@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0`\n'
-            + ' - `actions/setup-node v6@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e`\n'
-            + '\n'
-            + '</details>\n'
-            + '</blockquote>\n'
-            + '</details>\n'
-            + '\n'
-            + '<details><summary>dockerfile (1)</summary>\n'
-            + '<blockquote>\n'
-            + '<details><summary>Dockerfile (1)</summary>\n'
-            + '\n'
-            + ' - `node 24.18.0-slim@sha256:abc123`\n'
-            + '\n'
-            + '</details>\n'
-            + '</blockquote>\n'
-            + '</details>\n'
-            + '\n'
-            + '---\n'
-            + '\n'
-            + '- [ ] <!-- manual job -->Check this box to trigger a request for Renovate to run again on this repository\n',
+          body:
+            "# Dependency Dashboard\n" +
+            "This issue lists Renovate updates and detected dependencies.\n" +
+            "\n" +
+            "## Detected Dependencies\n" +
+            "\n" +
+            "<details><summary>npm (1)</summary>\n" +
+            "<blockquote>\n" +
+            "<details><summary>package.json (3)</summary>\n" +
+            "\n" +
+            " - `@octokit/app ^16.0.0`\n" +
+            " - `express ^5.0.0`\n" +
+            " - `chokidar 3.6.0`\n" +
+            "\n" +
+            "</details>\n" +
+            "</blockquote>\n" +
+            "</details>\n" +
+            "\n" +
+            "<details><summary>github-actions (1)</summary>\n" +
+            "<blockquote>\n" +
+            "<details><summary>.github/workflows/test.yml (2)</summary>\n" +
+            "\n" +
+            " - `actions/checkout v7@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0`\n" +
+            " - `actions/setup-node v6@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e`\n" +
+            "\n" +
+            "</details>\n" +
+            "</blockquote>\n" +
+            "</details>\n" +
+            "\n" +
+            "<details><summary>dockerfile (1)</summary>\n" +
+            "<blockquote>\n" +
+            "<details><summary>Dockerfile (1)</summary>\n" +
+            "\n" +
+            " - `node 24.18.0-slim@sha256:abc123`\n" +
+            "\n" +
+            "</details>\n" +
+            "</blockquote>\n" +
+            "</details>\n" +
+            "\n" +
+            "---\n" +
+            "\n" +
+            "- [ ] <!-- manual job -->Check this box to trigger a request for Renovate to run again on this repository\n",
         },
       ],
     };
@@ -141,9 +137,6 @@ describe("handleIssuesApiResponse", () => {
       new Dependency("node", "24.18.0-slim"),
     ];
 
-    expect.deepEqual(
-      handleIssuesApiResponse(issuesApiResponse),
-      expectedDependencies
-    );
+    expect.deepEqual(handleIssuesApiResponse(issuesApiResponse), expectedDependencies);
   });
 });

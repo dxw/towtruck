@@ -9,15 +9,18 @@ export const getOpenPRsForRepo = async ({ octokit, repository }) => {
 
   return Promise.all([
     octokit.request(repository.pulls_url).then(handlePrsApiResponse),
-    octokit.request(`${pullsUrl}?state=closed&sort=updated&direction=desc&per_page=100`)
+    octokit
+      .request(`${pullsUrl}?state=closed&sort=updated&direction=desc&per_page=100`)
       .then(({ data }) => handleClosedBotPrsResponse(data)),
-  ]).then(([openPrInfo, closedBotPrInfo]) => ({
-    ...openPrInfo,
-    ...closedBotPrInfo,
-  })).catch((error) => {
-    console.warn(`[${repository.name}] Pull requests: ${error.message}`);
-    return {};
-  });
+  ])
+    .then(([openPrInfo, closedBotPrInfo]) => ({
+      ...openPrInfo,
+      ...closedBotPrInfo,
+    }))
+    .catch((error) => {
+      console.warn(`[${repository.name}] Pull requests: ${error.message}`);
+      return {};
+    });
 };
 
 const depdencyUpdateBots = ["renovate[bot]", "dependabot[bot]"];

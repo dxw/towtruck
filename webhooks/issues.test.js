@@ -35,9 +35,7 @@ describe("handleEvent", () => {
       },
     };
 
-    t.mock.method(octokit, "request", async (url) =>
-      Promise.resolve(responses[url]),
-    );
+    t.mock.method(octokit, "request", async (url) => Promise.resolve(responses[url]));
     t.mock.method(db, "saveToRepository");
 
     const payload = {
